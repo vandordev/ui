@@ -50,7 +50,9 @@ Use your project's configured UI alias if it differs from `@/components/ui`.
 
 Press and hold a Button in the playground to try the scale feedback. Pointer presses and keyboard Enter presses use Motion's `whileTap` gesture. The scale transition takes `0.12` seconds and returns on release or cancellation, including when using `asChild` with a link.
 
-Disabled buttons do not animate. The press animation is also disabled when the user prefers reduced motion. CSS color and focus transitions remain separate from Motion's transform animation.
+Hover changes to background, text, border, and focus shadow transition smoothly over `200ms` with ease-out timing. These CSS transitions remain separate from Motion's press animation, so the scale feedback stays responsive.
+
+Disabled buttons do not animate. Both press feedback and CSS transitions are disabled when the user prefers reduced motion.
 
 To disable press feedback on an individual Button, pass `whileTap={false}`. Motion animation props, including `whileTap` and `transition`, are supported. Animation and drag callbacks use Motion's API rather than the corresponding native DOM animation/drag events.
 
