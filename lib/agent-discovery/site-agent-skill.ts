@@ -8,7 +8,7 @@ export const SITE_AGENT_SKILL_MD = `# ${SITE.NAME}
 
 ## Summary
 
-Help users discover, inspect, and install React components from the public ${SITE.NAME} shadcn registry and its documentation site. The registry currently contains a development placeholder, not a production-ready component.
+Help users discover, inspect, and install React components from the public ${SITE.NAME} shadcn registry and its documentation site. The first pilot is the standard shadcn Button (new-york + Radix), without Vandor-specific customizations. A development placeholder is also retained separately.
 
 ## Registry
 
@@ -22,7 +22,7 @@ This site is a shadcn-compatible registry. For MCP workflows, use the maintained
 ## Install
 
 \`\`\`bash
-npx shadcn@latest add ${SITE.URL}/r/your-component.json
+npx shadcn@latest add ${SITE.URL}/r/button.json
 \`\`\`
 
 Prefer following the on-site installation guide: ${ROUTES.DOCS_INSTALLATION}

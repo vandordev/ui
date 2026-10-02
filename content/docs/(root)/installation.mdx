@@ -15,23 +15,25 @@ See the [shadcn installation guide](https://ui.shadcn.com/docs/installation) for
 
 ## Install a Component
 
-Install a registry item using its published JSON URL. The registry currently includes a development placeholder, `your-component`, for verifying installation:
+Install a registry item using its published JSON URL. Start with the standard shadcn Button baseline:
 
 ```bash
-pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/your-component.json
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
 ```
 
 The CLI copies the component source into your project. You can edit the installed file directly.
 
 ```tsx
-import { YourComponent } from "@/components/ui/your-component";
+import { Button } from "@/components/ui/button";
 
 export function Demo() {
-  return <YourComponent />;
+  return <Button variant="outline">Button</Button>;
 }
 ```
 
 The import path above assumes the default `@/components/ui` alias. Use your project's configured UI alias if it differs.
+
+If your project already has a Button, review the CLI's overwrite prompt before replacing it. See the [Button documentation](/docs/components/button) for variants, sizes, and source code.
 
 ## Develop Vandor UI Locally
 

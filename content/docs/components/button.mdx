@@ -1,0 +1,101 @@
+---
+title: Button
+description: The standard shadcn Button, ready for the first Vandor UI pilot.
+---
+
+import { ButtonDemo } from "@/examples/button-demo";
+import { ButtonVariants } from "@/examples/button-variants";
+import { ButtonSizes } from "@/examples/button-sizes";
+import { ButtonIcon } from "@/examples/button-icon";
+import { ButtonDisabled } from "@/examples/button-disabled";
+import { ButtonAsChild } from "@/examples/button-as-child";
+
+This is the official shadcn Button baseline for the **new-york** style and **Radix** primitives. Its variants, sizes, focus styles, and `asChild` behavior are unchanged. The `cn` import uses the standard project helper path, and code formatting follows this repository's conventions.
+
+This registry component does not include the audio or haptic feedback used by the website's internal Button. Vandor-specific customizations will be explored after this baseline.
+
+<ComponentPreview name="button-demo" title="button-demo.tsx">
+  <div className="flex flex-wrap items-center justify-center gap-2 rounded-md border p-6">
+    <ButtonDemo />
+  </div>
+</ComponentPreview>
+
+## Installation
+
+Initialize shadcn in your React project, then install the Button from the Vandor UI registry:
+
+```bash
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
+```
+
+The registry declares `class-variance-authority`, `radix-ui`, and shadcn's `utils` helper as dependencies. The Button uses your project's existing shadcn theme tokens.
+
+The default installation target is `components/ui/button.tsx`. If you already have a Button there, review the CLI's overwrite prompt before replacing local customizations.
+
+## Usage
+
+```tsx
+import { Button } from "@/components/ui/button";
+
+export function Demo() {
+  return <Button variant="outline">Button</Button>;
+}
+```
+
+Use your project's configured UI alias if it differs from `@/components/ui`.
+
+## Variants
+
+The six built-in variants are `default`, `secondary`, `outline`, `ghost`, `destructive`, and `link`.
+
+<ComponentPreview name="button-variants" title="button-variants.tsx">
+  <div className="rounded-md border p-6">
+    <ButtonVariants />
+  </div>
+</ComponentPreview>
+
+## Sizes
+
+Use `xs`, `sm`, `default`, or `lg` for text buttons. Icon-only buttons use `icon-xs`, `icon-sm`, `icon`, or `icon-lg`. Give icon-only buttons an accessible label.
+
+<ComponentPreview name="button-sizes" title="button-sizes.tsx">
+  <div className="rounded-md border p-6">
+    <ButtonSizes />
+  </div>
+</ComponentPreview>
+
+## With Icons
+
+Use `data-icon="inline-start"` or `data-icon="inline-end"` to indicate an icon's position. Icon sizing is handled by the Button.
+
+<ComponentPreview name="button-icon" title="button-icon.tsx">
+  <div className="rounded-md border p-6">
+    <ButtonIcon />
+  </div>
+</ComponentPreview>
+
+## Disabled
+
+Use the native `disabled` prop to prevent interaction.
+
+<ComponentPreview name="button-disabled" title="button-disabled.tsx">
+  <div className="rounded-md border p-6">
+    <ButtonDisabled />
+  </div>
+</ComponentPreview>
+
+## As Child
+
+Use `asChild` to style a link without nesting it inside a button. The child retains its native link semantics. Use this for navigation, not the `variant="link"` appearance alone.
+
+<ComponentPreview name="button-as-child" title="button-as-child.tsx">
+  <div className="rounded-md border p-6">
+    <ButtonAsChild />
+  </div>
+</ComponentPreview>
+
+## Source
+
+<ComponentSource name="button" title="button.tsx" />
+
+For upstream usage and guidance, see the [shadcn Button documentation](https://ui.shadcn.com/docs/components/radix/button).

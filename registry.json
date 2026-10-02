@@ -3,6 +3,21 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "button",
+      "type": "registry:ui",
+      "title": "Button",
+      "description": "The standard shadcn Button using the new-york style and Radix primitives, without Vandor-specific customizations.",
+      "dependencies": ["class-variance-authority", "radix-ui"],
+      "registryDependencies": ["utils"],
+      "files": [
+        {
+          "path": "registry/new-york/button.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/button.tsx"
+        }
+      ]
+    },
+    {
       "name": "your-component",
       "type": "registry:ui",
       "title": "Your Component",
