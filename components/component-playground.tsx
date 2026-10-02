@@ -8,9 +8,13 @@ import { CopyButton } from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import type { PlaygroundValues, PropDefinition } from "@/lib/playground";
 
@@ -91,23 +95,26 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
               );
             }
             return (
-              <div
-                className="flex flex-col gap-2 text-sm [&_[data-slot=native-select-wrapper]]:w-full"
-                key={name}
-              >
+              <div className="flex flex-col gap-2 text-sm" key={name}>
                 <label htmlFor={controlId}>{control.label}</label>
                 {control.kind === "select" ? (
-                  <NativeSelect
-                    id={controlId}
+                  <Select
                     value={String(values[name])}
-                    onChange={(event) => updateValue(name, event.target.value)}
+                    onValueChange={(value) => updateValue(name, value)}
                   >
-                    {control.options.map((option) => (
-                      <NativeSelectOption value={option} key={option}>
-                        {option}
-                      </NativeSelectOption>
-                    ))}
-                  </NativeSelect>
+                    <SelectTrigger id={controlId} className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent position="popper" align="start">
+                      <SelectGroup>
+                        {control.options.map((option) => (
+                          <SelectItem value={option} key={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 ) : (
                   <Input
                     id={controlId}
