@@ -1,3 +1,4 @@
+import { BRAND_ASSETS } from "@/constants/brand";
 import { LINK } from "@/constants/links";
 import { ROUTES } from "@/constants/routes";
 import { SITE } from "@/constants/site";
@@ -62,7 +63,7 @@ export const OrganizationJsonLd = () => (
     data={{
       "@context": "https://schema.org",
       "@type": "Organization",
-      logo: SITE.OG_IMAGE,
+      logo: `${SITE.URL}${BRAND_ASSETS.logo}`,
       name: SITE.NAME,
       sameAs: [LINK.GITHUB, LINK.PORTFOLIO],
       url: SITE.URL,

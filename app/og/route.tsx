@@ -1,12 +1,13 @@
 import { ImageResponse } from "next/og";
 
-import { LogoMark } from "@/components/logo";
 import { SITE } from "@/constants/site";
+import { getLogoDataUrl } from "@/lib/brand-assets";
 
-export const GET = (request: Request) => {
+export const GET = async (request: Request) => {
   const { searchParams } = new URL(request.url);
   const title = searchParams.get("title") || SITE.NAME;
   const description = searchParams.get("description") || SITE.DESCRIPTION.LONG;
+  const logo = await getLogoDataUrl();
 
   return new ImageResponse(
     <div tw="flex h-full w-full bg-black text-white">
@@ -15,7 +16,9 @@ export const GET = (request: Request) => {
       <div tw="flex border absolute border-stone-700 inset-x-0 h-[1px] top-16" />
       <div tw="flex border absolute border-stone-700 inset-x-0 h-[1px] bottom-16" />
       <div tw="flex absolute flex-row bottom-24 right-24 text-white">
-        <LogoMark width={48} height={48} />
+        {/* next/og requires a native image rather than next/image. */}
+        {/* oxlint-disable-next-line nextjs/no-img-element */}
+        <img src={logo} alt={`${SITE.NAME} logo`} width={48} height={48} />
       </div>
       <div tw="flex flex-col absolute w-[896px] justify-center inset-32">
         <div

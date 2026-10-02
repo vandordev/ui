@@ -40,7 +40,7 @@ export const SiteHeader = () => (
             sound="click"
           >
             <Link href={ROUTES.HOME} transitionTypes={["nav-back"]}>
-              <LogoMark className="size-5" />
+              <LogoMark alt="" className="size-5" />
               <span className="sr-only">{SITE.NAME}</span>
             </Link>
           </Button>

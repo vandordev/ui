@@ -36,7 +36,7 @@ const nextConfig = {
     ],
   },
   outputFileTracingIncludes: {
-    "/*": ["./registry/**/*"],
+    "/*": ["./registry/**/*", "./public/assets/vandor-ui-logo.png"],
   },
   redirects() {
     return [

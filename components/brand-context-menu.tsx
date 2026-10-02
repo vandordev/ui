@@ -1,17 +1,17 @@
 "use client";
 
 import { DownloadIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
-import { LogoMark, getLogoMarkSVG } from "@/components/logo";
+import { LogoMark } from "@/components/logo";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { BRAND_ASSETS } from "@/constants/brand";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 
 export const BrandContextMenu = ({
@@ -19,30 +19,13 @@ export const BrandContextMenu = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { resolvedTheme } = useTheme();
-  const { copyToClipboard } = useCopyToClipboard();
-
-  const logoMarkSvgString = getLogoMarkSVG(
-    resolvedTheme === "light" ? "#000" : "#fff"
-  );
+  const { copyToClipboard } = useCopyToClipboard({
+    onCopy: () => toast.success("Logo URL copied"),
+  });
 
   const handleCopy = useCallback(() => {
-    copyToClipboard(logoMarkSvgString);
-    toast.success("Icon as SVG copied");
-  }, [logoMarkSvgString, copyToClipboard]);
-
-  const handleDownload = useCallback(() => {
-    const blob = new Blob([logoMarkSvgString], {
-      type: "image/svg+xml;charset=utf-8",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "icon.svg";
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Icon as SVG downloaded");
-  }, [logoMarkSvgString]);
+    copyToClipboard(new URL(BRAND_ASSETS.logo, window.location.origin).href);
+  }, [copyToClipboard]);
 
   return (
     <ContextMenu>
@@ -50,12 +33,14 @@ export const BrandContextMenu = ({
 
       <ContextMenuContent>
         <ContextMenuItem onClick={handleCopy}>
-          <LogoMark />
-          Copy as SVG
+          <LogoMark alt="" />
+          Copy logo URL
         </ContextMenuItem>
 
-        <ContextMenuItem onClick={handleDownload}>
-          <DownloadIcon /> Download as SVG
+        <ContextMenuItem asChild>
+          <a href={BRAND_ASSETS.logo} download="vandor-ui-logo.png">
+            <DownloadIcon /> Download PNG
+          </a>
         </ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
