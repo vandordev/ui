@@ -18,7 +18,7 @@ export const ButtonPlayground = () => (
     definitions={buttonProps}
     initialValues={getButtonDefaults()}
     getCode={getButtonCode}
-    hint="Icon sizes use a Plus icon. The Label control becomes its accessible name."
+    hint="Press and hold to feel the scale feedback. Icon sizes use the Label as their accessible name."
     renderPreview={(values) => (
       <Button
         variant={values.variant}

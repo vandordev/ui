@@ -10,7 +10,7 @@ React developers evaluating components, inspecting source code, and installing r
 
 ## Product Purpose
 
-Vandor UI is Vandor's public component registry and documentation website. Components are distributed as editable source through the shadcn CLI. The first pilot is Button: establish the uncustomized shadcn baseline before introducing Vandor-specific changes.
+Vandor UI is Vandor's public component registry and documentation website. Components are distributed as editable source through the shadcn CLI. The first pilot is Button: its shadcn baseline is established, and the first Vandor-specific customization is subtle press feedback powered by Motion.
 
 ## Brand Personality
 
@@ -18,7 +18,7 @@ Technical, clear, practical. The display name is Vandor UI; package names, regis
 
 ## Anti-references
 
-Do not redesign the existing startercn documentation surface during baseline component work. Avoid decorative changes, new button variants, custom motion, or additional interaction effects before the baseline is established.
+Do not redesign the existing startercn documentation surface during component work. Preserve the shadcn foundation; add custom behavior only when explicitly requested. Motion should convey interaction, not decorate the interface.
 
 ## Design Principles
 
@@ -29,4 +29,4 @@ Do not redesign the existing startercn documentation surface during baseline com
 
 ## Accessibility & Inclusion
 
-Preserve shadcn's native button/link semantics, keyboard focus behavior, disabled states, and accessible names for icon-only buttons. The initial Button pilot adds no audio, haptics, or custom animation. Verify previews in both supported themes and at narrow viewport widths.
+Preserve shadcn's native button/link semantics, keyboard focus behavior, disabled states, and accessible names for icon-only buttons. Button press feedback scales to 0.96 and respects reduced-motion preferences. Registry buttons add no audio or haptics. Verify previews in both supported themes and at narrow viewport widths.

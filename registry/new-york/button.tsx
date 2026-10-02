@@ -1,12 +1,16 @@
+"use client";
+
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
+import { motion, useReducedMotion } from "motion/react";
+import type { HTMLMotionProps } from "motion/react";
 import { Slot } from "radix-ui";
 import type * as React from "react";
 
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     defaultVariants: {
       size: "default",
@@ -39,17 +43,26 @@ const buttonVariants = cva(
   }
 );
 
+const MotionSlot = motion.create(Slot.Root);
+
+type ButtonProps = Omit<HTMLMotionProps<"button">, "children"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+    children?: React.ReactNode;
+  };
+
 const Button = ({
   className,
   variant = "default",
   size = "default",
   asChild = false,
+  disabled,
+  whileTap = { scale: 0.96 },
+  transition = { duration: 0.12, ease: "easeOut" },
   ...props
-}: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) => {
-  const Comp = asChild ? Slot.Root : "button";
+}: ButtonProps) => {
+  const shouldReduceMotion = useReducedMotion();
+  const Comp = asChild ? MotionSlot : motion.button;
 
   return (
     <Comp
@@ -57,7 +70,10 @@ const Button = ({
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ className, size, variant }))}
+      disabled={disabled}
       {...props}
+      transition={transition}
+      whileTap={disabled || shouldReduceMotion ? undefined : whileTap}
     />
   );
 };

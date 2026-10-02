@@ -6,7 +6,7 @@ An open-source collection of customizable React components by Vandor, distribute
 - **Documentation:** https://vandor-ui.vercel.app/docs
 - **Repository:** https://github.com/vandordev/ui
 
-Built from [startercn](https://github.com/shadcn-labs/startercn). The first pilot component is the standard shadcn **Button** (new-york + Radix), without Vandor-specific customizations. The original `your-component` development placeholder is retained separately.
+Built from [startercn](https://github.com/shadcn-labs/startercn). The first pilot component is a shadcn-based **Button** (new-york + Radix) with subtle press feedback powered by `motion/react`. The original `your-component` development placeholder is retained separately.
 
 ## Stack
 
@@ -32,7 +32,7 @@ Open http://localhost:3000.
 
 Components are installed as source files, not as an npm component package. Initialize shadcn in your React project first, then install a registry item by its URL.
 
-Install the Button baseline:
+Install the Button:
 
 ```bash
 pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/button.json

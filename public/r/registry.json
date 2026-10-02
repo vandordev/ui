@@ -6,8 +6,8 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "The standard shadcn Button using the new-york style and Radix primitives, without Vandor-specific customizations.",
-      "dependencies": ["class-variance-authority", "radix-ui"],
+      "description": "A shadcn-based Button with subtle press feedback powered by Motion, using the new-york style and Radix primitives.",
+      "dependencies": ["class-variance-authority", "radix-ui", "motion"],
       "registryDependencies": ["utils"],
       "files": [
         {

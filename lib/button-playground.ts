@@ -98,6 +98,17 @@ export const buttonProps = {
       "Accessible name for icon-only buttons or buttons without visible text.",
     type: "string",
   },
+  whileTap: {
+    defaultValue: "{ scale: 0.96 }",
+    description:
+      "Motion target while pressed. Set false to disable press feedback. Ignored when disabled or reduced motion is preferred.",
+    type: 'MotionProps["whileTap"]',
+  },
+  transition: {
+    defaultValue: '{ duration: 0.12, ease: "easeOut" }',
+    description: "Motion transition for the press and release animation.",
+    type: "Transition",
+  },
 } satisfies Record<string, PropDefinition>;
 
 export const getButtonDefaults = () => getPlaygroundDefaults(buttonProps);

@@ -8,7 +8,7 @@ export const SITE_AGENT_SKILL_MD = `# ${SITE.NAME}
 
 ## Summary
 
-Help users discover, inspect, and install React components from the public ${SITE.NAME} shadcn registry and its documentation site. The first pilot is the standard shadcn Button (new-york + Radix), without Vandor-specific customizations. A development placeholder is also retained separately.
+Help users discover, inspect, and install React components from the public ${SITE.NAME} shadcn registry and its documentation site. The first pilot is a shadcn-based Button (new-york + Radix) with Motion press feedback. Its registry dependencies include the motion package, imported as motion/react. A development placeholder is also retained separately.
 
 ## Registry
 
