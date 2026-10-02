@@ -3,7 +3,9 @@ title: Button
 description: The standard shadcn Button, ready for the first Vandor UI pilot.
 ---
 
-import { ButtonDemo } from "@/examples/button-demo";
+import { ButtonPlayground } from "@/components/button-playground";
+import { PropsReference } from "@/components/props-reference";
+import { buttonProps } from "@/lib/button-playground";
 import { ButtonVariants } from "@/examples/button-variants";
 import { ButtonSizes } from "@/examples/button-sizes";
 import { ButtonIcon } from "@/examples/button-icon";
@@ -14,11 +16,11 @@ This is the official shadcn Button baseline for the **new-york** style and **Rad
 
 This registry component does not include the audio or haptic feedback used by the website's internal Button. Vandor-specific customizations will be explored after this baseline.
 
-<ComponentPreview name="button-demo" title="button-demo.tsx">
-  <div className="flex flex-wrap items-center justify-center gap-2 rounded-md border p-6">
-    <ButtonDemo />
-  </div>
-</ComponentPreview>
+## Playground
+
+Change the controls to update the preview and its copyable usage code. Reset restores the playground defaults. These controls do not change the installed Button source.
+
+<ButtonPlayground />
 
 ## Installation
 
@@ -43,6 +45,12 @@ export function Demo() {
 ```
 
 Use your project's configured UI alias if it differs from `@/components/ui`.
+
+## Props
+
+<PropsReference definitions={buttonProps} />
+
+The reference lists component-specific props and selected native button props, not the complete React button API. Other native attributes are forwarded to the rendered element. With `asChild`, use the child element's native attributes and semantics.
 
 ## Variants
 
