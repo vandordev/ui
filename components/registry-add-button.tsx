@@ -38,16 +38,15 @@ const Description = ({ registryName }: { registryName: string }) => (
     Run this command to add{" "}
     <a
       className="text-foreground underline underline-offset-4"
-      href={addQueryParams("https://ui.shadcn.com/docs/directory", {
-        q: registryName,
+      href={addQueryParams("https://ui.shadcn.com/docs/registry/namespace", {
         ...UTM_PARAMS,
       })}
       target="_blank"
       rel="noopener"
     >
-      {registryName}
+      {registryName.split("=")[0]}
     </a>{" "}
-    to your project.
+    to your project&apos;s registry configuration.
   </>
 );
 

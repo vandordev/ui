@@ -31,7 +31,7 @@ export const SponsorLink = () => {
     >
       <Link href={ROUTES.SPONSOR}>
         <HeartHandshakeIcon className="text-pink-500" ref={heartRef} />
-        <span className="max-sm:sr-only">Sponsor</span>
+        <span className="max-sm:sr-only">Support</span>
       </Link>
     </Button>
   );

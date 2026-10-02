@@ -1,103 +1,68 @@
 ---
 title: Installation
-description: How to use this template to build your own shadcn component.
+description: Install Vandor UI registry components in your React project.
 ---
 
-## Building Your Component
+## Prerequisites
 
-### 1. Fork the Template
-
-Click "Use this template" on [GitHub](https://github.com/shadcn-labs/startercn).
-
-### 2. Install Dependencies
+Use a React project with Tailwind CSS and shadcn configured. If you have not initialized shadcn yet, run:
 
 ```bash
-pnpm install
+pnpm dlx shadcn@latest init
 ```
 
-### 3. Create Your Component
+See the [shadcn installation guide](https://ui.shadcn.com/docs/installation) for framework-specific setup.
 
-Replace the placeholder at `registry/new-york/your-component.tsx`:
+## Install a Component
+
+Install a registry item using its published JSON URL. The registry currently includes a development placeholder, `your-component`, for verifying installation:
+
+```bash
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/your-component.json
+```
+
+The CLI copies the component source into your project. You can edit the installed file directly.
 
 ```tsx
-import { forwardRef, HTMLAttributes } from "react";
-import { cn } from "@/lib/utils";
+import { YourComponent } from "@/components/ui/your-component";
 
-export interface MyButtonProps extends HTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "outline";
-}
-
-const MyButton = forwardRef<HTMLButtonElement, MyButtonProps>(
-  ({ className, variant = "default", ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        className={cn(
-          "rounded-md px-4 py-2 font-medium",
-          variant === "default" && "bg-primary text-primary-foreground",
-          variant === "outline" && "border border-input",
-          className
-        )}
-        {...props}
-      />
-    );
-  }
-);
-
-MyButton.displayName = "MyButton";
-
-export { MyButton };
-```
-
-### 4. Update registry.json
-
-```json
-{
-  "name": "your-name/your-registry",
-  "homepage": "https://your-site.com",
-  "items": [
-    {
-      "name": "my-button",
-      "type": "registry:ui",
-      "title": "My Button",
-      "description": "A custom button component.",
-      "files": [
-        {
-          "path": "registry/new-york/my-button.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/my-button.tsx"
-        }
-      ]
-    }
-  ]
+export function Demo() {
+  return <YourComponent />;
 }
 ```
 
-### 5. Build & Deploy
+The import path above assumes the default `@/components/ui` alias. Use your project's configured UI alias if it differs.
+
+## Develop Vandor UI Locally
+
+To contribute components or documentation, clone the repository:
+
+```bash
+git clone https://github.com/vandordev/ui.git
+cd ui
+pnpm install
+pnpm dev
+```
+
+Open `http://localhost:3000` to preview the website.
+
+### Add a Registry Component
+
+1. Create its source file under `registry/new-york/`.
+2. Add an item to `registry.json`, including dependencies and file targets.
+3. Create its documentation under `content/docs/components/` and update navigation in `meta.json`.
+4. Generate the registry output:
 
 ```bash
 pnpm registry:build
-pnpm build
 ```
 
-Deploy your app and your component is live!
-
----
-
-## Installing Components
-
-To install a component from any registry built with this template:
+### Verify Before Publishing
 
 ```bash
-npx shadcn@latest add https://example.com/r/my-button.json
+pnpm check
+pnpm build
+pnpm typecheck
 ```
 
-Then use it:
-
-```tsx
-import { MyButton } from "@/components/ui/my-button";
-
-export function Demo() {
-  return <MyButton variant="outline">Click me</MyButton>;
-}
-```
+The production build also rebuilds the registry. Deploying the website serves the generated component JSON under `/r/`.

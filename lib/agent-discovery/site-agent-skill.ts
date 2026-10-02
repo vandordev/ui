@@ -8,7 +8,7 @@ export const SITE_AGENT_SKILL_MD = `# ${SITE.NAME}
 
 ## Summary
 
-Help users discover, inspect, and install components from this public shadcn registry starter and its documentation site.
+Help users discover, inspect, and install React components from the public ${SITE.NAME} shadcn registry and its documentation site. The registry currently contains a development placeholder, not a production-ready component.
 
 ## Registry
 

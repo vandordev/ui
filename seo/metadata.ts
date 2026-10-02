@@ -67,10 +67,8 @@ export const createPageMetadata = ({
     title,
     twitter: {
       card: "summary_large_image",
-      creator: SITE.AUTHOR.TWITTER,
       description: ogDescription ?? description,
       images: [resolvedOgImage],
-      site: SITE.AUTHOR.TWITTER,
       title: resolvedTitle,
     },
     ...(noIndex
@@ -155,10 +153,8 @@ export const baseMetadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    creator: SITE.AUTHOR.TWITTER,
     description: SITE.DESCRIPTION.LONG,
     images: [SITE.OG_IMAGE],
-    site: SITE.AUTHOR.TWITTER,
     title: SITE.NAME,
   },
 };

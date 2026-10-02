@@ -208,13 +208,13 @@ export const CommandMenu = ({
       const parsed = parseDocPageUrl(item.url);
       if (parsed.kind === "theme") {
         setCopyPayload(
-          `${packageManager} dlx shadcn@latest add ${SITE.REGISTRY}/theme-${parsed.slug}`
+          `${packageManager} dlx shadcn@latest add ${SITE.REGISTRY}/r/theme-${parsed.slug}.json`
         );
         return;
       }
       if (parsed.kind === "component" || parsed.kind === "template") {
         setCopyPayload(
-          `${packageManager} dlx shadcn@latest add ${SITE.REGISTRY}/${parsed.slug}`
+          `${packageManager} dlx shadcn@latest add ${SITE.REGISTRY}/r/${parsed.slug}.json`
         );
         return;
       }

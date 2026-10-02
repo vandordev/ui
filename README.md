@@ -1,97 +1,90 @@
-<p align="center">
-  <img src="https://startercn.vercel.app/og" alt="startercn banner" />
-</p>
+# Vandor UI
 
-<h1 align="center">startercn</h1>
+An open-source collection of customizable React components by Vandor, distributed through the [shadcn registry](https://ui.shadcn.com/docs/registry).
 
-<p align="center">
-  A template for building and publishing your own custom shadcn registry components. Includes documentation, landing page, and everything you need to deploy your component registry.
-  <br />
-  <br />
-  <a href="https://github.com/shadcn-labs/startercn"><img src="https://www.shieldcn.dev/github/stars/shadcn-labs/startercn.svg?variant=secondary&size=xs&theme=zinc" alt="GitHub Stars" /></a>
-  <a href="https://github.com/shadcn-labs/startercn/actions"><img src="https://www.shieldcn.dev/github/ci/shadcn-labs/startercn.svg?variant=secondary&size=xs&theme=zinc" alt="CI" /></a>
-  <a href="https://discord.com/invite/N6G36KhYK4"><img src="https://www.shieldcn.dev/discord/online-members/N6G36KhYK4.svg?variant=secondary&size=xs&theme=zinc" alt="Discord Members" /></a>
-  <a href="https://x.com/shadcnlabs"><img src="https://www.shieldcn.dev/x/follow/shadcnlabs.svg?variant=branded&size=xs&theme=zinc" alt="X Follow" /></a>
-</p>
+- **Website:** https://vandor-ui.vercel.app
+- **Documentation:** https://vandor-ui.vercel.app/docs
+- **Repository:** https://github.com/vandordev/ui
 
-## Features
+Built from [startercn](https://github.com/shadcn-labs/startercn). The registry currently contains `your-component`, a development placeholder rather than a production-ready component.
 
-- 📦 **Ready-to-use template** - Fork and start building immediately
-- 📚 **Documentation site** - Beautiful docs powered by Fumadocs
-- 🎨 **Shadcn registry compatible** - Works with `npx shadcn add`
-- 🤖 **[Agent ready](https://www.mintlify.com/score/startercn)** - Includes `llms.txt`, `llms-full.txt`, agent skills discovery routes, and API catalog endpoints
-- 🔊 **[Web audio feedback](https://audio.raphaelsalaja.com/)** - Built-in sound effects powered by `@web-kits/audio`
-- 📳 **[Web haptics](https://haptics.lochie.me/)** - Optional haptic feedback hooks for supported devices via `web-haptics`
-- ✨ **[Motion animations](https://motion.dev/)** - `motion`-powered UI polish for copy states, text transitions, and interactive elements
-- 🎯 **[Animated icons](https://lucide-animated.com/)** - Reusable animated icons for navigation, sharing, sponsorship, and CTAs
-- 🔄 **[View transitions](https://nextjs.org/docs/app/api-reference/config/next-config-js/viewTransition)** - Next.js view transitions enabled for smoother navigation between pages
-- 🚀 **Deploy ready** - Deploy anywhere
+## Stack
 
-## Built In
+- Next.js 16, React 19, TypeScript, and Tailwind CSS 4
+- Fumadocs and MDX for documentation
+- shadcn/ui and Radix UI primitives
+- Shiki and rehype-pretty-code for syntax highlighting
+- Motion, optional audio feedback, and haptics
+- Markdown documentation, `llms.txt`, and agent discovery endpoints
 
-- `Next.js 16` with the App Router
-- `React 19` and `TypeScript`
-- `Tailwind CSS 4`
-- `Fumadocs` for documentation
-- `shiki` + `rehype-pretty-code` for code blocks
-- `sonner` for toasts
-- `radix-ui` + `vaul` for accessible primitives
-- `@vercel/analytics` for analytics
-
-## Quick Start
-
-1. **Use this template** - Click "Use this template" on GitHub
-
-2. **Install dependencies**:
+## Local Development
 
 ```bash
+git clone https://github.com/vandordev/ui.git
+cd ui
 pnpm install
-```
-
-3. **Replace the placeholder component** at `registry/new-york/your-component.tsx`
-
-4. **Update `registry.json`** with your component details
-
-5. **Build the registry**:
-
-```bash
-pnpm registry:build
-```
-
-6. **Start development**:
-
-```bash
 pnpm dev
 ```
 
-7. **Deploy** and share your component!
+Open http://localhost:3000.
 
-## Usage
+## Installing Components
 
-Once deployed, users can install your component with:
+Components are installed as source files, not as an npm component package. Initialize shadcn in your React project first, then install a registry item by its URL.
+
+The current placeholder can be used to verify the registry installation flow:
 
 ```bash
-npx shadcn@latest add https://your-domain.com/r/your-component.json
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/your-component.json
 ```
+
+## Adding a Registry Component
+
+1. Add the source file under `registry/new-york/`.
+2. Register the component, dependencies, and installation targets in `registry.json`.
+3. Add its MDX documentation under `content/docs/components/` and update the relevant `meta.json` navigation.
+4. Build the registry with `pnpm registry:build`.
+5. Verify with `pnpm check`, `pnpm build`, and `pnpm typecheck`.
+
+`components/ui/` contains the website's UI primitives. `registry/new-york/` contains components intended for distribution.
 
 ## Project Structure
 
-```
-├── registry/
-│   └── new-york/           # Your components go here
-│       └── your-component.tsx
-├── registry.json           # Component registry manifest
-├── content/docs/           # Documentation (MDX)
-├── app/                    # Next.js app
-└── public/r/               # Built registry files (auto-generated)
+```text
+app/                  Next.js pages and route handlers
+components/           Website and documentation components
+constants/            Site identity, routes, and external links
+content/docs/         MDX documentation
+lib/                  Documentation, registry, and shared utilities
+registry/new-york/    Distributable component source
+registry.json         Registry manifest
+public/r/             Generated registry JSON
+seo/                  Metadata and structured data
+styles/               Global styles and theme tokens
 ```
 
 ## Scripts
 
-- `pnpm dev` - Start development server
-- `pnpm build` - Build for production
-- `pnpm registry:build` - Rebuild the component registry
+| Command               | Purpose                                   |
+| --------------------- | ----------------------------------------- |
+| `pnpm dev`            | Start the development server              |
+| `pnpm registry:build` | Generate registry files in `public/r/`    |
+| `pnpm build`          | Build the registry and production website |
+| `pnpm start`          | Serve the production build                |
+| `pnpm typecheck`      | Check TypeScript types                    |
+| `pnpm check`          | Check lint and formatting                 |
+| `pnpm fix`            | Apply lint and formatting fixes           |
+
+## Deployment
+
+The default production URL is `https://vandor-ui.vercel.app`. On Vercel, `VERCEL_PROJECT_PRODUCTION_URL` takes precedence. Elsewhere, set `SITE_URL` to your production origin. Local development uses `http://localhost:3000`.
+
+When changing domains, also update the homepage in `registry.json` and installation URLs in the documentation.
+
+## Contributing
+
+Report bugs and suggest components through [GitHub issues](https://github.com/vandordev/ui/issues). Pull requests are welcome.
 
 ## License
 
-[MIT](./LICENSE)
+[MIT](./LICENSE). Original startercn attribution is retained in the license.

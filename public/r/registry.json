@@ -1,6 +1,6 @@
 {
-  "name": "startercn",
-  "homepage": "https://github.com/shadcn-labs/startercn",
+  "name": "vandor-ui",
+  "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
       "name": "your-component",

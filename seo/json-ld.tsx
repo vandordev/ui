@@ -29,7 +29,7 @@ export const SoftwareSourceCodeJsonLd = () => (
       "@type": "SoftwareSourceCode",
       applicationCategory: "DeveloperApplication",
       author: {
-        "@type": "Person",
+        "@type": "Organization",
         name: SITE.AUTHOR.NAME,
         url: LINK.PORTFOLIO,
       },
@@ -39,7 +39,7 @@ export const SoftwareSourceCodeJsonLd = () => (
       keywords: SITE.KEYWORDS,
       license: LINK.LICENSE,
       maintainer: {
-        "@type": "Person",
+        "@type": "Organization",
         name: SITE.AUTHOR.NAME,
         url: LINK.PORTFOLIO,
       },
@@ -62,14 +62,9 @@ export const OrganizationJsonLd = () => (
     data={{
       "@context": "https://schema.org",
       "@type": "Organization",
-      founder: {
-        "@type": "Person",
-        name: SITE.AUTHOR.NAME,
-        url: LINK.PORTFOLIO,
-      },
       logo: SITE.OG_IMAGE,
       name: SITE.NAME,
-      sameAs: [LINK.GITHUB, LINK.PORTFOLIO, LINK.X],
+      sameAs: [LINK.GITHUB, LINK.PORTFOLIO],
       url: SITE.URL,
     }}
   />
