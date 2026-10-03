@@ -24,7 +24,69 @@ test("registry Button declares cn directly without a utils registry dependency",
     "cn",
     "motion",
   ]);
-  assert.deepEqual(item.registryDependencies ?? [], []);
+  assert.deepEqual(item.registryDependencies, [
+    `${registry.homepage}/r/loading.json`,
+  ]);
+});
+
+test("loading Button renders arc before its label and cannot be enabled by disabled=false", () => {
+  const { Button } = jiti("../registry/new-york/button.tsx");
+  const html = renderToStaticMarkup(
+    React.createElement(
+      Button,
+      { "aria-busy": false, disabled: false, isLoading: true },
+      "Save"
+    )
+  );
+  assert.ok(html.includes('disabled=""'));
+  assert.ok(html.includes('aria-busy="true"'));
+  assert.ok(html.includes('data-variant="arc"'));
+  assert.ok(html.indexOf('data-slot="loading"') < html.indexOf("Save"));
+  assert.ok(html.includes('aria-hidden="true"'));
+  assert.ok(!html.includes("isLoading="));
+});
+
+test("icon-only loading Buttons replace their icon and retain their accessible name", () => {
+  const { Button } = jiti("../registry/new-york/button.tsx");
+  for (const size of ["icon", "icon-sm", "icon-lg", "icon-xs"]) {
+    const html = renderToStaticMarkup(
+      React.createElement(
+        Button,
+        { "aria-label": "Save", isLoading: true, size },
+        React.createElement("svg", { "data-original-icon": true })
+      )
+    );
+    assert.ok(html.includes('aria-label="Save"'));
+    assert.ok(html.includes('data-slot="loading"'));
+    assert.ok(!html.includes("data-original-icon"));
+  }
+});
+
+test("loading asChild preserves the child element and its content", () => {
+  const { Button } = jiti("../registry/new-york/button.tsx");
+  const html = renderToStaticMarkup(
+    React.createElement(
+      Button,
+      { asChild: true, isLoading: true },
+      React.createElement("a", { href: "/docs" }, "Browse")
+    )
+  );
+  assert.ok(html.startsWith("<a "));
+  assert.ok(html.includes('aria-disabled="true"'));
+  assert.ok(html.includes('aria-busy="true"'));
+  assert.ok(html.includes('data-slot="loading"'));
+  assert.ok(html.includes("Browse"));
+  assert.ok(!html.includes("<button"));
+});
+
+test("non-loading Button has no spinner or loading busy state", () => {
+  const { Button } = jiti("../registry/new-york/button.tsx");
+  const html = renderToStaticMarkup(
+    React.createElement(Button, { isLoading: false }, "Save")
+  );
+  assert.ok(!html.includes('data-slot="loading"'));
+  assert.ok(!html.includes('aria-busy="true"'));
+  assert.ok(!html.includes('disabled=""'));
 });
 
 test("Button className overrides conflicting Tailwind classes", () => {

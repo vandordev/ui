@@ -13,6 +13,7 @@ import { ButtonSizes } from "@/examples/button-sizes";
 import { ButtonIcon } from "@/examples/button-icon";
 import { ButtonDisabled } from "@/examples/button-disabled";
 import { ButtonAsChild } from "@/examples/button-as-child";
+import { ButtonLoading } from "@/examples/button-loading";
 
 ## Usage
 
@@ -70,6 +71,22 @@ Use the native `disabled` prop to prevent interaction.
   </div>
 </ComponentPreview>
 
+### Loading
+
+Set `isLoading` while an action is pending. The Button shows the Loading component's default `arc` before its label, becomes disabled, and sets `aria-busy`. Icon-only sizes replace their icon with the spinner and retain the supplied `aria-label`.
+
+```tsx
+<Button isLoading={isSaving}>Save</Button>
+```
+
+Installing Button also installs Loading through its registry dependency. The loading indicator inherits the button's color and respects reduced-motion preferences. The playground's **Is Loading** toggle updates both the preview and generated code.
+
+<ComponentPreview name="button-loading" title="button-loading.tsx">
+  <div className="rounded-md border p-6">
+    <ButtonLoading />
+  </div>
+</ComponentPreview>
+
 ### As Child
 
 Use `asChild` to style a link without nesting it inside a button. The child retains its native link semantics. Use this for navigation, not the `variant="link"` appearance alone.
@@ -106,3 +123,4 @@ Set `whileTap={false}` to turn off the press animation. Active color feedback re
 - A visible focus ring identifies keyboard focus. Give icon-only buttons an `aria-label`.
 - Buttons default to `type="button"`. Set `type="submit"` for form submission.
 - With `asChild`, the child retains its own keyboard behavior and attributes. Use links for navigation; native `disabled` does not disable a link.
+- `isLoading` blocks clicks, including on `asChild` links, and disables press feedback. The spinner is decorative; the button retains its accessible name and communicates the pending state through `aria-busy`.

@@ -24,6 +24,7 @@ export const ButtonPlayground = () => (
         variant={values.variant}
         size={values.size}
         disabled={values.disabled}
+        isLoading={values.isLoading}
         whileTap={getButtonWhileTap(values)}
         aria-label={getButtonAccessibleLabel(values)}
       >

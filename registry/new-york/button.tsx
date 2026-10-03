@@ -8,6 +8,9 @@ import { cn } from "cn";
 import { motion, useReducedMotion } from "motion/react";
 import type { HTMLMotionProps } from "motion/react";
 import type * as React from "react";
+import { cloneElement, isValidElement } from "react";
+
+import { Loading } from "./loading";
 
 const buttonVariants = cva(
   "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-[background-color,color,border-color,box-shadow,filter] duration-200 ease-out motion-reduce:transition-none [&:active:not([disabled]):not([aria-disabled=true])]:brightness-90 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -53,9 +56,15 @@ const Slot = ({ children, ref, ...props }: React.ComponentProps<"button">) =>
 const MotionSlot = motion.create(Slot);
 const MotionButton = motion.create(BaseButton);
 
+const blockLoadingClick = (event: React.MouseEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
+};
+
 type ButtonProps = Omit<HTMLMotionProps<"button">, "children" | "whileTap"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
+    isLoading?: boolean;
     render?: React.ComponentProps<typeof BaseButton>["render"];
     nativeButton?: boolean;
     children?: React.ReactNode;
@@ -67,6 +76,8 @@ const Button = ({
   variant = "default",
   size = "default",
   asChild = false,
+  isLoading = false,
+  children,
   disabled,
   whileTap = { scale: 0.96 },
   transition = { duration: 0.12, ease: "easeOut" },
@@ -74,6 +85,30 @@ const Button = ({
 }: ButtonProps) => {
   const shouldReduceMotion = useReducedMotion();
   const Comp = asChild ? MotionSlot : MotionButton;
+  const isDisabled = disabled || isLoading;
+  const iconOnly = size?.startsWith("icon");
+  const loadingContent = (content: React.ReactNode) => (
+    <>
+      <Loading
+        size={size === "xs" || size === "icon-xs" ? 12 : 16}
+        data-icon="inline-start"
+        aria-hidden="true"
+      />
+      {iconOnly ? null : content}
+    </>
+  );
+  let content = children;
+  if (isLoading) {
+    content =
+      asChild && isValidElement<React.ComponentProps<"button">>(children)
+        ? cloneElement(children, {
+            "aria-busy": true,
+            "aria-disabled": true,
+            children: loadingContent(children.props.children),
+            onClickCapture: blockLoadingClick,
+          })
+        : loadingContent(children);
+  }
 
   return (
     <Comp
@@ -81,15 +116,20 @@ const Button = ({
       data-variant={variant}
       data-size={size}
       className={cn(buttonVariants({ className, size, variant }))}
-      disabled={disabled}
       {...props}
+      disabled={isDisabled}
+      aria-busy={isLoading ? true : props["aria-busy"]}
+      aria-disabled={isLoading ? true : props["aria-disabled"]}
+      onClickCapture={isLoading ? blockLoadingClick : props.onClickCapture}
       transition={transition}
       whileTap={
-        disabled || shouldReduceMotion || whileTap === false
+        isDisabled || shouldReduceMotion || whileTap === false
           ? undefined
           : whileTap
       }
-    />
+    >
+      {content}
+    </Comp>
   );
 };
 

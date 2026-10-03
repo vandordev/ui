@@ -74,6 +74,17 @@ export const buttonProps = {
       "Uses the child element instead of a button, preserving the child's semantics. See the As Child example.",
     type: "boolean",
   },
+  isLoading: {
+    control: {
+      initialValue: false as boolean,
+      kind: "boolean",
+      label: "Is Loading",
+    },
+    defaultValue: "false",
+    description:
+      "Shows the Loading arc and prevents interaction. Keeps text labels; replaces icons for icon-only sizes. Sets aria-busy automatically.",
+    type: "boolean",
+  },
   className: {
     defaultValue: "Not set",
     description:
@@ -175,6 +186,9 @@ export const getButtonCode = (values: ButtonPlaygroundValues) => {
   }
   if (values.disabled) {
     attributes.push("disabled");
+  }
+  if (values.isLoading) {
+    attributes.push("isLoading");
   }
   if (!values.whileTap) {
     attributes.push("whileTap={false}");

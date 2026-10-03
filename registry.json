@@ -6,6 +6,7 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
+      "registryDependencies": ["https://vandor-ui.vercel.app/r/loading.json"],
       "description": "A shadcn-based Button with subtle press feedback powered by Motion, using the new-york style and Base UI primitives.",
       "dependencies": [
         "class-variance-authority",

@@ -95,6 +95,7 @@ test("Button controls derive a fresh default state from metadata", () => {
   assert.deepEqual(defaults, {
     children: "Button",
     disabled: false,
+    isLoading: false,
     size: "default",
     tapScale: 0.96,
     variant: "default",
@@ -105,6 +106,37 @@ test("Button controls derive a fresh default state from metadata", () => {
     getPlaygroundDefaults(buttonPlaygroundDefinitions).children,
     "Button"
   );
+});
+
+test("loading playground toggle generates the actual loading Button", () => {
+  const { Button } = jiti("../registry/new-york/button.tsx");
+  const { getButtonDefaults, getButtonCode, buttonProps } = jiti(
+    "../lib/button-playground.ts"
+  );
+  assert.equal(buttonProps.isLoading.control.kind, "boolean");
+  const defaults = getButtonDefaults();
+  assert.equal(defaults.isLoading, false);
+  assert.ok(!getButtonCode(defaults).includes("isLoading"));
+  const code = getButtonCode({ ...defaults, isLoading: true });
+  assert.ok(code.includes(" isLoading"));
+  const compiled = ts.transpileModule(code, {
+    compilerOptions: {
+      jsx: ts.JsxEmit.ReactJSX,
+      module: ts.ModuleKind.CommonJS,
+    },
+  });
+  const compiledModule = { exports: {} };
+  runInNewContext(compiled.outputText, {
+    exports: compiledModule.exports,
+    module: compiledModule,
+    require: (name) =>
+      name === "@/components/ui/button" ? { Button } : requireDependency(name),
+  });
+  const html = renderToStaticMarkup(
+    React.createElement(compiledModule.exports.ButtonDemo)
+  );
+  assert.ok(html.includes('data-slot="loading"'));
+  assert.ok(html.includes('disabled=""'));
 });
 
 test("tap controls synchronize Motion targets and generated JSX", () => {
