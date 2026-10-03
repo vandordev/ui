@@ -1,5 +1,6 @@
 "use client";
 
+import { mergeProps } from "@base-ui/react/merge-props";
 import { Select as SelectPrimitive } from "@base-ui/react/select";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "cn";
@@ -19,6 +20,26 @@ const PopupElement = ({
     render: <div {...props} />,
   });
 const MotionPopupElement = motion.create(PopupElement);
+
+const TriggerElement = ({
+  nativeProps,
+  state,
+  render,
+  ref,
+  ...props
+}: ComponentProps<"button"> & {
+  nativeProps: ComponentProps<"button">;
+  state: SelectPrimitive.Trigger.State;
+  render?: SelectPrimitive.Trigger.Props["render"];
+}) =>
+  useRender({
+    defaultTagName: "button",
+    props: mergeProps({ ...nativeProps }, { ...props }),
+    ref: ref ?? null,
+    render,
+    state: { ...state },
+  });
+const MotionTriggerElement = motion.create(TriggerElement);
 
 const SelectActionsContext = createContext<(() => void) | null>(null);
 
@@ -61,23 +82,46 @@ const SelectTrigger = ({
   className,
   size = "default",
   children,
+  render,
   ...props
-}: SelectPrimitive.Trigger.Props & { size?: "sm" | "default" }) => (
-  <SelectPrimitive.Trigger
-    data-slot="select-trigger"
-    data-size={size}
-    className={cn(
-      "flex w-fit items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm whitespace-nowrap outline-none transition-[background-color,border-color,box-shadow] duration-200 ease-out select-none hover:not-disabled:bg-accent/50 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[size=default]:h-9 data-[size=sm]:h-8 motion-reduce:transition-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-      className
-    )}
-    {...props}
-  >
-    {children}
-    <SelectPrimitive.Icon className="text-muted-foreground transition-transform duration-200 ease-out data-popup-open:rotate-180 motion-reduce:transition-none">
-      <ChevronDownIcon aria-hidden="true" />
-    </SelectPrimitive.Icon>
-  </SelectPrimitive.Trigger>
-);
+}: SelectPrimitive.Trigger.Props & { size?: "sm" | "default" }) => {
+  const reduceMotion = useReducedMotion();
+  return (
+    <SelectPrimitive.Trigger
+      data-slot="select-trigger"
+      data-size={size}
+      className={cn(
+        "flex w-fit cursor-pointer items-center justify-between gap-2 rounded-md border border-input bg-background bg-linear-to-b from-white/10 to-black/10 px-3 py-2 text-sm whitespace-nowrap outline-none transition-[background-color,border-color,box-shadow] duration-200 ease-out select-none hover:not-disabled:not-data-disabled:not-aria-disabled:bg-accent/50 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 data-disabled:cursor-not-allowed aria-disabled:cursor-not-allowed aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[size=default]:h-9 data-[size=sm]:h-8 motion-reduce:transition-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+        className
+      )}
+      {...props}
+      render={(triggerProps, state) => (
+        <MotionTriggerElement
+          nativeProps={triggerProps}
+          state={state}
+          render={render}
+          animate={{ filter: "brightness(1)", scale: 1 }}
+          whileTap={
+            state.disabled ||
+            state.readOnly ||
+            triggerProps["aria-disabled"] === true ||
+            triggerProps["aria-disabled"] === "true"
+              ? undefined
+              : { filter: "brightness(0.9)", scale: reduceMotion ? 1 : 0.96 }
+          }
+          transition={{ duration: reduceMotion ? 0 : 0.12, ease: "easeOut" }}
+        >
+          {triggerProps.children}
+        </MotionTriggerElement>
+      )}
+    >
+      {children}
+      <SelectPrimitive.Icon className="text-muted-foreground transition-transform duration-200 ease-out data-popup-open:rotate-180 motion-reduce:transition-none">
+        <ChevronDownIcon aria-hidden="true" />
+      </SelectPrimitive.Icon>
+    </SelectPrimitive.Trigger>
+  );
+};
 
 type SelectContentProps = Omit<SelectPrimitive.Popup.Props, "render"> &
   Pick<
@@ -176,7 +220,7 @@ const SelectItem = ({
   <SelectPrimitive.Item
     data-slot="select-item"
     className={cn(
-      "relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+      "relative flex w-full cursor-pointer items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:cursor-not-allowed data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
       className
     )}
     {...props}
