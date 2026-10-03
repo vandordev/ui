@@ -31,34 +31,40 @@ test("Drawer exposes its documented composition and renders an accessible trigge
   for (const name of [
     "Drawer",
     "DrawerBody",
-    "DrawerClose",
-    "DrawerContent",
-    "DrawerDescription",
     "DrawerFooter",
-    "DrawerHeader",
-    "DrawerOverlay",
-    "DrawerPanel",
-    "DrawerPortal",
-    "DrawerSwipeHandle",
-    "DrawerTitle",
-    "DrawerTrigger",
     "useDrawer",
     "useDrawerControl",
   ]) {
     assert.equal(typeof drawer[name], "function", `${name} is exported`);
   }
+  for (const name of [
+    "DrawerPanel",
+    "DrawerContent",
+    "DrawerTrigger",
+    "DrawerClose",
+    "DrawerHeader",
+    "DrawerTitle",
+    "DrawerDescription",
+    "DrawerPortal",
+    "DrawerOverlay",
+    "DrawerSwipeHandle",
+  ]) {
+    assert.equal(
+      drawer[name],
+      undefined,
+      `${name} is not part of the public API`
+    );
+  }
 
   const html = renderToStaticMarkup(
     el(
       drawer.Drawer,
-      null,
-      el(drawer.DrawerTrigger, null, "Open project settings"),
-      el(
-        drawer.DrawerContent,
-        null,
-        el(drawer.DrawerHeader, null, el(drawer.DrawerTitle, null, "Settings")),
-        el(drawer.DrawerDescription, null, "Update project preferences")
-      )
+      {
+        description: "Update project preferences",
+        title: "Settings",
+        trigger: el("button", { type: "button" }, "Open project settings"),
+      },
+      el(drawer.DrawerBody, null, "Project settings")
     )
   );
   assert.match(html, /aria-haspopup="dialog"/);
@@ -93,7 +99,7 @@ test("Drawer playground defaults, generated source, and configurable props stay 
   assert.ok(code.includes('swipeDirection="down"'));
   assert.ok(code.includes("modal={false}"));
   assert.ok(code.includes("showSwipeHandle"));
-  assert.ok(code.includes("showCloseButton={false}"));
+  assert.ok(code.includes("showCloseButton: false"));
   assert.ok(code.includes("snapPoints={[0.5, 0.9]}"));
   assert.ok(drawerProps.onOpenChange);
   assert.ok(drawerProps.closeButtonLabel);
@@ -101,7 +107,7 @@ test("Drawer playground defaults, generated source, and configurable props stay 
   const external = getDrawerCode({ ...defaults, example: "control" });
   assert.ok(external.includes("useDrawerControl()"));
   assert.ok(external.includes("control={control}"));
-  assert.ok(external.includes("finalFocus={opener}"));
+  assert.ok(external.includes("finalFocus: opener"));
   const renderFunction = getDrawerCode({
     ...defaults,
     example: "render-function",
@@ -115,7 +121,7 @@ test("Drawer playground defaults, generated source, and configurable props stay 
     example: "panel-form",
     longContent: true,
   });
-  assert.ok(panel.includes("<DrawerPanel"));
+  assert.ok(panel.includes("<Drawer"));
   assert.ok(panel.includes('className="flex min-h-0 flex-1 flex-col"'));
   assert.ok(panel.includes('type="submit"'));
   assert.ok(panel.includes("length: 30"));

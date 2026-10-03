@@ -16,7 +16,7 @@ export const drawerProps = {
     },
     defaultValue: "Not applicable",
     description:
-      "Playground only: choose trigger, external control, render function, or a DrawerPanel form.",
+      "Playground only: choose trigger, external control, render function, or a form.",
     type: "Example preset",
   },
   longContent: {
@@ -35,6 +35,34 @@ export const drawerProps = {
     description:
       "Drawer: stable controller returned by useDrawerControl. Cannot be combined with open, defaultOpen, or handle.",
     type: "DrawerControl",
+  },
+  title: {
+    defaultValue: "Required",
+    description: "Drawer: meaningful accessible panel title.",
+    type: "ReactNode",
+  },
+  description: {
+    defaultValue: "Not set",
+    description: "Drawer: optional supporting content beneath the title.",
+    type: "ReactNode",
+  },
+  trigger: {
+    defaultValue: "Not set",
+    description:
+      "Drawer: optional button element composed as an associated trigger.",
+    type: "ReactElement",
+  },
+  children: {
+    defaultValue: "Not set",
+    description:
+      "Drawer: content or a function receiving the panel controller.",
+    type: "ReactNode | ((control: DrawerControl) => ReactNode)",
+  },
+  contentProps: {
+    defaultValue: "Not set",
+    description:
+      "Drawer: popup props, focus restoration, close button options, and keepMounted. Does not accept children.",
+    type: "object",
   },
   swipeDirection: {
     control: {
@@ -76,13 +104,14 @@ export const drawerProps = {
       label: "Close button",
     },
     defaultValue: "true",
-    description: "DrawerContent: shows the top-right close button.",
+    description:
+      "contentProps.showCloseButton: shows the top-right close button.",
     type: "boolean",
   },
   closeButtonLabel: {
     defaultValue: '"Close drawer"',
     description:
-      "DrawerContent: accessible label for the close button. Use a localized label in translated interfaces.",
+      "contentProps.closeButtonLabel: accessible label for the close button. Use a localized label in translated interfaces.",
     type: "string",
   },
   snapPoints: {
@@ -129,11 +158,11 @@ const snapPointsFor = (preset: DrawerPlaygroundValues["snapPoints"]) => {
 
 const getDrawerPanelCode = (values: DrawerPlaygroundValues) => `"use client";
 
-import { DrawerPanel, DrawerBody, DrawerFooter } from "@/components/ui/drawer";
+import { Drawer, DrawerBody, DrawerFooter } from "@/components/ui/drawer";
 
 export function DrawerDemo() {
   return (
-    <DrawerPanel
+    <Drawer
       title="Project settings"
       description="Edit the project name. This demo does not save data."
       trigger={<button type="button">Open drawer</button>}
@@ -156,7 +185,7 @@ export function DrawerDemo() {
           </DrawerFooter>
         </form>
       )}
-    </DrawerPanel>
+    </Drawer>
   );
 }`;
 
@@ -165,7 +194,6 @@ export const getDrawerCode = (values: DrawerPlaygroundValues) => {
     return getDrawerPanelCode(values);
   }
   const external = values.example === "control";
-  const renderFunction = values.example === "render-function";
   const body = values.longContent
     ? `{Array.from({ length: 30 }, (_, index) => (
             <p key={index} className="mb-4">Setting {index + 1}: Configure your project preferences.</p>
@@ -174,23 +202,28 @@ export const getDrawerCode = (values: DrawerPlaygroundValues) => {
   return `"use client";
 
 ${external ? 'import { useRef } from "react";\n' : ""}import {
-  Drawer, DrawerBody, ${renderFunction ? "" : "DrawerClose, "}DrawerContent, DrawerDescription, DrawerFooter,
-  DrawerHeader, DrawerTitle, ${external ? "useDrawerControl" : "DrawerTrigger"},
+  Drawer, DrawerBody, DrawerFooter, ${external ? "useDrawerControl, " : ""}useDrawer,
 } from "@/components/ui/drawer";
+
+function DoneButton() {
+  const { close } = useDrawer();
+  return <button type="button" onClick={close}>Done</button>;
+}
 
 export function DrawerDemo() {
 ${external ? "  const control = useDrawerControl();\n  const opener = useRef<HTMLButtonElement>(null);\n" : ""}  return (
-${external ? '    <>\n      <button ref={opener} type="button" onClick={control.open}>Open drawer</button>\n' : ""}    <Drawer${external ? " control={control}" : ""} swipeDirection="${values.swipeDirection}"${values.modal ? "" : " modal={false}"}${values.showSwipeHandle ? " showSwipeHandle" : ""}${snapPointsFor(values.snapPoints)}>
-${external ? "" : "      <DrawerTrigger>Open drawer</DrawerTrigger>\n"}      <DrawerContent${external ? " finalFocus={opener}" : ""}${values.showCloseButton ? "" : " showCloseButton={false}"}>
-${renderFunction ? "        {({ close }) => (\n          <>\n" : ""}        <DrawerHeader>
-          <DrawerTitle>Project settings</DrawerTitle>
-          <DrawerDescription>Manage the details and preferences for this project.</DrawerDescription>
-        </DrawerHeader>
+${external ? '    <>\n      <button ref={opener} type="button" onClick={control.open}>Open drawer</button>\n' : ""}    <Drawer${external ? " control={control}" : ""} swipeDirection="${values.swipeDirection}"${values.modal ? "" : " modal={false}"}${values.showSwipeHandle ? " showSwipeHandle" : ""}${snapPointsFor(values.snapPoints)}
+      title="Project settings"
+      description="Manage the details and preferences for this project."
+      ${external ? "" : 'trigger={<button type="button">Open drawer</button>}'}
+      contentProps={{ showCloseButton: ${values.showCloseButton}${external ? ", finalFocus: opener" : ""} }}
+    >
+${values.example === "render-function" ? "      {({ close }) => (\n        <>\n" : ""}
         <DrawerBody>${body}</DrawerBody>
         <DrawerFooter>
-          ${renderFunction ? '<button type="button" onClick={close}>Done</button>' : "<DrawerClose>Done</DrawerClose>"}
+          ${values.example === "render-function" ? '<button type="button" onClick={close}>Done</button>' : "<DoneButton />"}
         </DrawerFooter>
-${renderFunction ? "          </>\n        )}\n" : ""}      </DrawerContent>
+${values.example === "render-function" ? "        </>\n      )}\n" : ""}
     </Drawer>
 ${external ? "    </>\n" : ""}  );
 }`;

@@ -92,7 +92,7 @@ const useDrawer = (control?: DrawerControl): DrawerControl => {
   return useDrawerSubscription(selected);
 };
 
-type DrawerProps = Omit<
+type DrawerRootProps = Omit<
   DrawerPrimitive.Root.Props,
   "handle" | "open" | "defaultOpen"
 > & {
@@ -114,7 +114,7 @@ type DrawerProps = Omit<
 
 const controlOwners = new WeakMap<DrawerControl, object>();
 
-const Drawer = ({
+const DrawerRoot = ({
   control,
   handle,
   onOpenChange,
@@ -123,7 +123,7 @@ const Drawer = ({
   snapPoints,
   swipeDirection = "right",
   ...props
-}: DrawerProps) => {
+}: DrawerRootProps) => {
   const [localHandle] = useState(() => DrawerPrimitive.createHandle());
   const localControl = useMemo(
     () => createDrawerControl(handle ?? localHandle),
@@ -257,6 +257,7 @@ type DrawerContentProps = Omit<DrawerPrimitive.Popup.Props, "children"> & {
   children?: ReactNode | ((control: DrawerControl) => ReactNode);
   showCloseButton?: boolean;
   closeButtonLabel?: string;
+  keepMounted?: boolean;
 };
 
 const DrawerContent = ({
@@ -264,6 +265,7 @@ const DrawerContent = ({
   children,
   showCloseButton = true,
   closeButtonLabel = "Close drawer",
+  keepMounted = false,
   ...props
 }: DrawerContentProps) => {
   const control = useDrawer();
@@ -277,7 +279,7 @@ const DrawerContent = ({
     swipeDirection === "down" || swipeDirection === "up" ? "y" : "x";
 
   return (
-    <DrawerPortal container={container}>
+    <DrawerPortal container={container} keepMounted={keepMounted}>
       {modal === true && (
         <DrawerOverlay data-snap-points={hasSnapPoints ? "" : undefined} />
       )}
@@ -381,11 +383,11 @@ const DrawerDescription = ({
   />
 );
 
-type DrawerPanelRootProps<T = DrawerProps> = T extends unknown
+type DrawerStateProps<T = DrawerRootProps> = T extends unknown
   ? Omit<T, "children">
   : never;
 
-type DrawerPanelProps = DrawerPanelRootProps & {
+type DrawerProps = DrawerStateProps & {
   title: ReactNode;
   description?: ReactNode;
   trigger?: ReactElement;
@@ -393,15 +395,15 @@ type DrawerPanelProps = DrawerPanelRootProps & {
   contentProps?: Omit<DrawerContentProps, "children">;
 };
 
-const DrawerPanel = ({
+const Drawer = ({
   title,
   description,
   trigger,
   children,
   contentProps,
   ...props
-}: DrawerPanelProps) => (
-  <Drawer {...props}>
+}: DrawerProps) => (
+  <DrawerRoot {...props}>
     {trigger && <DrawerTrigger render={trigger} />}
     <DrawerContent {...contentProps}>
       {(control) => (
@@ -416,30 +418,9 @@ const DrawerPanel = ({
         </>
       )}
     </DrawerContent>
-  </Drawer>
+  </DrawerRoot>
 );
 
-export {
-  Drawer,
-  DrawerBody,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerOverlay,
-  DrawerPanel,
-  DrawerPortal,
-  DrawerSwipeHandle,
-  DrawerTitle,
-  DrawerTrigger,
-  useDrawer,
-  useDrawerControl,
-};
+export { Drawer, DrawerBody, DrawerFooter, useDrawer, useDrawerControl };
 
-export type {
-  DrawerContentProps,
-  DrawerControl,
-  DrawerPanelProps,
-  DrawerProps,
-};
+export type { DrawerControl, DrawerProps };

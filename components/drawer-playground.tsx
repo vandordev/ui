@@ -12,14 +12,8 @@ import type { DrawerPlaygroundValues } from "@/lib/drawer-playground";
 import {
   Drawer,
   DrawerBody,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
   DrawerFooter,
-  DrawerHeader,
-  DrawerPanel,
-  DrawerTitle,
-  DrawerTrigger,
+  useDrawer,
   useDrawerControl,
 } from "@/registry/new-york/drawer";
 
@@ -27,6 +21,15 @@ const actionClassName =
   "inline-flex h-9 cursor-pointer items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 const triggerClassName =
   "inline-flex h-9 cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 text-sm font-medium transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
+const DoneButton = () => {
+  const { close } = useDrawer();
+  return (
+    <button type="button" className={actionClassName} onClick={close}>
+      Done
+    </button>
+  );
+};
 
 const DrawerPreview = ({ values }: { values: DrawerPlaygroundValues }) => {
   const control = useDrawerControl();
@@ -42,12 +45,6 @@ const DrawerPreview = ({ values }: { values: DrawerPlaygroundValues }) => {
   }
   const content = (close?: () => void) => (
     <>
-      <DrawerHeader>
-        <DrawerTitle>Project settings</DrawerTitle>
-        <DrawerDescription>
-          Manage the details and preferences for this project.
-        </DrawerDescription>
-      </DrawerHeader>
       <DrawerBody className="pt-5 text-sm text-muted-foreground">
         {values.longContent
           ? Array.from({ length: 30 }, (_, index) => (
@@ -63,14 +60,14 @@ const DrawerPreview = ({ values }: { values: DrawerPlaygroundValues }) => {
             Done
           </button>
         ) : (
-          <DrawerClose className={actionClassName}>Done</DrawerClose>
+          <DoneButton />
         )}
       </DrawerFooter>
     </>
   );
   if (values.example === "panel-form") {
     return (
-      <DrawerPanel
+      <Drawer
         title="Project settings"
         description="Edit the project name. This demo does not save data."
         trigger={
@@ -124,7 +121,7 @@ const DrawerPreview = ({ values }: { values: DrawerPlaygroundValues }) => {
             </DrawerFooter>
           </form>
         )}
-      </DrawerPanel>
+      </Drawer>
     );
   }
   return (
@@ -140,23 +137,26 @@ const DrawerPreview = ({ values }: { values: DrawerPlaygroundValues }) => {
         </button>
       )}
       <Drawer
+        title="Project settings"
+        description="Manage the details and preferences for this project."
+        trigger={
+          external ? undefined : (
+            <button type="button" className={triggerClassName}>
+              Open drawer
+            </button>
+          )
+        }
         control={external ? control : undefined}
         modal={values.modal}
         showSwipeHandle={values.showSwipeHandle}
         snapPoints={snapPoints}
         swipeDirection={values.swipeDirection}
+        contentProps={{
+          finalFocus: external ? opener : undefined,
+          showCloseButton: values.showCloseButton,
+        }}
       >
-        {!external && (
-          <DrawerTrigger className={triggerClassName}>
-            Open drawer
-          </DrawerTrigger>
-        )}
-        <DrawerContent
-          finalFocus={external ? opener : undefined}
-          showCloseButton={values.showCloseButton}
-        >
-          {renderFunction ? ({ close }) => content(close) : content()}
-        </DrawerContent>
+        {renderFunction ? ({ close }) => content(close) : content()}
       </Drawer>
     </>
   );

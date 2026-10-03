@@ -88,19 +88,17 @@ test("external control and explicit hook follow accepted Base UI state, includin
       null,
       el("output", { id: "external-state" }, String(control.isOpen)),
       el(Consumer),
-      el(
-        drawer.Drawer,
-        {
-          control,
-          onOpenChange: (open, details) => {
-            changes.push([open, details.reason]);
-            if (!open && rejectClose) {
-              details.cancel();
-            }
-          },
+      el(drawer.Drawer, {
+        control,
+        onOpenChange: (open, details) => {
+          changes.push([open, details.reason]);
+          if (!open && rejectClose) {
+            details.cancel();
+          }
         },
-        el(drawer.DrawerTrigger, { id: "trigger" }, "Open")
-      )
+        title: "Settings",
+        trigger: el("button", { id: "trigger", type: "button" }, "Open"),
+      })
     );
   };
   await mount(el(App));
@@ -144,8 +142,17 @@ test("context hook selects nearest drawer and explicit control selects an outer 
     outer = drawer.useDrawerControl();
     return el(
       drawer.Drawer,
-      { control: outer },
-      el(drawer.Drawer, { defaultOpen: true }, el(Inner))
+      {
+        contentProps: { keepMounted: true },
+        control: outer,
+        modal: false,
+        title: "Outer",
+      },
+      el(
+        drawer.Drawer,
+        { defaultOpen: true, modal: false, title: "Inner" },
+        el(Inner)
+      )
     );
   };
   await mount(el(App));
@@ -170,8 +177,10 @@ test("controlled drawers wait for their parent to accept requests", async () => 
     el(
       drawer.Drawer,
       {
+        contentProps: { keepMounted: true },
         onOpenChange: (open) => changes.push(open),
         open: true,
+        title: "Settings",
       },
       el(Child)
     )
@@ -180,7 +189,13 @@ test("controlled drawers wait for their parent to accept requests", async () => 
   assert.deepEqual(changes, [false]);
   assert.equal(context.isOpen, true);
   await React.act(async () =>
-    root.render(el(drawer.Drawer, { open: false }, el(Child)))
+    root.render(
+      el(
+        drawer.Drawer,
+        { contentProps: { keepMounted: true }, open: false, title: "Settings" },
+        el(Child)
+      )
+    )
   );
   assert.equal(context.isOpen, false);
 });
@@ -192,21 +207,16 @@ test("render function receives controller and DrawerBody preserves scrolling str
   await mount(
     el(
       drawer.Drawer,
-      { defaultOpen: true, modal: false },
-      el(drawer.DrawerContent, null, (value) => {
+      { defaultOpen: true, modal: false, title: "Settings" },
+      (value) => {
         actions = value;
         return el(
           React.Fragment,
           null,
-          el(
-            drawer.DrawerHeader,
-            null,
-            el(drawer.DrawerTitle, null, "Settings")
-          ),
           el(drawer.DrawerBody, { id: "body" }, "Long content"),
           el(drawer.DrawerFooter, null, "Actions")
         );
-      })
+      }
     )
   );
   assert.equal(actions.isOpen, true);
@@ -218,7 +228,7 @@ test("render function receives controller and DrawerBody preserves scrolling str
   assert.equal(actions.isOpen, false);
 });
 
-test("DrawerPanel composes one associated trigger and keeps form footer outside its body", async () => {
+test("Drawer composes one associated trigger and keeps form footer outside its body", async () => {
   await ready;
   const el = React.createElement;
   let selected;
@@ -241,7 +251,7 @@ test("DrawerPanel composes one associated trigger and keeps form footer outside 
   };
   await mount(
     el(
-      drawer.DrawerPanel,
+      drawer.Drawer,
       {
         contentProps: {
           closeButtonLabel: "Dismiss editor",
@@ -282,7 +292,7 @@ test("DrawerPanel composes one associated trigger and keeps form footer outside 
   assert.equal(selected.isOpen, false);
 });
 
-test("DrawerPanel without a trigger shares external control with render children and child hooks", async () => {
+test("Drawer without a trigger shares external control with render children and child hooks", async () => {
   await ready;
   const el = React.createElement;
   let control;
@@ -295,7 +305,7 @@ test("DrawerPanel without a trigger shares external control with render children
   const App = () => {
     control = drawer.useDrawerControl();
     return el(
-      drawer.DrawerPanel,
+      drawer.Drawer,
       {
         contentProps: { showCloseButton: false },
         control,
@@ -325,6 +335,43 @@ test("DrawerPanel without a trigger shares external control with render children
   assert.equal(control.isOpen, false);
 });
 
+test("keepMounted preserves form values across closure without leaking portal props to the popup", async () => {
+  await ready;
+  const el = React.createElement;
+  let control;
+  const App = () => {
+    control = drawer.useDrawerControl();
+    return el(
+      drawer.Drawer,
+      {
+        contentProps: { keepMounted: true },
+        control,
+        modal: false,
+        title: "Persistent form",
+      },
+      el(
+        drawer.DrawerBody,
+        null,
+        el("input", { defaultValue: "Original", id: "persistent-input" })
+      )
+    );
+  };
+  await mount(el(App));
+  await React.act(async () => control.open());
+  const input = document.querySelector("#persistent-input");
+  input.value = "Edited";
+  await React.act(async () => control.close());
+  await React.act(async () => control.open());
+  assert.equal(document.querySelector("#persistent-input"), input);
+  assert.equal(input.value, "Edited");
+  assert.equal(
+    document
+      .querySelector('[data-slot="drawer-popup"]')
+      .hasAttribute("keepmounted"),
+    false
+  );
+});
+
 test("unmounted controls ignore actions and do not queue them for remount", async () => {
   await ready;
   const el = React.createElement;
@@ -334,7 +381,7 @@ test("unmounted controls ignore actions and do not queue them for remount", asyn
     control = drawer.useDrawerControl();
     const [mounted, set] = React.useState(false);
     setMounted = set;
-    return mounted ? el(drawer.Drawer, { control }) : null;
+    return mounted ? el(drawer.Drawer, { control, title: "Settings" }) : null;
   };
   await mount(el(App));
   await React.act(async () => control.open());
@@ -360,7 +407,7 @@ test("missing context, duplicate bindings, and conflicting ownership fail clearl
   assert.throws(() => renderToStaticMarkup(el(Missing)), /inside Drawer/);
   const Conflict = () => {
     const control = drawer.useDrawerControl();
-    return el(drawer.Drawer, { control, open: true });
+    return el(drawer.Drawer, { control, open: true, title: "Settings" });
   };
   assert.throws(() => renderToStaticMarkup(el(Conflict)), /control.*open/);
   const Duplicate = () => {
@@ -368,8 +415,8 @@ test("missing context, duplicate bindings, and conflicting ownership fail clearl
     return el(
       React.Fragment,
       null,
-      el(drawer.Drawer, { control }),
-      el(drawer.Drawer, { control })
+      el(drawer.Drawer, { control, title: "First" }),
+      el(drawer.Drawer, { control, title: "Second" })
     );
   };
   await assert.rejects(mount(el(Duplicate)), /one Drawer/);
@@ -391,7 +438,10 @@ test("Strict Mode preserves controller binding and a mounted drawer can switch c
       null,
       el("output", { id: "first-state" }, String(first.isOpen)),
       el("output", { id: "second-state" }, String(second.isOpen)),
-      el(drawer.Drawer, { control: useSecond ? second : first })
+      el(drawer.Drawer, {
+        control: useSecond ? second : first,
+        title: "Settings",
+      })
     );
   };
   await mount(el(React.StrictMode, null, el(App)));
@@ -420,8 +470,10 @@ test("cancelled opening leaves both context and external consumers closed", asyn
     return el(
       drawer.Drawer,
       {
+        contentProps: { keepMounted: true },
         control,
         onOpenChange: (_, details) => details.cancel(),
+        title: "Settings",
       },
       el(Child)
     );
