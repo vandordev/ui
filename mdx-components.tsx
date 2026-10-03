@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Callout } from "@/components/callout";
 import { CodeBlockCommand } from "@/components/code-block-command";
 import { CodeTabs } from "@/components/code-tabs";
+import { ComponentDocumentation } from "@/components/component-documentation";
 import { ComponentPreview } from "@/components/component-preview";
 import { ComponentSource } from "@/components/component-source";
 import { ComponentsList } from "@/components/components-list";
@@ -37,6 +38,7 @@ export const mdxComponents = {
   Button,
   Callout,
   CodeTabs,
+  ComponentDocumentation,
   ComponentPreview,
   ComponentSource,
   ComponentsList,

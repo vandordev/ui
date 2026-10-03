@@ -1,41 +1,18 @@
 ---
 title: Button
 description: Vandor UI's Button with a subtle raised finish, smooth hover transitions, and configurable press feedback.
+component: button
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/radix/button
+    contribution: Original Button code and foundation. Vandor UI adds a raised finish, smooth hover transitions, configurable press feedback, and direct cn integration.
 ---
 
-import { ButtonPlayground } from "@/components/button-playground";
-import { ComponentDependencies } from "@/components/component-dependencies";
-import { PropsReference } from "@/components/props-reference";
-import { buttonProps } from "@/lib/button-playground";
 import { ButtonVariants } from "@/examples/button-variants";
 import { ButtonSizes } from "@/examples/button-sizes";
 import { ButtonIcon } from "@/examples/button-icon";
 import { ButtonDisabled } from "@/examples/button-disabled";
 import { ButtonAsChild } from "@/examples/button-as-child";
-
-Vandor UI's Button combines a subtle raised finish, smooth hover transitions, and configurable press feedback. Six variants, eight sizes, and `asChild` composition.
-
-## Playground
-
-Adjust the controls to update the preview and code. **While Tap** toggles press feedback; **Tap Scale** adjusts `whileTap.scale` from `0.80` to `1.00`. Reset restores the defaults.
-
-<ButtonPlayground />
-
-## Installation
-
-Initialize shadcn in your React project, then install the Button from the Vandor UI registry:
-
-```bash
-npx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
-```
-
-The default installation target is `components/ui/button.tsx`. If you already have a Button there, review the CLI's overwrite prompt before replacing local customizations.
-
-## Dependencies
-
-Installed automatically by the registry CLI. For manual setup:
-
-<ComponentDependencies name="button" />
 
 ## Usage
 
@@ -49,23 +26,9 @@ export function Demo() {
 
 Use your project's configured UI alias if it differs from `@/components/ui`.
 
-## Press Feedback
+## Examples
 
-The Button scales to `0.96` while pressed and returns on release, with a `0.12s` transition. Hover colors transition over `200ms`. Disabled buttons and reduced-motion preferences disable animation.
-
-Set `whileTap={false}` to turn off press feedback. Motion's animation props and callbacks are supported.
-
-```tsx
-<Button whileTap={false}>No scale feedback</Button>
-```
-
-## Props
-
-<PropsReference definitions={buttonProps} />
-
-The reference lists component-specific props and selected native button props, not the complete React button API. Other native attributes are forwarded to the rendered element. With `asChild`, use the child element's native attributes and semantics.
-
-## Variants
+### Variants
 
 The six built-in variants are `default`, `secondary`, `outline`, `ghost`, `destructive`, and `link`.
 
@@ -77,7 +40,7 @@ Solid variants use a subtle top-to-bottom gradient and thin border, without shad
   </div>
 </ComponentPreview>
 
-## Sizes
+### Sizes
 
 Use `xs`, `sm`, `default`, or `lg` for text buttons. Icon-only buttons use `icon-xs`, `icon-sm`, `icon`, or `icon-lg`. Give icon-only buttons an accessible label.
 
@@ -87,7 +50,7 @@ Use `xs`, `sm`, `default`, or `lg` for text buttons. Icon-only buttons use `icon
   </div>
 </ComponentPreview>
 
-## With Icons
+### With Icons
 
 Use `data-icon="inline-start"` or `data-icon="inline-end"` to indicate an icon's position. Icon sizing is handled by the Button.
 
@@ -97,7 +60,7 @@ Use `data-icon="inline-start"` or `data-icon="inline-end"` to indicate an icon's
   </div>
 </ComponentPreview>
 
-## Disabled
+### Disabled
 
 Use the native `disabled` prop to prevent interaction.
 
@@ -107,7 +70,7 @@ Use the native `disabled` prop to prevent interaction.
   </div>
 </ComponentPreview>
 
-## As Child
+### As Child
 
 Use `asChild` to style a link without nesting it inside a button. The child retains its native link semantics. Use this for navigation, not the `variant="link"` appearance alone.
 
@@ -117,10 +80,17 @@ Use `asChild` to style a link without nesting it inside a button. The child reta
   </div>
 </ComponentPreview>
 
-## Source
+## Behavior & Accessibility
 
-<ComponentSource name="button" title="button.tsx" />
+The Button scales to `0.96` while pressed and returns on release, with a `0.12s` transition. Hover colors transition over `200ms`. Disabled buttons and reduced-motion preferences disable animation.
 
-## Credits
+Set `whileTap={false}` to turn off press feedback. Motion's animation props and callbacks are supported.
 
-- [shadcn/ui](https://ui.shadcn.com/docs/components/radix/button): the original Button code and foundation. Vandor UI adapts it with a raised finish, smooth hover transitions, configurable press feedback, and direct `cn` integration.
+```tsx
+<Button whileTap={false}>No scale feedback</Button>
+```
+
+- Native buttons support Enter and Space activation. The press animation uses Motion's pointer and Enter gestures.
+- A visible focus ring identifies keyboard focus. Give icon-only buttons an `aria-label`.
+- Set `type="button"` for non-submit actions inside a form.
+- With `asChild`, the child retains its own keyboard behavior and attributes. Use links for navigation; native `disabled` does not disable a link.

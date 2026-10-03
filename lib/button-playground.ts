@@ -71,7 +71,7 @@ export const buttonProps = {
   asChild: {
     defaultValue: "false",
     description:
-      "Uses the child element instead of a button, preserving the child's semantics. See the As Child example below.",
+      "Uses the child element instead of a button, preserving the child's semantics. See the As Child example.",
     type: "boolean",
   },
   className: {

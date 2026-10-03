@@ -28,7 +28,7 @@ const buttonVariants = cva(
       },
       variant: {
         default:
-          "border border-primary border-t-primary/70 bg-primary bg-linear-to-b from-white/10 to-black/10 text-primary-foreground hover:bg-primary/90",
+          "border border-primary border-t-primary/70 bg-primary bg-linear-to-b from-white/10 to-black/20 text-primary-foreground hover:bg-primary/90",
         destructive:
           "border border-destructive border-t-destructive/70 bg-destructive bg-linear-to-b from-white/10 to-black/10 text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
         ghost:
