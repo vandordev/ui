@@ -41,7 +41,7 @@ const Command = <Item extends CommandSearchItem>({
     <div
       data-slot="command"
       className={cn(
-        "bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md",
+        "bg-popover text-popover-foreground flex w-full flex-col overflow-hidden rounded-md",
         className
       )}
     >
@@ -120,7 +120,7 @@ const CommandEmpty = ({
 }: ComponentProps<typeof Autocomplete.Empty>) => (
   <Autocomplete.Empty
     data-slot="command-empty"
-    className={cn("py-6 text-center text-sm", className)}
+    className={cn("py-6 text-center text-sm empty:p-0", className)}
     {...props}
   />
 );

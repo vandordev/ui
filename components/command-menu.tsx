@@ -379,10 +379,10 @@ export const CommandMenu = ({
             aria-label="Search documentation"
             placeholder="Search documentation..."
           />
-          <CommandEmpty className="text-muted-foreground min-h-80 py-12 text-center text-sm">
+          <CommandEmpty className="text-muted-foreground py-12 text-center text-sm">
             No results found.
           </CommandEmpty>
-          <CommandList className="no-scrollbar min-h-80 scroll-pt-2 scroll-pb-1.5">
+          <CommandList className="no-scrollbar max-h-[min(300px,50dvh)] scroll-pt-2 scroll-pb-1.5">
             {(group: SearchGroup) => (
               <CommandGroup
                 key={group.label}
