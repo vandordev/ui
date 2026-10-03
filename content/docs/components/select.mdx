@@ -8,13 +8,46 @@ credits:
     contribution: Select composition and foundation. Vandor UI adds Motion reveal and exit transitions, reduced-motion support, and direct cn integration.
 ---
 
-import { SelectDemo } from "@/examples/select-demo";
+import { SelectDemo, SelectGroupedDemo } from "@/examples/select-demo";
 
 ## Usage
 
+Use `SelectInput` for a ready-to-use control. It renders the trigger, popup, options, and groups using the same Select primitives.
+
+```tsx
+import { SelectInput } from "@/components/ui/select";
+
+const data = [
+  { label: "Apple", value: "apple" },
+  { label: "Banana", value: "banana" },
+];
+
+export function Demo() {
+  return (
+    <SelectInput
+      data={data}
+      aria-label="Fruit"
+      placeholder="Select a fruit"
+      className="w-56"
+    />
+  );
+}
+```
+
+`className`, `size`, and `aria-*` props apply to the trigger. Use `triggerProps` for additional trigger attributes, event handlers, or a ref. Use `contentProps` for popup positioning and styling. Root props such as `value`, `defaultValue`, `onValueChange`, `name`, `required`, and `multiple` are forwarded to Select. `data` is the single source for option rendering and selected labels; do not also pass `items` or `children`.
+
+### Custom Composition
+
+The existing primitives remain available when you need a custom trigger, value display, or popup layout.
+
 ```tsx
 import {
-  Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 const items = [
@@ -58,7 +91,45 @@ Use `size="sm"` on `SelectTrigger` for a compact control. Set `disabled` on `Sel
 
 ### Groups
 
+`SelectInput` accepts options and groups in the same array, preserving their order. A group uses `label` and `items`; an option uses `label`, `value`, and optionally `disabled`.
+
+```tsx
+const data = [
+  { label: "Apple", value: "apple" },
+  {
+    label: "Tropical",
+    items: [
+      { label: "Mango", value: "mango" },
+      { label: "Banana", value: "banana", disabled: true },
+    ],
+  },
+];
+
+<SelectInput data={data} aria-label="Fruit" placeholder="Select a fruit" />;
+```
+
+<div className="flex justify-center rounded-md border p-6">
+  <SelectGroupedDemo />
+</div>
+
+Groups support one level only. Use unique group labels and option values across the control. Labels are strings and values are strings or numbers. Readonly arrays are supported. An empty array renders no options and still displays the placeholder when no value is selected.
+
 Place options inside `SelectGroup`. Use `SelectLabel` for a group heading and `SelectSeparator` between groups. Group headings do not label the control: give the trigger a visible label or `aria-label`.
+
+### Custom Option Content
+
+Use `renderItem` to add icons or other non-interactive content. The option's original `label` remains the selected text and keyboard typeahead label.
+
+```tsx
+<SelectInput
+  data={data}
+  aria-label="Fruit"
+  renderItem={(item) => <span>{item.label}</span>}
+  contentProps={{ side: "top", align: "end" }}
+/>
+```
+
+Set `size="sm"`, `disabled`, or `animated={false}` directly on `SelectInput`. For searchable or very large lists, prefer a Combobox instead of extending Select with search.
 
 ### Controlled Values and Forms
 

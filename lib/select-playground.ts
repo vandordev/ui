@@ -18,7 +18,7 @@ export const selectProps = {
       label: "Placeholder",
     },
     defaultValue: "Not set",
-    description: "SelectValue: text shown before choosing a value.",
+    description: "SelectInput: text shown before choosing a value.",
     type: "ReactNode",
   },
   size: {
@@ -29,7 +29,7 @@ export const selectProps = {
       options: ["default", "sm"],
     },
     defaultValue: '"default"',
-    description: "SelectTrigger: control height.",
+    description: "SelectInput: control height.",
     type: '"default" | "sm"',
   },
   disabled: {
@@ -50,7 +50,7 @@ export const selectProps = {
     },
     defaultValue: "true",
     description:
-      "SelectContent: enables Motion reveal and exit. Respects reduced motion.",
+      "SelectInput: enables Motion reveal and exit. Respects reduced motion.",
     type: "boolean",
   },
   alignItemWithTrigger: {
@@ -80,6 +80,29 @@ export const selectProps = {
     description: "Select: maps values to displayed labels.",
     type: "Array<{ label, value }> | Record<string, ReactNode>",
   },
+  data: {
+    defaultValue: "Required",
+    description:
+      "SelectInput: options and one-level groups rendered automatically.",
+    type: "readonly (SelectOption<Value> | SelectOptionGroup<Value>)[]",
+  },
+  renderItem: {
+    defaultValue: "Not set",
+    description:
+      "SelectInput: custom option content; label remains the trigger and typeahead text.",
+    type: "(item: SelectOption<Value>) => ReactNode",
+  },
+  triggerProps: {
+    defaultValue: "Not set",
+    description:
+      "SelectInput: additional trigger props, including ref and event handlers.",
+    type: "Omit<SelectTriggerProps, 'children' | 'className' | 'size'>",
+  },
+  contentProps: {
+    defaultValue: "Not set",
+    description: "SelectInput: popup props and positioning options.",
+    type: "Omit<SelectContentProps, 'children' | 'animated'>",
+  },
   name: {
     defaultValue: "Not set",
     description: "Select: name included in native form submission.",
@@ -90,25 +113,17 @@ export const selectProps = {
 export const getSelectDefaults = () => getPlaygroundDefaults(selectProps);
 export type SelectPlaygroundValues = ReturnType<typeof getSelectDefaults>;
 
-export const getSelectCode = (values: SelectPlaygroundValues) => `import {
-  Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
+export const getSelectCode = (
+  values: SelectPlaygroundValues
+) => `import { SelectInput } from "@/components/ui/select";
 
 const items = ${JSON.stringify(selectItems, null, 2)};
 
 export const SelectDemo = () => (
-  <Select items={items}${values.disabled ? " disabled" : ""}>
-    <SelectTrigger aria-label="Fruit" className="w-56"${values.size === "sm" ? ' size="sm"' : ""}>
-      <SelectValue placeholder={${JSON.stringify(values.placeholder)}} />
-    </SelectTrigger>
-    <SelectContent${values.animated ? "" : " animated={false}"}>
-      <SelectGroup>
-        {items.map((item) => (
-          <SelectItem key={item.value} value={item.value}>
-            {item.label}
-          </SelectItem>
-        ))}
-      </SelectGroup>
-    </SelectContent>
-  </Select>
+  <SelectInput
+    data={items}
+    aria-label="Fruit"
+    className="w-56"
+    placeholder={${JSON.stringify(values.placeholder)}}${values.size === "sm" ? '\n    size="sm"' : ""}${values.disabled ? "\n    disabled" : ""}${values.animated ? "" : "\n    animated={false}"}
+  />
 );`;

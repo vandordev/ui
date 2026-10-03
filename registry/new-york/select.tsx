@@ -7,7 +7,7 @@ import { cn } from "cn";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { createContext, useContext, useRef } from "react";
-import type { ComponentProps } from "react";
+import type { AriaAttributes, ComponentProps, ReactNode } from "react";
 
 const PopupElement = ({
   nativeProps,
@@ -277,10 +277,123 @@ const SelectScrollDownButton = ({
   </SelectPrimitive.ScrollDownArrow>
 );
 
+interface SelectOption<Value extends string | number = string> {
+  label: string;
+  value: Value;
+  disabled?: boolean;
+}
+
+interface SelectOptionGroup<Value extends string | number = string> {
+  label: string;
+  items: readonly SelectOption<Value>[];
+}
+
+type SelectInputProps<
+  Value extends string | number = string,
+  Multiple extends boolean | undefined = false,
+> = Omit<
+  SelectPrimitive.Root.Props<NoInfer<Value>, Multiple>,
+  "children" | "items"
+> &
+  AriaAttributes & {
+    data: readonly (SelectOption<Value> | SelectOptionGroup<Value>)[];
+    placeholder?: ReactNode;
+    size?: ComponentProps<typeof SelectTrigger>["size"];
+    className?: string;
+    animated?: boolean;
+    triggerProps?: Omit<
+      ComponentProps<typeof SelectTrigger>,
+      "children" | "className" | "size"
+    >;
+    contentProps?: Omit<SelectContentProps, "children" | "animated">;
+    renderItem?: (item: SelectOption<Value>) => ReactNode;
+  };
+
+const SelectInput = <
+  Value extends string | number,
+  Multiple extends boolean | undefined = false,
+>({
+  data,
+  placeholder,
+  size,
+  className,
+  animated,
+  triggerProps,
+  contentProps,
+  renderItem,
+  ...props
+}: SelectInputProps<Value, Multiple>) => {
+  // Keep adjacent ungrouped options together, preserving mixed data order.
+  const groups: { label?: string; items: SelectOption<Value>[] }[] = [];
+  for (const entry of data) {
+    if ("items" in entry) {
+      groups.push({ items: [...entry.items], label: entry.label });
+    } else {
+      const previous = groups.at(-1);
+      if (previous && previous.label === undefined) {
+        previous.items.push(entry);
+      } else {
+        groups.push({ items: [entry] });
+      }
+    }
+  }
+  // Base UI resolves labels from a flat lookup even when data mixes groups and options.
+  const items = groups.flatMap((group) => group.items);
+  const rootProps = { ...props };
+  const ariaProps: AriaAttributes = {};
+  for (const key of Object.keys(rootProps)) {
+    if (key.startsWith("aria-")) {
+      Object.assign(ariaProps, { [key]: Reflect.get(rootProps, key) });
+      Reflect.deleteProperty(rootProps, key);
+    }
+  }
+
+  return (
+    <Select {...rootProps} items={items}>
+      <SelectTrigger
+        {...triggerProps}
+        {...ariaProps}
+        className={className}
+        size={size}
+      >
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent {...contentProps} animated={animated}>
+        {groups.map((group) => (
+          <SelectGroup
+            key={
+              group.label === undefined
+                ? `options:${typeof group.items[0].value}:${group.items[0].value}`
+                : `group:${group.label}`
+            }
+          >
+            {group.label !== undefined && (
+              <SelectLabel>{group.label}</SelectLabel>
+            )}
+            {group.items.map((item) => (
+              <SelectItem
+                key={`${typeof item.value}:${item.value}`}
+                value={item.value}
+                label={item.label}
+                disabled={item.disabled}
+              >
+                {renderItem ? renderItem(item) : item.label}
+              </SelectItem>
+            ))}
+          </SelectGroup>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
+
+export type { SelectInputProps, SelectOption, SelectOptionGroup };
+
 export {
   Select,
   SelectContent,
   SelectGroup,
+  SelectInput,
   SelectItem,
   SelectLabel,
   SelectScrollDownButton,

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/registry/new-york/select";
+import { SelectInput } from "@/registry/new-york/select";
 
 const items = [
   { label: "Apple", value: "apple" },
@@ -16,18 +9,28 @@ const items = [
 ];
 
 export const SelectDemo = () => (
-  <Select items={items}>
-    <SelectTrigger aria-label="Fruit" className="w-56 max-w-full">
-      <SelectValue placeholder="Select a fruit" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectGroup>
-        {items.map((item) => (
-          <SelectItem key={item.value} value={item.value}>
-            {item.label}
-          </SelectItem>
-        ))}
-      </SelectGroup>
-    </SelectContent>
-  </Select>
+  <SelectInput
+    data={items}
+    aria-label="Fruit"
+    className="w-56 max-w-full"
+    placeholder="Select a fruit"
+  />
+);
+
+export const SelectGroupedDemo = () => (
+  <SelectInput
+    data={[
+      { label: "Apple", value: "apple" },
+      {
+        items: [
+          { label: "Mango", value: "mango" },
+          { disabled: true, label: "Banana", value: "banana" },
+        ],
+        label: "Tropical",
+      },
+    ]}
+    aria-label="Grouped fruit"
+    className="w-56 max-w-full"
+    placeholder="Select a fruit"
+  />
 );
