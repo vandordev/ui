@@ -1,0 +1,43 @@
+"use client";
+
+import { cn } from "cn";
+import { motion } from "motion/react";
+
+function PulsatingDots({
+  className,
+  dots = 3,
+  duration = 1,
+  ...props
+}: React.ComponentProps<"span"> & { dots?: number; duration?: number }) {
+  const dotCount = Number.isFinite(dots) ? Math.max(1, Math.floor(dots)) : 3;
+
+  return (
+    <span
+      role="status"
+      className={cn("inline-flex items-center justify-center", className)}
+      {...props}
+    >
+      <span aria-hidden="true" className="inline-flex w-full gap-[16%]">
+        {Array.from({ length: dotCount }, (_, index) => (
+          <motion.span
+            key={index}
+            className="inline-block aspect-square grow rounded-full bg-current"
+            animate={{
+              opacity: [0.5, 1, 0.5],
+              scale: [1, 1.5, 1],
+            }}
+            transition={{
+              delay: index * 0.3,
+              duration,
+              ease: "easeInOut",
+              repeat: Infinity,
+            }}
+          />
+        ))}
+      </span>
+      <span className="sr-only">Loading</span>
+    </span>
+  );
+}
+
+export { PulsatingDots };

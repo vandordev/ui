@@ -1,0 +1,46 @@
+import { cn } from "cn";
+
+function TwinOrbit({ className, ...props }: React.ComponentProps<"span">) {
+  return (
+    <>
+      <style>{`
+        @keyframes loading-ui-twin-orbit-rotate {
+          100% {
+            transform: rotate(360deg) translate(155%);
+          }
+        }
+      `}</style>
+      <span
+        role="status"
+        className={cn(
+          "relative inline-block aspect-square rounded-full bg-current",
+          className
+        )}
+        {...props}
+      >
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 rounded-full bg-current"
+          style={{
+            animation:
+              "loading-ui-twin-orbit-rotate var(--duration, 1s) ease infinite",
+            transform: "rotate(0deg) translate(155%)",
+          }}
+        />
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 rounded-full bg-current"
+          style={{
+            animation:
+              "loading-ui-twin-orbit-rotate var(--duration, 1s) ease infinite",
+            animationDelay: "calc(var(--duration, 1s) / 2)",
+            transform: "rotate(0deg) translate(155%)",
+          }}
+        />
+        <span className="sr-only">Loading</span>
+      </span>
+    </>
+  );
+}
+
+export { TwinOrbit };

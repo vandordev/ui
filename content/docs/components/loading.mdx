@@ -1,0 +1,91 @@
+---
+title: Loading
+description: All 47 loading-ui animations in one component, selected with a typed variant prop.
+component: loading
+credits:
+  - name: loading-ui
+    url: https://github.com/turbostarter/loading-ui
+    contribution: Original MIT-licensed animations by Bartosz Zagrodzki. Vandor UI adds a unified typed variant API, proportional sizing, accessible status labels, and a reduced-motion fallback.
+---
+
+import { LoadingVariants } from "@/examples/loading-variants";
+
+## Usage
+
+```tsx
+import { Loading } from "@/components/ui/loading";
+
+export function Demo() {
+  return <Loading variant="ring" size={32} aria-label="Saving changes" />;
+}
+```
+
+Omit `variant` to use `ring`. Installation adds the wrapper and variant list to `components/ui/`, plus all 47 loading-ui components and their MIT license to `components/loading-ui/`. Vandor UI distributes a source snapshot so the installed animations match the previews. Use your project's configured aliases if they differ.
+
+The catalog matches loading-ui at the time of this release. Future upstream additions require a Vandor UI update; they do not silently become new variants.
+
+## Variants
+
+Choose any name shown below with `variant`. This includes every visual component in loading-ui, not just circular spinners. The upstream `index`, `style`, and `utils` entries are infrastructure, not visual variants.
+
+<ComponentPreview name="loading-variants" title="loading-variants.tsx">
+  <LoadingVariants />
+</ComponentPreview>
+
+## Variant Configuration
+
+`variantProps` preserves each upstream component's options. TypeScript checks them against the selected `variant`; for example, `prompt` belongs to `terminal`, not `ring`.
+
+```tsx
+<Loading variant="dots-ring" variantProps={{ dots: 12, dotScale: 0.2 }} />
+<Loading variant="bars" variantProps={{ bars: 5 }} />
+<Loading variant="terminal" variantProps={{ prompt: "$" }} />
+<Loading variant="square-grid" variantProps={{ size: 7, track: "·" }} />
+<Loading
+  variant="wandering-eyes"
+  size={40}
+  variantProps={{ eyeScale: 0.6, pupilScale: 0.25 }}
+/>
+```
+
+`size` is the base visual size, in pixels or a CSS length. Text and glyph loaders use it as font size. Skeleton, eyes, and orbiting dots use proportional dimensions. `variantProps.size`, where supported, remains the upstream option (for example, the number of grid cells).
+
+Use `className` for wrapper layout and inherited color. Use `variantProps.className` and `variantProps.style` for the visual itself:
+
+```tsx
+<Loading variant="ring" className="text-primary" size="2rem" />
+<Loading
+  variant="skeleton"
+  aria-label="Loading profile"
+  variantProps={{ className: "rounded-none", style: { width: 160, height: 24 } }}
+/>
+```
+
+### Text
+
+`text` supplies the visible content for all four text variants. It is separate from the accessible status label.
+
+```tsx
+<Loading variant="text-dots" text="Uploading" aria-label="Uploading file" />
+<Loading variant="text-blink" text="Thinking" variantProps={{ minOpacity: 0.3 }} />
+<Loading variant="text-shimmer" text="Generating" variantProps={{ duration: 2, spread: 3 }} />
+<Loading variant="text-shimmer-wave" text="Processing" variantProps={{ yDistance: -4 }} />
+```
+
+### Animation Timing
+
+`duration` sets the inherited `--duration` CSS variable in seconds for CSS-based loaders. Original fixed Motion and SVG SMIL timings remain unchanged, including `spiral`, `morphing-infinity`, `analyzing-image`, `diamond`, `dash-ring`, and `ripple`. For Motion loaders that expose a timing prop, use `variantProps.duration`:
+
+```tsx
+<Loading variant="ring" duration={0.8} />
+<Loading variant="bobbing-dots" variantProps={{ duration: 1.5 }} />
+<Loading variant="pulsating-dots" variantProps={{ duration: 1.5 }} />
+```
+
+## Accessibility
+
+The wrapper is a `div` with `role="status"` and the default accessible name `Loading`. Native div props and its ref are forwarded to the wrapper. All animated visuals are hidden from assistive technology to avoid duplicate announcements.
+
+Provide a localized `aria-label` describing the operation. For a decorative indicator next to an existing status message, set `aria-hidden` on `Loading`. Render the loader only while work is pending, and use `aria-busy` on the region being updated when appropriate.
+
+When `prefers-reduced-motion` is enabled, looping animations are replaced by a static ring, or static content for text variants. The accessible status name is preserved.

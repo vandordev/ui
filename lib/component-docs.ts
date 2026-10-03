@@ -5,6 +5,11 @@ import {
   getButtonCode,
   getButtonDefaults,
 } from "@/lib/button-playground";
+import {
+  getLoadingCode,
+  getLoadingDefaults,
+  loadingProps,
+} from "@/lib/loading-playground";
 import type { PropDefinition } from "@/lib/playground";
 import registry from "@/registry.json";
 
@@ -19,6 +24,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
       code: getButtonCode(getButtonDefaults()),
     },
     props: buttonProps,
+  },
+  loading: {
+    playground: { code: getLoadingCode(getLoadingDefaults()) },
+    props: loadingProps,
   },
 };
 

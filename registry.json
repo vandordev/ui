@@ -20,6 +20,265 @@
           "target": "components/ui/button.tsx"
         }
       ]
+    },
+    {
+      "name": "loading",
+      "type": "registry:ui",
+      "title": "Loading",
+      "description": "All 47 loading-ui animations behind one typed variant prop, with sizing, accessible status labels, and reduced-motion support.",
+      "dependencies": ["cn", "motion"],
+      "files": [
+        {
+          "path": "registry/new-york/loading.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/loading.tsx"
+        },
+        {
+          "path": "registry/new-york/loading-variants.ts",
+          "type": "registry:ui",
+          "target": "components/ui/loading-variants.ts"
+        },
+        {
+          "path": "components/loading-ui/LICENSE.md",
+          "type": "registry:file",
+          "target": "components/loading-ui/LICENSE.md"
+        },
+        {
+          "path": "components/loading-ui/ring.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/ring.tsx"
+        },
+        {
+          "path": "components/loading-ui/spokes.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/spokes.tsx"
+        },
+        {
+          "path": "components/loading-ui/classic.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/classic.tsx"
+        },
+        {
+          "path": "components/loading-ui/dots-ring.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/dots-ring.tsx"
+        },
+        {
+          "path": "components/loading-ui/spiral.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/spiral.tsx"
+        },
+        {
+          "path": "components/loading-ui/swirling.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/swirling.tsx"
+        },
+        {
+          "path": "components/loading-ui/arc.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/arc.tsx"
+        },
+        {
+          "path": "components/loading-ui/dual-arc.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/dual-arc.tsx"
+        },
+        {
+          "path": "components/loading-ui/fade-arc.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/fade-arc.tsx"
+        },
+        {
+          "path": "components/loading-ui/concentric-ring.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/concentric-ring.tsx"
+        },
+        {
+          "path": "components/loading-ui/orbit-ring.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/orbit-ring.tsx"
+        },
+        {
+          "path": "components/loading-ui/satellite-ring.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/satellite-ring.tsx"
+        },
+        {
+          "path": "components/loading-ui/clock-ring.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/clock-ring.tsx"
+        },
+        {
+          "path": "components/loading-ui/quarter-ring.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/quarter-ring.tsx"
+        },
+        {
+          "path": "components/loading-ui/dash-ring.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/dash-ring.tsx"
+        },
+        {
+          "path": "components/loading-ui/comet-spinner.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/comet-spinner.tsx"
+        },
+        {
+          "path": "components/loading-ui/pulse.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/pulse.tsx"
+        },
+        {
+          "path": "components/loading-ui/ripple.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/ripple.tsx"
+        },
+        {
+          "path": "components/loading-ui/pulse-dot.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/pulse-dot.tsx"
+        },
+        {
+          "path": "components/loading-ui/dots.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/dots.tsx"
+        },
+        {
+          "path": "components/loading-ui/bobbing-dots.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/bobbing-dots.tsx"
+        },
+        {
+          "path": "components/loading-ui/bouncing-dots.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/bouncing-dots.tsx"
+        },
+        {
+          "path": "components/loading-ui/typing.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/typing.tsx"
+        },
+        {
+          "path": "components/loading-ui/twin-orbit.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/twin-orbit.tsx"
+        },
+        {
+          "path": "components/loading-ui/pulsating-dots.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/pulsating-dots.tsx"
+        },
+        {
+          "path": "components/loading-ui/triple-dot-spinner.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/triple-dot-spinner.tsx"
+        },
+        {
+          "path": "components/loading-ui/text-shimmer.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/text-shimmer.tsx"
+        },
+        {
+          "path": "components/loading-ui/text-blink.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/text-blink.tsx"
+        },
+        {
+          "path": "components/loading-ui/text-dots.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/text-dots.tsx"
+        },
+        {
+          "path": "components/loading-ui/text-shimmer-wave.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/text-shimmer-wave.tsx"
+        },
+        {
+          "path": "components/loading-ui/morphing-infinity.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/morphing-infinity.tsx"
+        },
+        {
+          "path": "components/loading-ui/infinity.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/infinity.tsx"
+        },
+        {
+          "path": "components/loading-ui/accordion-loader.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/accordion-loader.tsx"
+        },
+        {
+          "path": "components/loading-ui/symmetric-wave.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/symmetric-wave.tsx"
+        },
+        {
+          "path": "components/loading-ui/square-grid.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/square-grid.tsx"
+        },
+        {
+          "path": "components/loading-ui/square-accordion.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/square-accordion.tsx"
+        },
+        {
+          "path": "components/loading-ui/conveyor-loop.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/conveyor-loop.tsx"
+        },
+        {
+          "path": "components/loading-ui/square-snake.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/square-snake.tsx"
+        },
+        {
+          "path": "components/loading-ui/infinity-square-snake.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/infinity-square-snake.tsx"
+        },
+        {
+          "path": "components/loading-ui/infinity-track.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/infinity-track.tsx"
+        },
+        {
+          "path": "components/loading-ui/diamond.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/diamond.tsx"
+        },
+        {
+          "path": "components/loading-ui/wave.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/wave.tsx"
+        },
+        {
+          "path": "components/loading-ui/bars.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/bars.tsx"
+        },
+        {
+          "path": "components/loading-ui/analyzing-image.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/analyzing-image.tsx"
+        },
+        {
+          "path": "components/loading-ui/skeleton.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/skeleton.tsx"
+        },
+        {
+          "path": "components/loading-ui/terminal.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/terminal.tsx"
+        },
+        {
+          "path": "components/loading-ui/wandering-eyes.tsx",
+          "type": "registry:component",
+          "target": "components/loading-ui/wandering-eyes.tsx"
+        }
+      ]
     }
   ]
 }

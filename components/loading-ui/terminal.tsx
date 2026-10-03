@@ -1,0 +1,47 @@
+import { cn } from "cn";
+
+type TerminalProps = React.ComponentProps<"span"> & {
+  prompt?: string;
+};
+
+function Terminal({ className, prompt = ">", style, ...props }: TerminalProps) {
+  return (
+    <>
+      <style>{`
+        @keyframes loading-ui-terminal-blink {
+          0%,
+          100% {
+            opacity: 1;
+          }
+
+          50% {
+            opacity: 0;
+          }
+        }
+      `}</style>
+      <span
+        role="status"
+        className={cn(
+          "inline-flex items-center gap-[0.25em] font-mono",
+          className
+        )}
+        style={style}
+        {...props}
+      >
+        <span aria-hidden="true">{prompt}</span>
+        <span
+          aria-hidden="true"
+          className="inline-block w-[0.5em] bg-current"
+          style={{
+            animation:
+              "loading-ui-terminal-blink var(--duration, 1s) step-end infinite",
+            height: "1em",
+          }}
+        />
+        <span className="sr-only">Loading</span>
+      </span>
+    </>
+  );
+}
+
+export { Terminal };

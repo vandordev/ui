@@ -15,4 +15,11 @@ export default defineConfig({
     ".web-kits/**",
     "audio/**",
   ],
+  // Keep upstream source declarations recognizable when updating loading-ui.
+  overrides: [
+    {
+      files: ["components/loading-ui/**/*.tsx"],
+      rules: { "func-style": "off" },
+    },
+  ],
 });
