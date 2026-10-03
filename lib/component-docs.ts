@@ -11,6 +11,11 @@ import {
   getButtonDefaults,
 } from "@/lib/button-playground";
 import {
+  drawerProps,
+  getDrawerCode,
+  getDrawerDefaults,
+} from "@/lib/drawer-playground";
+import {
   getLoadingCode,
   getLoadingDefaults,
   loadingProps,
@@ -38,6 +43,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
       code: getButtonCode(getButtonDefaults()),
     },
     props: buttonProps,
+  },
+  drawer: {
+    playground: { code: getDrawerCode(getDrawerDefaults()) },
+    props: drawerProps,
   },
   loading: {
     playground: { code: getLoadingCode(getLoadingDefaults()) },

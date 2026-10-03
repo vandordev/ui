@@ -1,0 +1,271 @@
+---
+title: Drawer
+description: An accessible, swipeable panel for focused content and actions.
+component: drawer
+credits:
+  - name: Base UI
+    url: https://base-ui.com/react/components/drawer
+    contribution: Drawer primitive, gesture handling, snap points, nested drawers, and accessible interaction foundation.
+---
+
+import { DrawerDemo } from "@/examples/drawer-demo";
+
+## Usage
+
+```tsx
+import {
+  Drawer,
+  DrawerBody,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
+export function ProjectSettings() {
+  return (
+    <Drawer swipeDirection="right">
+      <DrawerTrigger>Open settings</DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Project settings</DrawerTitle>
+          <DrawerDescription>
+            Manage the details and preferences for this project.
+          </DrawerDescription>
+        </DrawerHeader>
+        <DrawerBody>Your settings form</DrawerBody>
+        <DrawerFooter>
+          <DrawerClose>Done</DrawerClose>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+```
+
+The registry installs editable source into your project. Use your configured UI alias if it differs from `@/components/ui`.
+
+## Examples
+
+<ComponentPreview name="drawer-demo" title="drawer-demo.tsx">
+  <div className="flex justify-center rounded-md border p-6">
+    <DrawerDemo />
+  </div>
+</ComponentPreview>
+
+## Composition
+
+- `Drawer` owns open state and configures `modal`, `swipeDirection`, `snapPoints`, and `showSwipeHandle`.
+- `DrawerTrigger` opens the panel. `DrawerClose` closes it, and can wrap any button-like content.
+- `DrawerContent` composes the portal, optional modal overlay, viewport, swipeable popup, and scroll-safe content region.
+- A close button appears in the top-right corner by default. `DrawerHeader` reserves space so the button does not overlap the title. Set `showCloseButton={false}` on `DrawerContent` when supplying your own dismissal control, and use `closeButtonLabel` to translate its accessible label.
+- `DrawerHeader`, `DrawerFooter`, `DrawerTitle`, and `DrawerDescription` provide a consistent structure. Give every drawer a title; the description is optional.
+- `DrawerBody` is the flexible, vertically scrollable region with default padding. Header, footer, and the close button remain outside its scroll area.
+- `DrawerPortal`, `DrawerOverlay`, and `DrawerSwipeHandle` are exported for custom compositions. If replacing `DrawerContent`, compose the Base UI viewport and popup behavior as well.
+
+## Direction and Snap Points
+
+The default `swipeDirection` is `right`, which opens a side panel from the right edge. Set it to `left`, `up`, or `down` for the other edges. Side drawers have a responsive width capped at `28rem`; vertical drawers use the available viewport height and can scroll.
+
+For a vertical drawer, pass snap points as fractions between `0` and `1`:
+
+```tsx
+<Drawer swipeDirection="down" snapPoints={[0.5, 0.9]} showSwipeHandle>
+  {/* trigger and content */}
+</Drawer>
+```
+
+The active snap point and swipe gestures are managed by Base UI. `showSwipeHandle` adds a visual grabber; it is optional and does not replace the gesture area. Snap points are most useful with `up` or `down` drawers.
+
+## Controlled State and Modal Behavior
+
+Use `defaultOpen` for an initially open, uncontrolled drawer. Use `open` and `onOpenChange` when application state must control it. Base UI root props, including `disabled`, `actionsRef`, and change event details, are forwarded.
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
+export function ControlledDrawer() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger>Open settings</DrawerTrigger>
+      <DrawerContent closeButtonLabel="Close settings">
+        <DrawerHeader>
+          <DrawerTitle>Settings</DrawerTitle>
+        </DrawerHeader>
+        <div className="p-4">
+          <DrawerClose>Done</DrawerClose>
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+}
+```
+
+Drawers are modal by default: they render a backdrop and use Base UI's modal focus management. Set `modal={false}` only when the surrounding interface should remain interactive. Non-modal drawers omit the backdrop, so provide suitable dismissal and focus behavior for your use case.
+
+## Scrollable Body
+
+Use `DrawerBody` instead of manually adding overflow classes. It forwards native `div` props, including `ref`, and accepts `className` overrides.
+
+```tsx
+<DrawerContent>
+  <DrawerHeader>
+    <DrawerTitle>Project settings</DrawerTitle>
+  </DrawerHeader>
+  <DrawerBody>
+    {Array.from({ length: 30 }, (_, index) => (
+      <p key={index} className="mb-4">
+        Setting {index + 1}
+      </p>
+    ))}
+  </DrawerBody>
+  <DrawerFooter>
+    <DrawerClose>Done</DrawerClose>
+  </DrawerFooter>
+</DrawerContent>
+```
+
+The panel constrains its height to the viewport. `DrawerBody` uses `min-h-0 flex-1 overflow-y-auto`, so only the body scrolls. Enable **Long content** in the playground to try it.
+
+## Drawer Controls
+
+`useDrawerControl()` creates a stable controller for one mounted Drawer. `useDrawer()` selects the nearest Drawer; `useDrawer(control)` selects a specific controller instead. All three return `DrawerControl`:
+
+| Member    | Type                  | Behavior                              |
+| --------- | --------------------- | ------------------------------------- |
+| `isOpen`  | `boolean` (read-only) | Reactive state of the mounted Drawer. |
+| `open()`  | `() => void`          | Requests opening through Base UI.     |
+| `close()` | `() => void`          | Requests closing through Base UI.     |
+
+### Control from Outside
+
+```tsx
+"use client";
+
+import { useRef } from "react";
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  useDrawerControl,
+} from "@/components/ui/drawer";
+
+export function SettingsDrawer() {
+  const control = useDrawerControl();
+  const opener = useRef<HTMLButtonElement>(null);
+
+  return (
+    <>
+      <button ref={opener} type="button" onClick={control.open}>
+        Open settings
+      </button>
+      <Drawer control={control}>
+        <DrawerContent finalFocus={opener}>
+          <DrawerHeader>
+            <DrawerTitle>Settings</DrawerTitle>
+          </DrawerHeader>
+          <DrawerBody>Your settings form</DrawerBody>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+}
+```
+
+An ordinary external button is not an associated Base UI trigger. Use `finalFocus` to explicitly restore focus to it. Prefer `DrawerTrigger` inside the root when you do not need external control.
+
+### Control from a Child
+
+```tsx
+import { useDrawer } from "@/components/ui/drawer";
+
+export function SaveSettings({ save }: { save: () => Promise<void> }) {
+  const { close } = useDrawer();
+
+  async function handleSave() {
+    await save(); // The drawer stays open if saving fails.
+    close();
+  }
+
+  return (
+    <button type="button" onClick={handleSave}>
+      Save settings
+    </button>
+  );
+}
+```
+
+Place `SaveSettings` inside `DrawerBody`. Handle loading and save errors in your form before closing. Unlike `DrawerClose`, this waits for the action to succeed. A hook-bound child depends on being inside a Drawer; reusable forms can instead accept an `onSuccess` callback.
+
+### Render Function Shortcut
+
+```tsx
+<DrawerContent>
+  {({ close }) => (
+    <>
+      <DrawerHeader>
+        <DrawerTitle>Settings</DrawerTitle>
+      </DrawerHeader>
+      <DrawerBody>Your settings form</DrawerBody>
+      <DrawerFooter>
+        <button type="button" onClick={close}>
+          Done
+        </button>
+      </DrawerFooter>
+    </>
+  )}
+</DrawerContent>
+```
+
+The render function receives the same controller as `useDrawer()`. Call hooks at the top level of a component, not inside this callback.
+
+### Ownership, Nesting, and Lifecycle
+
+- Without `control`, each `Drawer` manages its own state (or uses the existing `open` / `onOpenChange` API). It never inherits another Drawer's state.
+- `useDrawer()` selects the nearest root, including through portals. In nested drawers, `useDrawer(outerControl)` explicitly selects the outer one. Outside a root, pass a control or the hook throws a descriptive error.
+- One controller binds to one mounted Drawer. Sharing it between simultaneous roots throws an error. A controller can be reused after its previous root unmounts.
+- Do not combine `control` with `open`, `defaultOpen`, or `handle`. Types and runtime checks reject ambiguous state ownership. `onOpenChange` remains available for observation or cancellation.
+- `isOpen` is `false` before attachment and after unmount. Actions before mount or after unmount are ignored, not queued; Base UI emits a development warning. Invoke actions in event handlers or effects, never during rendering.
+- `open()` and `close()` go through Base UI's imperative actions and emit `onOpenChange` with reason `imperative-action`. `details.cancel()` can reject either request without desynchronizing the controller.
+- With a controlled `open` prop, `useDrawer().close()` requests a change; the panel remains open until the parent updates the prop.
+- `close()` returns `void`, not a promise for the exit animation. Use `onOpenChangeComplete` for work that must wait for animation completion.
+
+```tsx
+<Drawer
+  control={control}
+  onOpenChange={(nextOpen, details) => {
+    if (!nextOpen && hasUnsavedChanges) details.cancel();
+  }}
+>
+  {/* trigger and content */}
+</Drawer>
+```
+
+## Accessibility and Interaction
+
+- Base UI provides dialog semantics, focus management, Escape dismissal, and focus restoration to the trigger.
+- `DrawerTitle` supplies the accessible name. Use `DrawerDescription` for supporting context, not as a replacement for the title.
+- Triggers and close controls should remain keyboard-operable and have clear accessible names. Icon-only controls need an `aria-label`.
+- The built-in X uses a compact 32px button with a visible keyboard focus ring and an accessible label. Keep a visible close control even when swipe dismissal is available.
+- Touch users can drag the popup toward its closing edge. The modal overlay follows swipe progress, and reduced-motion preferences disable CSS transitions.
+- Keep long content in `DrawerBody`; the popup content region constrains overflow and scrolling.
+- The portal stays within the drawer's theme scope, which helps preserve inherited theme variables and nested drawers.
+
+See the [Base UI Drawer API](https://base-ui.com/react/components/drawer) for all supported root and primitive props.

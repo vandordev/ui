@@ -4,6 +4,7 @@ import { AccordionPlayground } from "@/components/accordion-playground";
 import { ButtonPlayground } from "@/components/button-playground";
 import { CodeCollapsibleWrapper } from "@/components/code-collapsible-wrapper";
 import { ComponentDependencies } from "@/components/component-dependencies";
+import { DrawerPlayground } from "@/components/drawer-playground";
 import { LoadingPlayground } from "@/components/loading-playground";
 import { PropsReference } from "@/components/props-reference";
 import { SelectPlayground } from "@/components/select-playground";
@@ -12,6 +13,7 @@ import { componentDocDefinitions } from "@/lib/component-docs";
 const playgrounds: Record<string, () => ReactNode> = {
   accordion: AccordionPlayground,
   button: ButtonPlayground,
+  drawer: DrawerPlayground,
   loading: LoadingPlayground,
   select: SelectPlayground,
 };

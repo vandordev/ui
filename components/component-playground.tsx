@@ -127,6 +127,7 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
                   <label htmlFor={controlId}>{control.label}</label>
                   <Switch
                     id={controlId}
+                    aria-label={control.label}
                     checked={values[name] === true}
                     onCheckedChange={(checked) => updateValue(name, checked)}
                   />

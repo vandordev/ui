@@ -3,6 +3,20 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "Drawer",
+      "description": "An accessible, swipeable Base UI Drawer with directional panels, snap points, and reduced-motion support.",
+      "dependencies": ["@base-ui/react", "cn", "lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/drawer.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/drawer.tsx"
+        }
+      ]
+    },
+    {
       "name": "accordion",
       "type": "registry:ui",
       "title": "Accordion",
