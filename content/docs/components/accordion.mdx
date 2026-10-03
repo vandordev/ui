@@ -1,0 +1,74 @@
+---
+title: Accordion
+description: Accessible headings that reveal collapsible content panels.
+component: accordion
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/accordion
+    contribution: Base UI Accordion composition and foundation. Vandor UI uses direct cn integration, a rotating chevron, and reduced-motion-aware opacity transitions.
+---
+
+import { AccordionDemo } from "@/examples/accordion-demo";
+
+## Usage
+
+```tsx
+import {
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+} from "@/components/ui/accordion";
+
+export function Demo() {
+  return (
+    <Accordion defaultValue={["item-1"]}>
+      <AccordionItem value="item-1">
+        <AccordionTrigger>Is it accessible?</AccordionTrigger>
+        <AccordionContent>
+          Yes. Base UI connects each heading to its content panel.
+        </AccordionContent>
+      </AccordionItem>
+      <AccordionItem value="item-2">
+        <AccordionTrigger>Can I customize it?</AccordionTrigger>
+        <AccordionContent>
+          Yes. The registry installs editable source into your project.
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  );
+}
+```
+
+Use your project's configured UI alias if it differs from `@/components/ui`.
+
+## Examples
+
+<ComponentPreview name="accordion-demo" title="accordion-demo.tsx">
+  <div className="flex justify-center rounded-md border p-6">
+    <AccordionDemo />
+  </div>
+</ComponentPreview>
+
+### Multiple Panels
+
+Set `multiple` on `Accordion` to allow more than one panel to remain open. By default, opening an item closes the previously expanded item. Pressing an expanded trigger closes its panel.
+
+### Disabled Items
+
+Set `disabled` on `Accordion` to prevent interaction with all items, or on an individual `AccordionItem` to disable only that item.
+
+### Controlled Values
+
+Use `value` and `onValueChange` for controlled state. Both `value` and `defaultValue` are arrays of item values, even when only one panel can be open. Give each item a unique `value`.
+
+### Keeping Content Mounted
+
+Set `keepMounted` on `AccordionContent` to preserve its DOM when closed. Base UI hides closed panels from interaction.
+
+## Accessibility & Transitions
+
+- Triggers are native buttons inside level-three headings, with expanded state and panel relationships managed by Base UI.
+- Tab moves between triggers. Enter or Space toggles the focused item.
+- Visible focus rings and disabled states use the existing theme tokens.
+- The chevron rotates and panels fade over `200ms`. Reduced-motion preferences disable transitions.
+- `className` on `AccordionContent` styles the inner content wrapper, following the shadcn composition.
+
+See the [Base UI API reference](https://base-ui.com/react/components/accordion) for the complete primitive props, including `render` composition.

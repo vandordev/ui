@@ -3,6 +3,20 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "A Base UI Accordion with accessible headings, collapsible panels, and reduced-motion-aware state transitions.",
+      "dependencies": ["@base-ui/react", "cn", "lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/accordion.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/accordion.tsx"
+        }
+      ]
+    },
+    {
       "name": "select",
       "type": "registry:ui",
       "title": "Select",

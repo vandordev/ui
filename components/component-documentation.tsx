@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { AccordionPlayground } from "@/components/accordion-playground";
 import { ButtonPlayground } from "@/components/button-playground";
 import { CodeCollapsibleWrapper } from "@/components/code-collapsible-wrapper";
 import { ComponentDependencies } from "@/components/component-dependencies";
@@ -9,6 +10,7 @@ import { SelectPlayground } from "@/components/select-playground";
 import { componentDocDefinitions } from "@/lib/component-docs";
 
 const playgrounds: Record<string, () => ReactNode> = {
+  accordion: AccordionPlayground,
   button: ButtonPlayground,
   loading: LoadingPlayground,
   select: SelectPlayground,

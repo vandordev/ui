@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 import {
+  accordionProps,
+  getAccordionCode,
+  getAccordionDefaults,
+} from "@/lib/accordion-playground";
+import {
   buttonProps,
   getButtonCode,
   getButtonDefaults,
@@ -24,6 +29,10 @@ interface ComponentDocDefinition {
 }
 
 export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
+  accordion: {
+    playground: { code: getAccordionCode(getAccordionDefaults()) },
+    props: accordionProps,
+  },
   button: {
     playground: {
       code: getButtonCode(getButtonDefaults()),
