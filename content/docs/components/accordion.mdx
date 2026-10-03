@@ -5,7 +5,7 @@ component: accordion
 credits:
   - name: shadcn/ui
     url: https://ui.shadcn.com/docs/components/base/accordion
-    contribution: Base UI Accordion composition and foundation. Vandor UI uses direct cn integration, a rotating chevron, and reduced-motion-aware opacity transitions.
+    contribution: Base UI Accordion composition and foundation. Vandor UI adds Motion-powered height, fade, and chevron transitions with reduced-motion support and direct cn integration.
 ---
 
 import { AccordionDemo } from "@/examples/accordion-demo";
@@ -68,7 +68,9 @@ Set `keepMounted` on `AccordionContent` to preserve its DOM when closed. Base UI
 - Triggers are native buttons inside level-three headings, with expanded state and panel relationships managed by Base UI.
 - Tab moves between triggers. Enter or Space toggles the focused item.
 - Visible focus rings and disabled states use the existing theme tokens.
-- The chevron rotates and panels fade over `200ms`. Reduced-motion preferences disable transitions.
+- Panel height, content opacity, and chevron rotation animate together with `motion/react` over `240ms`, using an ease-out curve without bounce or delayed content. Initially expanded panels render open without a first-paint collapse.
+- Closing content remains mounted until the animation finishes, but becomes inert and hidden from assistive technology immediately. Rapid toggles reverse from the current animated position.
+- Reduced-motion preferences make transitions immediate. Triggers do not scale.
 - `className` on `AccordionContent` styles the inner content wrapper, following the shadcn composition.
 
 See the [Base UI API reference](https://base-ui.com/react/components/accordion) for the complete primitive props, including `render` composition.

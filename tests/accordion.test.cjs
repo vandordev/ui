@@ -3,6 +3,7 @@ const test = require("node:test");
 const React = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
 const { createJiti } = require("jiti");
+const registry = require("../registry.json");
 
 const jiti = createJiti(__filename, {
   alias: { "@": process.cwd() },
@@ -10,6 +11,17 @@ const jiti = createJiti(__filename, {
   jsx: { runtime: "automatic" },
 });
 const el = React.createElement;
+
+test("Accordion registry declares Motion and initially open panels do not collapse on first paint", () => {
+  assert.ok(
+    registry.items
+      .find((item) => item.name === "accordion")
+      .dependencies.includes("motion")
+  );
+  const html = renderAccordion({ defaultValue: ["first"] });
+  assert.match(html, /rotate\(180deg\)/);
+  assert.match(html, /height:auto;opacity:1/);
+});
 
 const renderAccordion = (props = {}, itemProps = {}) => {
   const { Accordion, AccordionItem, AccordionTrigger, AccordionContent } = jiti(
@@ -52,6 +64,43 @@ test("Accordion forwards multiple, controlled values and disabled states", () =>
   assert.equal((html.match(/aria-expanded="true"/g) ?? []).length, 2);
   assert.equal((html.match(/<button[^>]*disabled=""/g) ?? []).length, 2);
   assert.match(renderAccordion({}, { disabled: true }), /data-disabled/);
+});
+
+test("Accordion preserves mounted content settings inherited from its root", () => {
+  assert.match(renderAccordion({ keepMounted: true }), /second content/);
+  assert.match(renderAccordion({ hiddenUntilFound: true }), /second content/);
+  assert.ok(!renderAccordion().includes("second content"));
+});
+
+test("Motion wrappers preserve custom trigger and panel render elements", () => {
+  const { Accordion, AccordionItem, AccordionTrigger, AccordionContent } = jiti(
+    "../registry/new-york/accordion.tsx"
+  );
+  const html = renderToStaticMarkup(
+    el(
+      Accordion,
+      { defaultValue: ["custom"] },
+      el(
+        AccordionItem,
+        { value: "custom" },
+        el(
+          AccordionTrigger,
+          { render: el("button", { "data-custom-trigger": true }) },
+          "Custom heading"
+        ),
+        el(
+          AccordionContent,
+          { render: el("section", { "data-custom-panel": true }) },
+          "Custom content"
+        )
+      )
+    )
+  );
+  assert.equal((html.match(/<button/g) ?? []).length, 1);
+  assert.match(html, /data-custom-trigger="true"/);
+  assert.match(html, /<section[^>]*data-custom-panel="true"/);
+  assert.match(html, /Custom heading/);
+  assert.match(html, /Custom content/);
 });
 
 test("Accordion playground code reflects multiple and disabled controls", () => {

@@ -6,8 +6,8 @@
       "name": "accordion",
       "type": "registry:ui",
       "title": "Accordion",
-      "description": "A Base UI Accordion with accessible headings, collapsible panels, and reduced-motion-aware state transitions.",
-      "dependencies": ["@base-ui/react", "cn", "lucide-react"],
+      "description": "A Base UI Accordion with Motion-powered height, fade, and chevron transitions and reduced-motion support.",
+      "dependencies": ["@base-ui/react", "cn", "lucide-react", "motion"],
       "files": [
         {
           "path": "registry/new-york/accordion.tsx",
