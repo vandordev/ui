@@ -9,7 +9,7 @@ import type { PropDefinition } from "@/lib/playground";
 import registry from "@/registry.json";
 
 interface ComponentDocDefinition {
-  playground?: { description: string; code: string };
+  playground?: { code: string };
   props?: Record<string, PropDefinition>;
 }
 
@@ -17,8 +17,6 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   button: {
     playground: {
       code: getButtonCode(getButtonDefaults()),
-      description:
-        "Adjust the controls to update the preview and code. While Tap toggles press feedback; Tap Scale adjusts whileTap.scale from 0.80 to 1.00. Reset restores the defaults.",
     },
     props: buttonProps,
   },
@@ -112,7 +110,6 @@ export const buildComponentDocSections = (
   if (definition?.playground) {
     before.push(
       heading("Playground"),
-      paragraph(definition.playground.description),
       section(name, "playground", [code(definition.playground.code, "tsx")])
     );
   }

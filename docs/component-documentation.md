@@ -32,7 +32,7 @@ Do not repeat the generated headings or installation/dependency/source data in t
 ## Adding a component
 
 - Register its package dependencies, source file, and installation target in `registry.json`.
-- Add its props and optional playground description/default code to `componentDocDefinitions` in `lib/component-docs.ts`. Use the same prop metadata as its playground controls rather than maintaining a second props list.
+- Add its props and optional playground default code to `componentDocDefinitions` in `lib/component-docs.ts`. Use the same prop metadata as its playground controls rather than maintaining a second props list.
 - Implement its live preview adapter and add it to `playgrounds` in `components/component-documentation.tsx`. The shared playground renderer handles controls, reset, and copy; the adapter handles component-specific composition.
 - Create an MDX page with `component` frontmatter and its unique examples/behavior. Import only the examples used by that body.
 

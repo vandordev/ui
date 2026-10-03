@@ -19,7 +19,6 @@ export const ButtonPlayground = () => (
     definitions={buttonPlaygroundDefinitions}
     initialValues={getButtonDefaults()}
     getCode={getButtonCode}
-    hint="Press and hold to feel the scale feedback. Icon sizes use the Label as their accessible name."
     renderPreview={(values) => (
       <Button
         variant={values.variant}

@@ -45,24 +45,32 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
       className="mt-6 min-w-0 overflow-hidden rounded-md border"
       aria-label={`${title} playground`}
     >
-      <div className="grid min-w-0 md:grid-cols-[minmax(0,1fr)_15rem]">
+      <div className="flex min-w-0 flex-col">
         <div className="flex min-w-0 flex-col">
-          <div className="px-5 pt-4 text-xs font-medium text-muted-foreground">
+          <div className="px-5 py-5 text-xs font-medium text-muted-foreground">
             Live preview
           </div>
           <div
             className="flex min-h-56 min-w-0 flex-1 items-center justify-center overflow-x-auto p-8"
             data-slot="playground-preview"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, color-mix(in oklch, var(--foreground) 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 5%, transparent) 1px, transparent 1px)",
+              backgroundPosition: "center",
+              backgroundSize: "24px 24px",
+            }}
           >
             {renderPreview(values)}
           </div>
-          <div className="px-5 pb-4 text-xs leading-relaxed text-muted-foreground">
-            {hint ?? "Change the controls to explore this component."}
-          </div>
+          {hint ? (
+            <div className="px-5 py-5 text-xs leading-relaxed text-muted-foreground">
+              {hint}
+            </div>
+          ) : null}
         </div>
-        <fieldset className="m-0 flex min-w-0 flex-col gap-4 border-0 border-t p-5 md:border-t-0 md:border-l">
+        <fieldset className="m-0 grid min-w-0 grid-cols-1 gap-x-6 gap-y-5 border-0 border-t p-5 sm:grid-cols-2 lg:grid-cols-3">
           <legend className="sr-only">Customize {title}</legend>
-          <div className="flex items-center justify-between gap-2">
+          <div className="col-span-full flex items-center justify-between gap-2">
             <span className="text-sm font-medium">Customize</span>
             <Button
               type="button"
