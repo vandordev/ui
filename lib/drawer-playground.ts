@@ -5,14 +5,18 @@ import { getPlaygroundDefaults } from "@/lib/playground";
 export const drawerProps = {
   example: {
     control: {
-      initialValue: "trigger" as "trigger" | "control" | "render-function",
+      initialValue: "trigger" as
+        | "trigger"
+        | "control"
+        | "render-function"
+        | "panel-form",
       kind: "select",
       label: "Example",
-      options: ["trigger", "control", "render-function"],
+      options: ["trigger", "control", "render-function", "panel-form"],
     },
     defaultValue: "Not applicable",
     description:
-      "Playground only: choose trigger, external control, or render function usage.",
+      "Playground only: choose trigger, external control, render function, or a DrawerPanel form.",
     type: "Example preset",
   },
   longContent: {
@@ -123,7 +127,43 @@ const snapPointsFor = (preset: DrawerPlaygroundValues["snapPoints"]) => {
   return "";
 };
 
+const getDrawerPanelCode = (values: DrawerPlaygroundValues) => `"use client";
+
+import { DrawerPanel, DrawerBody, DrawerFooter } from "@/components/ui/drawer";
+
+export function DrawerDemo() {
+  return (
+    <DrawerPanel
+      title="Project settings"
+      description="Edit the project name. This demo does not save data."
+      trigger={<button type="button">Open drawer</button>}
+      swipeDirection="${values.swipeDirection}"${values.modal ? "" : " modal={false}"}${values.showSwipeHandle ? " showSwipeHandle" : ""}${snapPointsFor(values.snapPoints)}
+      contentProps={{ showCloseButton: ${values.showCloseButton} }}
+    >
+      {({ close }) => (
+        <form className="flex min-h-0 flex-1 flex-col" onSubmit={(event) => {
+          event.preventDefault();
+          close(); // Demo only: in production, close after saving succeeds.
+        }}>
+          <DrawerBody>
+            <label htmlFor="project-name">Project name</label>
+            <input id="project-name" name="name" defaultValue="Vandor UI" required />
+            ${values.longContent ? "{Array.from({ length: 30 }, (_, index) => <p key={index}>Setting {index + 1}: Configure your project preferences.</p>)}" : ""}
+          </DrawerBody>
+          <DrawerFooter>
+            <button type="submit">Submit demo</button>
+            <button type="button" onClick={close}>Cancel</button>
+          </DrawerFooter>
+        </form>
+      )}
+    </DrawerPanel>
+  );
+}`;
+
 export const getDrawerCode = (values: DrawerPlaygroundValues) => {
+  if (values.example === "panel-form") {
+    return getDrawerPanelCode(values);
+  }
   const external = values.example === "control";
   const renderFunction = values.example === "render-function";
   const body = values.longContent

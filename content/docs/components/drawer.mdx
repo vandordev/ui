@@ -66,6 +66,310 @@ The registry installs editable source into your project. Use your configured UI 
 - `DrawerBody` is the flexible, vertically scrollable region with default padding. Header, footer, and the close button remain outside its scroll area.
 - `DrawerPortal`, `DrawerOverlay`, and `DrawerSwipeHandle` are exported for custom compositions. If replacing `DrawerContent`, compose the Base UI viewport and popup behavior as well.
 
+## DrawerPanel Shortcut
+
+Use `DrawerPanel` for the common trigger, title, and panel composition. It uses the same primitives and controllers as `Drawer`; the compound API remains available for custom headers or layouts.
+
+```tsx
+import { DrawerBody, DrawerPanel } from "@/components/ui/drawer";
+
+export function ProjectDetails() {
+  return (
+    <DrawerPanel
+      trigger={<button type="button">View project</button>}
+      title="Project details"
+      description="Information about this project."
+    >
+      <DrawerBody>Project details go here.</DrawerBody>
+    </DrawerPanel>
+  );
+}
+```
+
+| Prop           | Purpose                                                                                                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`        | Required title, rendered with `DrawerTitle`. Supply a meaningful accessible name.                                                                                               |
+| `description`  | Optional supporting content, rendered with `DrawerDescription`.                                                                                                                 |
+| `trigger`      | Optional React element composed through `DrawerTrigger`. Only this element occupies space in the page. Custom button components must forward their ref and native button props. |
+| `children`     | Panel content, or a function receiving `DrawerControl`.                                                                                                                         |
+| `contentProps` | `DrawerContent` props other than children, including `className`, `ref`, `finalFocus`, `showCloseButton`, and `closeButtonLabel`.                                               |
+| Root props     | The same state ownership and behavior props as `Drawer`, including `control`, `swipeDirection`, `modal`, and snap points.                                                       |
+
+`DrawerPanel` does **not** wrap children in `DrawerBody`. This lets a form own both its scrollable body and its stationary footer. For non-form content, add `DrawerBody` yourself. There is no additional trigger wrapper or hidden trigger.
+
+### External Controller
+
+Omit `trigger` when the opener already lives elsewhere. `useDrawer()` inside the panel still returns the supplied controller.
+
+```tsx
+"use client";
+
+import { useRef } from "react";
+import {
+  DrawerBody,
+  DrawerPanel,
+  useDrawerControl,
+} from "@/components/ui/drawer";
+
+export function ExternalPanel() {
+  const editor = useDrawerControl();
+  const opener = useRef<HTMLButtonElement>(null);
+
+  return (
+    <>
+      <button ref={opener} type="button" onClick={editor.open}>
+        Edit project
+      </button>
+      <DrawerPanel
+        control={editor}
+        title="Edit project"
+        contentProps={{ finalFocus: opener }}
+      >
+        <DrawerBody>Project settings go here.</DrawerBody>
+      </DrawerPanel>
+    </>
+  );
+}
+```
+
+## Forms with a Stationary Footer
+
+Keep the native form **around** `DrawerBody` and `DrawerFooter`, not inside the body. Give it `flex min-h-0 flex-1 flex-col` so it fits the constrained panel height. Inputs scroll while the submit button stays outside that scroll region. No `DrawerForm` component or form-library dependency is needed.
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import type { FormEvent } from "react";
+import {
+  DrawerBody,
+  DrawerFooter,
+  DrawerPanel,
+  useDrawer,
+} from "@/components/ui/drawer";
+
+export function EditProjectDrawer({
+  save,
+}: {
+  save: (name: string) => Promise<void>;
+}) {
+  return (
+    <DrawerPanel
+      trigger={<button type="button">Edit project</button>}
+      title="Edit project"
+    >
+      <ProjectForm save={save} />
+    </DrawerPanel>
+  );
+}
+
+function ProjectForm({ save }: { save: (name: string) => Promise<void> }) {
+  const { close } = useDrawer();
+  const nameId = useId();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (pending) return;
+    const name = String(new FormData(event.currentTarget).get("name") ?? "");
+    setPending(true);
+    setError(null);
+    try {
+      await save(name);
+      close();
+    } catch {
+      setError("Could not save. Please try again.");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <form
+      className="flex min-h-0 flex-1 flex-col"
+      onSubmit={handleSubmit}
+      aria-busy={pending}
+    >
+      <DrawerBody>
+        <label htmlFor={nameId}>Project name</label>
+        <input id={nameId} name="name" required disabled={pending} />
+        {error && <p role="alert">{error}</p>}
+      </DrawerBody>
+      <DrawerFooter>
+        <button type="submit" disabled={pending}>
+          {pending ? "Saving…" : "Save"}
+        </button>
+        <button type="button" onClick={close} disabled={pending}>
+          Cancel
+        </button>
+      </DrawerFooter>
+    </form>
+  );
+}
+```
+
+The form owns validation, pending state, error feedback, and persistence. It closes only after saving succeeds. If closing during a mutation or with unsaved changes must be blocked, use the root `onOpenChange` event and `details.cancel()`; disabling Cancel alone does not block Escape, swipe, or the built-in X.
+
+### React Hook Form
+
+This integration example uses your application's installed `react-hook-form`. `FormProvider` adds context without a DOM wrapper. The native form still owns body and footer. Handle save failures through the form's root error.
+
+```tsx
+"use client";
+
+import { useId } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { DrawerBody, DrawerFooter, useDrawer } from "@/components/ui/drawer";
+
+export function ReactHookFormFields({
+  save,
+}: {
+  save: (values: { name: string }) => Promise<void>;
+}) {
+  const form = useForm({ defaultValues: { name: "" } });
+  const nameId = useId();
+  const { close } = useDrawer();
+  const { errors, isSubmitting } = form.formState;
+
+  const submit = form.handleSubmit(async (values) => {
+    form.clearErrors("root");
+    try {
+      await save(values);
+      close();
+    } catch {
+      form.setError("root", { message: "Could not save. Please try again." });
+    }
+  });
+
+  return (
+    <FormProvider {...form}>
+      <form
+        className="flex min-h-0 flex-1 flex-col"
+        onSubmit={submit}
+        aria-busy={isSubmitting}
+      >
+        <DrawerBody>
+          <label htmlFor={nameId}>Project name</label>
+          <input
+            id={nameId}
+            {...form.register("name", { required: "Enter a project name." })}
+            aria-invalid={!!errors.name}
+          />
+          {errors.name && <p role="alert">{errors.name.message}</p>}
+          {errors.root && <p role="alert">{errors.root.message}</p>}
+        </DrawerBody>
+        <DrawerFooter>
+          <button type="submit" disabled={isSubmitting}>
+            Save
+          </button>
+          <button type="button" onClick={close} disabled={isSubmitting}>
+            Cancel
+          </button>
+        </DrawerFooter>
+      </form>
+    </FormProvider>
+  );
+}
+```
+
+Mount `ReactHookFormFields` as a child of `DrawerPanel`, just like `ProjectForm` above.
+
+### TanStack Form
+
+This example uses your application's installed `@tanstack/react-form`. Subscribe to form state for the footer without moving it outside the native form.
+
+```tsx
+"use client";
+
+import { useId, useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { DrawerBody, DrawerFooter, useDrawer } from "@/components/ui/drawer";
+
+export function TanStackFormFields({
+  save,
+}: {
+  save: (values: { name: string }) => Promise<void>;
+}) {
+  const { close } = useDrawer();
+  const nameId = useId();
+  const [error, setError] = useState<string | null>(null);
+  const form = useForm({
+    defaultValues: { name: "" },
+    onSubmit: async ({ value }) => {
+      setError(null);
+      try {
+        await save(value);
+        close();
+      } catch {
+        setError("Could not save. Please try again.");
+      }
+    },
+  });
+
+  return (
+    <form
+      className="flex min-h-0 flex-1 flex-col"
+      onSubmit={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        void form.handleSubmit();
+      }}
+    >
+      <DrawerBody>
+        <form.Field
+          name="name"
+          validators={{
+            onChange: ({ value }) =>
+              value.trim() ? undefined : "Enter a project name.",
+          }}
+        >
+          {(field) => (
+            <>
+              <label htmlFor={nameId}>Project name</label>
+              <input
+                id={nameId}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(event) => field.handleChange(event.target.value)}
+                aria-invalid={!field.state.meta.isValid}
+              />
+              {field.state.meta.errors.map((message, index) => (
+                <p key={index} role="alert">
+                  {message}
+                </p>
+              ))}
+            </>
+          )}
+        </form.Field>
+        {error && <p role="alert">{error}</p>}
+      </DrawerBody>
+      <DrawerFooter>
+        <form.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+        >
+          {([canSubmit, isSubmitting]) => (
+            <>
+              <button type="submit" disabled={!canSubmit || isSubmitting}>
+                Save
+              </button>
+              <button type="button" onClick={close} disabled={isSubmitting}>
+                Cancel
+              </button>
+            </>
+          )}
+        </form.Subscribe>
+      </DrawerFooter>
+    </form>
+  );
+}
+```
+
+Mount `TanStackFormFields` inside `DrawerPanel`. If your own `AppForm` already renders a native form, apply the same layout class to that component instead. Never nest another form around it. Any DOM wrapper between the panel and form must also preserve the constrained flex layout.
+
+For a form reused outside drawers, pass `onSuccess={close}` through `DrawerPanel`'s render function instead of calling `useDrawer()` inside that form. Keep hooks inside components, not inside the render callback. Choose **panel-form** and enable **Long content** in the playground to inspect the stationary footer.
+
 ## Direction and Snap Points
 
 The default `swipeDirection` is `right`, which opens a side panel from the right edge. Set it to `left`, `up`, or `down` for the other edges. Side drawers have a responsive width capped at `28rem`; vertical drawers use the available viewport height and can scroll.

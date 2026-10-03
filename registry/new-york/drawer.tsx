@@ -11,7 +11,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 
 const drawerControlKey = Symbol("drawer-control");
 type DrawerHandle = ReturnType<typeof DrawerPrimitive.createHandle>;
@@ -381,6 +381,44 @@ const DrawerDescription = ({
   />
 );
 
+type DrawerPanelRootProps<T = DrawerProps> = T extends unknown
+  ? Omit<T, "children">
+  : never;
+
+type DrawerPanelProps = DrawerPanelRootProps & {
+  title: ReactNode;
+  description?: ReactNode;
+  trigger?: ReactElement;
+  children?: DrawerContentProps["children"];
+  contentProps?: Omit<DrawerContentProps, "children">;
+};
+
+const DrawerPanel = ({
+  title,
+  description,
+  trigger,
+  children,
+  contentProps,
+  ...props
+}: DrawerPanelProps) => (
+  <Drawer {...props}>
+    {trigger && <DrawerTrigger render={trigger} />}
+    <DrawerContent {...contentProps}>
+      {(control) => (
+        <>
+          <DrawerHeader>
+            <DrawerTitle>{title}</DrawerTitle>
+            {description !== null && description !== undefined && (
+              <DrawerDescription>{description}</DrawerDescription>
+            )}
+          </DrawerHeader>
+          {typeof children === "function" ? children(control) : children}
+        </>
+      )}
+    </DrawerContent>
+  </Drawer>
+);
+
 export {
   Drawer,
   DrawerBody,
@@ -390,6 +428,7 @@ export {
   DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
+  DrawerPanel,
   DrawerPortal,
   DrawerSwipeHandle,
   DrawerTitle,
@@ -398,4 +437,9 @@ export {
   useDrawerControl,
 };
 
-export type { DrawerContentProps, DrawerControl, DrawerProps };
+export type {
+  DrawerContentProps,
+  DrawerControl,
+  DrawerPanelProps,
+  DrawerProps,
+};

@@ -37,6 +37,7 @@ test("Drawer exposes its documented composition and renders an accessible trigge
     "DrawerFooter",
     "DrawerHeader",
     "DrawerOverlay",
+    "DrawerPanel",
     "DrawerPortal",
     "DrawerSwipeHandle",
     "DrawerTitle",
@@ -109,4 +110,13 @@ test("Drawer playground defaults, generated source, and configurable props stay 
   assert.ok(renderFunction.includes("onClick={close}"));
   const longContent = getDrawerCode({ ...defaults, longContent: true });
   assert.ok(longContent.includes("length: 30"));
+  const panel = getDrawerCode({
+    ...defaults,
+    example: "panel-form",
+    longContent: true,
+  });
+  assert.ok(panel.includes("<DrawerPanel"));
+  assert.ok(panel.includes('className="flex min-h-0 flex-1 flex-col"'));
+  assert.ok(panel.includes('type="submit"'));
+  assert.ok(panel.includes("length: 30"));
 });

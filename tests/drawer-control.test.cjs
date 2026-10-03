@@ -218,6 +218,113 @@ test("render function receives controller and DrawerBody preserves scrolling str
   assert.equal(actions.isOpen, false);
 });
 
+test("DrawerPanel composes one associated trigger and keeps form footer outside its body", async () => {
+  await ready;
+  const el = React.createElement;
+  let selected;
+  let submissions = 0;
+  const Form = () => {
+    selected = drawer.useDrawer();
+    return el(
+      "form",
+      {
+        className: "flex min-h-0 flex-1 flex-col",
+        id: "panel-form",
+        onSubmit: (event) => {
+          event.preventDefault();
+          submissions += 1;
+        },
+      },
+      el(drawer.DrawerBody, null, el("input", { name: "name" })),
+      el(drawer.DrawerFooter, null, el("button", { type: "submit" }, "Save"))
+    );
+  };
+  await mount(
+    el(
+      drawer.DrawerPanel,
+      {
+        contentProps: {
+          closeButtonLabel: "Dismiss editor",
+          "data-testid": "panel-popup",
+        },
+        description: "Update details",
+        modal: false,
+        title: "Edit agent",
+        trigger: el("button", { id: "panel-trigger", type: "button" }, "Edit"),
+      },
+      el(Form)
+    )
+  );
+  assert.equal(document.querySelectorAll("button").length, 1);
+  await React.act(async () => document.querySelector("#panel-trigger").click());
+  assert.equal(selected.isOpen, true);
+  const popup = document.querySelector('[data-testid="panel-popup"]');
+  assert.ok(popup.getAttribute("aria-labelledby"));
+  assert.ok(popup.getAttribute("aria-describedby"));
+  const form = document.querySelector("#panel-form");
+  const body = form.querySelector('[data-slot="drawer-body"]');
+  const footer = form.querySelector('[data-slot="drawer-footer"]');
+  assert.equal(body.parentElement, form);
+  assert.equal(footer.parentElement, form);
+  assert.equal(body.contains(footer), false);
+  await React.act(async () =>
+    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }))
+  );
+  assert.equal(submissions, 1);
+  assert.equal(
+    selected.isOpen,
+    true,
+    "submit does not automatically close the panel"
+  );
+  await React.act(async () =>
+    document.querySelector('[aria-label="Dismiss editor"]').click()
+  );
+  assert.equal(selected.isOpen, false);
+});
+
+test("DrawerPanel without a trigger shares external control with render children and child hooks", async () => {
+  await ready;
+  const el = React.createElement;
+  let control;
+  let rendered;
+  let child;
+  const Child = () => {
+    child = drawer.useDrawer();
+    return el(drawer.DrawerBody, null, "Content");
+  };
+  const App = () => {
+    control = drawer.useDrawerControl();
+    return el(
+      drawer.DrawerPanel,
+      {
+        contentProps: { showCloseButton: false },
+        control,
+        modal: false,
+        title: "Settings",
+      },
+      (value) => {
+        rendered = value;
+        return el(Child);
+      }
+    );
+  };
+  await mount(el(App));
+  assert.equal(document.querySelector('[data-slot="drawer-trigger"]'), null);
+  await React.act(async () => control.open());
+  assert.equal(rendered, control);
+  assert.equal(child, control);
+  assert.equal(
+    document.querySelector('[data-slot="drawer-close-button"]'),
+    null
+  );
+  assert.equal(
+    document.querySelector('[data-slot="drawer-description"]'),
+    null
+  );
+  await React.act(async () => child.close());
+  assert.equal(control.isOpen, false);
+});
+
 test("unmounted controls ignore actions and do not queue them for remount", async () => {
   await ready;
   const el = React.createElement;

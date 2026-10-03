@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useId, useRef } from "react";
 
 import { ComponentPlayground } from "@/components/component-playground";
 import {
@@ -17,6 +17,7 @@ import {
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
+  DrawerPanel,
   DrawerTitle,
   DrawerTrigger,
   useDrawerControl,
@@ -29,6 +30,7 @@ const triggerClassName =
 
 const DrawerPreview = ({ values }: { values: DrawerPlaygroundValues }) => {
   const control = useDrawerControl();
+  const nameId = useId();
   const opener = useRef<HTMLButtonElement>(null);
   const external = values.example === "control";
   const renderFunction = values.example === "render-function";
@@ -66,6 +68,65 @@ const DrawerPreview = ({ values }: { values: DrawerPlaygroundValues }) => {
       </DrawerFooter>
     </>
   );
+  if (values.example === "panel-form") {
+    return (
+      <DrawerPanel
+        title="Project settings"
+        description="Edit the project name. This demo does not save data."
+        trigger={
+          <button type="button" className={triggerClassName}>
+            Open drawer
+          </button>
+        }
+        modal={values.modal}
+        showSwipeHandle={values.showSwipeHandle}
+        snapPoints={snapPoints}
+        swipeDirection={values.swipeDirection}
+        contentProps={{ showCloseButton: values.showCloseButton }}
+      >
+        {({ close }) => (
+          <form
+            className="flex min-h-0 flex-1 flex-col"
+            onSubmit={(event) => {
+              event.preventDefault();
+              close();
+            }}
+          >
+            <DrawerBody>
+              <label htmlFor={nameId} className="mb-2 block font-medium">
+                Project name
+              </label>
+              <input
+                id={nameId}
+                name="name"
+                defaultValue="Vandor UI"
+                required
+                className="h-9 w-full rounded-md border border-input bg-background px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+              {values.longContent &&
+                Array.from({ length: 30 }, (_, index) => (
+                  <p key={index} className="mt-4 text-muted-foreground">
+                    Setting {index + 1}: Configure your project preferences.
+                  </p>
+                ))}
+            </DrawerBody>
+            <DrawerFooter>
+              <button type="submit" className={actionClassName}>
+                Submit demo
+              </button>
+              <button
+                type="button"
+                className={triggerClassName}
+                onClick={close}
+              >
+                Cancel
+              </button>
+            </DrawerFooter>
+          </form>
+        )}
+      </DrawerPanel>
+    );
+  }
   return (
     <>
       {external && (
