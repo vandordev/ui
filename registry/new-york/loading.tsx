@@ -128,8 +128,8 @@ type SelectedLoadingProps = LoadingBaseProps &
   }[LoadingVariant];
 
 type DefaultLoadingProps = LoadingBaseProps & {
-  variant?: "ring";
-  variantProps?: Omit<ComponentProps<typeof Ring>, "children" | "ref">;
+  variant?: "arc";
+  variantProps?: Omit<ComponentProps<typeof Arc>, "children" | "ref">;
 };
 
 export type LoadingProps =
@@ -193,7 +193,7 @@ const StaticLoading = ({ isText, text }: { isText: boolean; text: string }) => {
 };
 
 export const Loading = ({
-  variant = "ring",
+  variant = "arc",
   variantProps,
   size = 24,
   duration,

@@ -8,12 +8,12 @@ import type { LoadingVariant } from "@/registry/new-york/loading-variants";
 export const loadingProps = {
   variant: {
     control: {
-      initialValue: "ring" as LoadingVariant,
+      initialValue: "arc" as LoadingVariant,
       kind: "select",
       label: "Variant",
       options: loadingVariants,
     },
-    defaultValue: '"ring"',
+    defaultValue: '"arc"',
     description:
       "Select any of the 47 loading-ui components. Names match the upstream registry.",
     type: "LoadingVariant",

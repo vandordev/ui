@@ -36,7 +36,7 @@ test("morphing infinity starts with a valid SVG path before the first animation 
   assert.match(html, /<path[^>]*d="M /);
 });
 
-test("Loading defaults to ring with one accessible status and forwards native attributes", () => {
+test("Loading defaults to arc with one accessible status and forwards native attributes", () => {
   const { Loading } = jiti("../registry/new-york/loading.tsx");
   const html = renderToStaticMarkup(
     React.createElement(Loading, {
@@ -46,13 +46,13 @@ test("Loading defaults to ring with one accessible status and forwards native at
       size: 40,
     })
   );
-  assert.ok(html.includes('data-variant="ring"'));
+  assert.ok(html.includes('data-variant="arc"'));
   assert.ok(html.includes('id="progress"'));
   assert.ok(html.includes('aria-label="Saving"'));
   assert.ok(html.includes('aria-hidden="true"'));
   assert.ok(html.includes("--duration:2s"));
   assert.ok(html.includes("--loading-size:40px"));
-  assert.ok(html.includes("<svg"));
+  assert.ok(html.includes("border-t-current"));
 });
 
 test("every Loading variant renders without missing children or leaking variant props", () => {

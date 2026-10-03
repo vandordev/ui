@@ -16,11 +16,11 @@ import { LoadingVariants } from "@/examples/loading-variants";
 import { Loading } from "@/components/ui/loading";
 
 export function Demo() {
-  return <Loading variant="ring" size={32} aria-label="Saving changes" />;
+  return <Loading variant="arc" size={32} aria-label="Saving changes" />;
 }
 ```
 
-Omit `variant` to use `ring`. Installation adds the wrapper and variant list to `components/ui/`, plus all 47 loading-ui components and their MIT license to `components/loading-ui/`. Vandor UI distributes a source snapshot so the installed animations match the previews. Use your project's configured aliases if they differ.
+Omit `variant` to use `arc`. Installation adds the wrapper and variant list to `components/ui/`, plus all 47 loading-ui components and their MIT license to `components/loading-ui/`. Vandor UI distributes a source snapshot so the installed animations match the previews. Use your project's configured aliases if they differ.
 
 The catalog matches loading-ui at the time of this release. Future upstream additions require a Vandor UI update; they do not silently become new variants.
 
