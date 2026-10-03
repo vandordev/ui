@@ -1,12 +1,23 @@
 "use client";
 
+import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { XIcon } from "lucide-react";
-import { Dialog as SheetPrimitive } from "radix-ui";
 import { useCallback, useEffect, useRef } from "react";
 
 import { drawerOpen, drawerClose } from "@/audio/core";
+import { adaptBase } from "@/components/ui/base-ui-adapter";
 import { useFeedback } from "@/hooks/use-feedback";
 import { cn } from "@/lib/utils";
+
+const SheetPrimitive = {
+  ...BaseDialog,
+  Close: adaptBase(BaseDialog.Close, "button"),
+  Content: adaptBase(BaseDialog.Popup),
+  Description: adaptBase(BaseDialog.Description, "p"),
+  Overlay: adaptBase(BaseDialog.Backdrop),
+  Title: adaptBase(BaseDialog.Title, "h2"),
+  Trigger: adaptBase(BaseDialog.Trigger, "button"),
+};
 
 const Sheet = ({
   onOpenChange,
@@ -46,9 +57,9 @@ const Sheet = ({
   }, [isControlled, playStateSound, props.open]);
 
   const handleOpenChange = useCallback(
-    (open: boolean) => {
+    (open: boolean, details: BaseDialog.Root.ChangeEventDetails) => {
       playStateSound(open);
-      onOpenChange?.(open);
+      onOpenChange?.(open, details);
     },
     [onOpenChange, playStateSound]
   );

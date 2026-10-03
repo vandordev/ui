@@ -1,11 +1,18 @@
 "use client";
 
-import { Popover as PopoverPrimitive } from "radix-ui";
+import { Popover as BasePopover } from "@base-ui/react/popover";
 import { useCallback, useEffect, useRef } from "react";
 
 import { dropdownClose, dropdownOpen } from "@/audio/core";
+import { adaptBase, adaptPopup } from "@/components/ui/base-ui-adapter";
 import { useFeedback } from "@/hooks/use-feedback";
 import { cn } from "@/lib/utils";
+
+const PopoverPrimitive = {
+  ...BasePopover,
+  Content: adaptPopup(BasePopover.Popup, BasePopover.Positioner),
+  Trigger: adaptBase(BasePopover.Trigger, "button"),
+};
 
 const Popover = ({
   onOpenChange,
@@ -45,9 +52,9 @@ const Popover = ({
   }, [isControlled, playStateSound, props.open]);
 
   const handleOpenChange = useCallback(
-    (open: boolean) => {
+    (open: boolean, details: BasePopover.Root.ChangeEventDetails) => {
       playStateSound(open);
-      onOpenChange?.(open);
+      onOpenChange?.(open, details);
     },
     [onOpenChange, playStateSound]
   );
@@ -89,7 +96,7 @@ const PopoverContent = ({
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-md border p-4 shadow-md outline-hidden",
+        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 origin-(--transform-origin) rounded-md border p-4 shadow-md outline-hidden",
         className
       )}
       {...props}
@@ -97,10 +104,4 @@ const PopoverContent = ({
   </PopoverPrimitive.Portal>
 );
 
-const PopoverAnchor = ({
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Anchor>) => (
-  <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />
-);
-
-export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger };
+export { Popover, PopoverContent, PopoverTrigger };

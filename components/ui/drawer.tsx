@@ -1,12 +1,23 @@
 "use client";
 
+import { Drawer as BaseDrawer } from "@base-ui/react/drawer";
 import * as React from "react";
 import { useCallback, useEffect, useRef } from "react";
-import { Drawer as DrawerPrimitive } from "vaul";
 
 import { drawerClose, drawerOpen } from "@/audio/core";
+import { adaptBase } from "@/components/ui/base-ui-adapter";
 import { useFeedback } from "@/hooks/use-feedback";
 import { cn } from "@/lib/utils";
+
+const DrawerPrimitive = {
+  ...BaseDrawer,
+  Close: adaptBase(BaseDrawer.Close, "button"),
+  Content: adaptBase(BaseDrawer.Popup),
+  Description: adaptBase(BaseDrawer.Description, "p"),
+  Overlay: adaptBase(BaseDrawer.Backdrop),
+  Title: adaptBase(BaseDrawer.Title, "h2"),
+  Trigger: adaptBase(BaseDrawer.Trigger, "button"),
+};
 
 const Drawer = ({
   onOpenChange,
@@ -46,9 +57,9 @@ const Drawer = ({
   }, [isControlled, playStateSound, props.open]);
 
   const handleOpenChange = useCallback(
-    (open: boolean) => {
+    (open: boolean, details: BaseDrawer.Root.ChangeEventDetails) => {
       playStateSound(open);
-      onOpenChange?.(open);
+      onOpenChange?.(open, details);
     },
     [onOpenChange, playStateSound]
   );
@@ -111,21 +122,23 @@ const DrawerContent = ({
 }: React.ComponentProps<typeof DrawerPrimitive.Content>) => (
   <DrawerPortal data-slot="drawer-portal">
     <DrawerOverlay />
-    <DrawerPrimitive.Content
-      data-slot="drawer-content"
-      className={cn(
-        "group/drawer-content fixed z-50 flex h-auto flex-col bg-background",
-        "data-[vaul-drawer-direction=top]:inset-x-0 data-[vaul-drawer-direction=top]:top-0 data-[vaul-drawer-direction=top]:mb-24 data-[vaul-drawer-direction=top]:max-h-[80vh] data-[vaul-drawer-direction=top]:rounded-b-lg data-[vaul-drawer-direction=top]:border-b",
-        "data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:mt-24 data-[vaul-drawer-direction=bottom]:max-h-[80vh] data-[vaul-drawer-direction=bottom]:rounded-t-lg data-[vaul-drawer-direction=bottom]:border-t",
-        "data-[vaul-drawer-direction=right]:inset-y-0 data-[vaul-drawer-direction=right]:right-0 data-[vaul-drawer-direction=right]:w-3/4 data-[vaul-drawer-direction=right]:border-l data-[vaul-drawer-direction=right]:sm:max-w-sm",
-        "data-[vaul-drawer-direction=left]:inset-y-0 data-[vaul-drawer-direction=left]:left-0 data-[vaul-drawer-direction=left]:w-3/4 data-[vaul-drawer-direction=left]:border-r data-[vaul-drawer-direction=left]:sm:max-w-sm",
-        className
-      )}
-      {...props}
-    >
-      <div className="mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full bg-muted group-data-[vaul-drawer-direction=bottom]/drawer-content:block" />
-      {children}
-    </DrawerPrimitive.Content>
+    <BaseDrawer.Viewport className="fixed inset-0 z-50 pointer-events-none">
+      <DrawerPrimitive.Content
+        data-slot="drawer-content"
+        className={cn(
+          "group/drawer-content pointer-events-auto fixed z-50 flex h-auto flex-col bg-background transition-transform duration-300 data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full",
+          "data-[swipe-direction=up]:inset-x-0 data-[swipe-direction=up]:top-0 data-[swipe-direction=up]:mb-24 data-[swipe-direction=up]:max-h-[80vh] data-[swipe-direction=up]:rounded-b-lg data-[swipe-direction=up]:border-b",
+          "data-[swipe-direction=down]:inset-x-0 data-[swipe-direction=down]:bottom-0 data-[swipe-direction=down]:mt-24 data-[swipe-direction=down]:max-h-[80vh] data-[swipe-direction=down]:rounded-t-lg data-[swipe-direction=down]:border-t",
+          "data-[swipe-direction=right]:inset-y-0 data-[swipe-direction=right]:right-0 data-[swipe-direction=right]:w-3/4 data-[swipe-direction=right]:border-l data-[swipe-direction=right]:sm:max-w-sm",
+          "data-[swipe-direction=left]:inset-y-0 data-[swipe-direction=left]:left-0 data-[swipe-direction=left]:w-3/4 data-[swipe-direction=left]:border-r data-[swipe-direction=left]:sm:max-w-sm",
+          className
+        )}
+        {...props}
+      >
+        <div className="mx-auto mt-4 hidden h-2 w-[100px] shrink-0 rounded-full bg-muted group-data-[swipe-direction=down]/drawer-content:block" />
+        <BaseDrawer.Content>{children}</BaseDrawer.Content>
+      </DrawerPrimitive.Content>
+    </BaseDrawer.Viewport>
   </DrawerPortal>
 );
 
@@ -133,7 +146,7 @@ const DrawerHeader = ({ className, ...props }: React.ComponentProps<"div">) => (
   <div
     data-slot="drawer-header"
     className={cn(
-      "flex flex-col gap-0.5 p-4 group-data-[vaul-drawer-direction=bottom]/drawer-content:text-center group-data-[vaul-drawer-direction=top]/drawer-content:text-center md:gap-1.5 md:text-left",
+      "flex flex-col gap-0.5 p-4 group-data-[swipe-direction=down]/drawer-content:text-center group-data-[swipe-direction=up]/drawer-content:text-center md:gap-1.5 md:text-left",
       className
     )}
     {...props}

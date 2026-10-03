@@ -1,9 +1,10 @@
 "use client";
 
+import { Button as BaseButton } from "@base-ui/react/button";
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
-import { Slot } from "radix-ui";
 
+import { Slot } from "@/components/ui/base-ui-adapter";
 import type { FeedbackType } from "@/hooks/use-feedback";
 import { useFeedback } from "@/hooks/use-feedback";
 import { cn } from "@/lib/utils";
@@ -64,7 +65,7 @@ const Button = ({
     onClick?.(e);
   };
 
-  const Comp = asChild ? Slot.Root : "button";
+  const Comp = asChild ? Slot.Root : BaseButton;
 
   return (
     <Comp

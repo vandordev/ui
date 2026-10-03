@@ -4,7 +4,7 @@ description: Vandor UI's Button with a subtle raised finish, smooth hover transi
 component: button
 credits:
   - name: shadcn/ui
-    url: https://ui.shadcn.com/docs/components/radix/button
+    url: https://ui.shadcn.com/docs/components/base/button
     contribution: Original Button code and foundation. Vandor UI adds a raised finish, smooth hover transitions, configurable press feedback, and direct cn integration.
 ---
 
@@ -74,6 +74,18 @@ Use the native `disabled` prop to prevent interaction.
 
 Use `asChild` to style a link without nesting it inside a button. The child retains its native link semantics. Use this for navigation, not the `variant="link"` appearance alone.
 
+Base UI's `render` composition is also supported:
+
+```tsx
+<Button
+  render={<a href="/docs/components" />}
+  nativeButton={false}
+  variant="outline"
+>
+  Browse components
+</Button>
+```
+
 <ComponentPreview name="button-as-child" title="button-as-child.tsx">
   <div className="rounded-md border p-6">
     <ButtonAsChild />
@@ -92,5 +104,5 @@ Set `whileTap={false}` to turn off press feedback. Motion's animation props and 
 
 - Native buttons support Enter and Space activation. The press animation uses Motion's pointer and Enter gestures.
 - A visible focus ring identifies keyboard focus. Give icon-only buttons an `aria-label`.
-- Set `type="button"` for non-submit actions inside a form.
+- Buttons default to `type="button"`. Set `type="submit"` for form submission.
 - With `asChild`, the child retains its own keyboard behavior and attributes. Use links for navigation; native `disabled` does not disable a link.

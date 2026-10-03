@@ -1,9 +1,15 @@
 "use client";
 
-import { Switch as SwitchPrimitive } from "radix-ui";
+import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import type { ComponentProps } from "react";
 
+import { adaptBase } from "@/components/ui/base-ui-adapter";
 import { cn } from "@/lib/utils";
+
+const SwitchPrimitive = {
+  Root: adaptBase(BaseSwitch.Root, "button"),
+  Thumb: adaptBase(BaseSwitch.Thumb, "span"),
+};
 
 const Switch = ({
   className,

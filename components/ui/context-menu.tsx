@@ -1,10 +1,26 @@
 "use client";
 
+import { ContextMenu as BaseContextMenu } from "@base-ui/react/context-menu";
+import { Separator } from "@base-ui/react/separator";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
-import { ContextMenu as ContextMenuPrimitive } from "radix-ui";
 import * as React from "react";
 
+import { adaptBase, adaptPopup } from "@/components/ui/base-ui-adapter";
 import { cn } from "@/lib/utils";
+
+const ContextMenuPrimitive = {
+  ...BaseContextMenu,
+  CheckboxItem: adaptBase(BaseContextMenu.CheckboxItem),
+  Content: adaptPopup(BaseContextMenu.Popup, BaseContextMenu.Positioner),
+  Item: adaptBase(BaseContextMenu.Item),
+  Label: adaptBase(BaseContextMenu.GroupLabel),
+  RadioItem: adaptBase(BaseContextMenu.RadioItem),
+  Separator: adaptBase(Separator),
+  Sub: BaseContextMenu.SubmenuRoot,
+  SubContent: adaptPopup(BaseContextMenu.Popup, BaseContextMenu.Positioner),
+  SubTrigger: adaptBase(BaseContextMenu.SubmenuTrigger),
+  Trigger: adaptBase(BaseContextMenu.Trigger),
+};
 
 const ContextMenu = ({
   ...props
@@ -71,14 +87,19 @@ const ContextMenuSubContent = ({
   className,
   ...props
 }: React.ComponentProps<typeof ContextMenuPrimitive.SubContent>) => (
-  <ContextMenuPrimitive.SubContent
-    data-slot="context-menu-sub-content"
-    className={cn(
-      "z-50 min-w-[8rem] origin-(--radix-context-menu-content-transform-origin) overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
-      className
-    )}
-    {...props}
-  />
+  <ContextMenuPrimitive.Portal>
+    <ContextMenuPrimitive.SubContent
+      side="right"
+      align="start"
+      sideOffset={4}
+      data-slot="context-menu-sub-content"
+      className={cn(
+        "z-50 min-w-[8rem] origin-(--transform-origin) overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+        className
+      )}
+      {...props}
+    />
+  </ContextMenuPrimitive.Portal>
 );
 
 const ContextMenuContent = ({
@@ -89,7 +110,7 @@ const ContextMenuContent = ({
     <ContextMenuPrimitive.Content
       data-slot="context-menu-content"
       className={cn(
-        "z-50 max-h-(--radix-context-menu-content-available-height) min-w-[8rem] origin-(--radix-context-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
+        "z-50 max-h-(--available-height) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border bg-popover p-1 text-popover-foreground shadow-md data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
         className
       )}
       {...props}
@@ -134,9 +155,9 @@ const ContextMenuCheckboxItem = ({
     {...props}
   >
     <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-      <ContextMenuPrimitive.ItemIndicator>
+      <ContextMenuPrimitive.CheckboxItemIndicator>
         <CheckIcon className="size-4" />
-      </ContextMenuPrimitive.ItemIndicator>
+      </ContextMenuPrimitive.CheckboxItemIndicator>
     </span>
     {children}
   </ContextMenuPrimitive.CheckboxItem>
@@ -156,9 +177,9 @@ const ContextMenuRadioItem = ({
     {...props}
   >
     <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-      <ContextMenuPrimitive.ItemIndicator>
+      <ContextMenuPrimitive.RadioItemIndicator>
         <CircleIcon className="size-2 fill-current" />
-      </ContextMenuPrimitive.ItemIndicator>
+      </ContextMenuPrimitive.RadioItemIndicator>
     </span>
     {children}
   </ContextMenuPrimitive.RadioItem>

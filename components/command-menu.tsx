@@ -8,11 +8,12 @@ import {
   SquareDashedIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
   Command,
+  CommandCollection,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -34,8 +35,8 @@ import { SITE } from "@/constants/site";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useFeedback } from "@/hooks/use-feedback";
 import { useIsMac } from "@/hooks/use-is-mac";
-import { useMutationObserver } from "@/hooks/use-mutation-observer";
 import { usePackageManager } from "@/hooks/use-package-manager";
+import type { CommandSearchItem } from "@/lib/command-search";
 import { EXCLUDED_SECTIONS, isComponentsFolder } from "@/lib/docs";
 import { trackEvent } from "@/lib/events";
 import { getAllPagesFromFolder, getPagesFromFolder } from "@/lib/page-tree";
@@ -48,7 +49,19 @@ type DocUrlKind =
   | { kind: "page" };
 
 const GROUP_HEADING_CLS =
-  "!p-0 [&_[cmdk-group-heading]]:scroll-mt-16 [&_[cmdk-group-heading]]:!p-3 [&_[cmdk-group-heading]]:!pb-1";
+  "!p-0 **:data-[slot=command-group-heading]:scroll-mt-16 **:data-[slot=command-group-heading]:!p-3 **:data-[slot=command-group-heading]:!pb-1";
+
+type SearchOption = CommandSearchItem & {
+  title: string;
+  url: string;
+  parsed: DocUrlKind;
+  blockName?: string;
+  onHighlight: () => void;
+};
+interface SearchGroup {
+  label: string;
+  items: SearchOption[];
+}
 
 const parseDocPageUrl = (url: string): DocUrlKind => {
   const parts = url.split("/").filter(Boolean);
@@ -107,40 +120,18 @@ const DocPageLeadingIcon = ({ parsed }: { parsed: DocUrlKind }) => {
 const CommandMenuItem = ({
   children,
   className,
-  onHighlight,
   ...props
-}: React.ComponentProps<typeof CommandItem> & {
-  onHighlight?: () => void;
-  "data-selected"?: string;
-  "aria-selected"?: string;
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useMutationObserver(ref, (mutations) => {
-    for (const mutation of mutations) {
-      if (
-        mutation.type === "attributes" &&
-        mutation.attributeName === "aria-selected" &&
-        ref.current?.getAttribute("aria-selected") === "true"
-      ) {
-        onHighlight?.();
-      }
-    }
-  });
-
-  return (
-    <CommandItem
-      ref={ref}
-      className={cn(
-        "data-[selected=true]:border-input data-[selected=true]:bg-input/50 h-9 rounded-md border border-transparent px-3! font-medium",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </CommandItem>
-  );
-};
+}: React.ComponentProps<typeof CommandItem>) => (
+  <CommandItem
+    className={cn(
+      "data-highlighted:border-input data-highlighted:bg-input/50 h-9 rounded-md border border-transparent px-3! font-medium",
+      className
+    )}
+    {...props}
+  >
+    {children}
+  </CommandItem>
+);
 
 export const CommandMenu = ({
   blocks,
@@ -238,36 +229,68 @@ export const CommandMenu = ({
 
   const handleOpenClick = useCallback(() => setOpen(true), []);
 
-  const handleFilter = useCallback(
-    (value: string, search: string, keywords?: string[]) => {
-      const extendValue = `${value} ${keywords?.join(" ") || ""}`;
-      if (extendValue.toLowerCase().includes(search.toLowerCase())) {
-        return 1;
-      }
-      return 0;
-    },
-    []
-  );
-
-  const renderDocPageItem = (
-    title: string,
-    url: string,
-    breadcrumb: string[]
-  ) => {
-    const parsed = parseDocPageUrl(url);
-    return (
-      <CommandMenuItem
-        key={url}
-        keywords={buildDocPageKeywords(parsed, url, breadcrumb)}
-        value={[...breadcrumb, title].filter(Boolean).join(" ")}
-        onHighlight={() => handleDocPageHighlight({ name: title, url })}
-        onSelect={() => runCommand(() => router.push(url))}
-      >
-        <DocPageLeadingIcon parsed={parsed} />
-        {title}
-      </CommandMenuItem>
-    );
-  };
+  const searchGroups = useMemo<SearchGroup[]>(() => {
+    const groups: SearchGroup[] = [];
+    if (navItems.length) {
+      groups.push({
+        items: navItems.map((item) => ({
+          keywords: ["nav", "navigation", item.label.toLowerCase()],
+          onHighlight: () => {
+            setShowGoToPage(true);
+            setCopyPayload("");
+          },
+          parsed: { kind: "page" },
+          title: item.label,
+          url: item.href,
+          value: `Navigation ${item.label}`,
+        })),
+        label: "Pages",
+      });
+    }
+    for (const group of treeGroups) {
+      groups.push({
+        items: group.pages.map((page) => {
+          const parsed = parseDocPageUrl(page.url);
+          return {
+            keywords: buildDocPageKeywords(parsed, page.url, [group.label]),
+            onHighlight: () =>
+              handleDocPageHighlight({ name: page.name, url: page.url }),
+            parsed,
+            title: page.name,
+            url: page.url,
+            value: `${group.label} ${page.name}`,
+          };
+        }),
+        label: group.label,
+      });
+    }
+    if (blocks?.length) {
+      groups.push({
+        items: blocks.map((block) => ({
+          blockName: block.name,
+          keywords: [
+            "block",
+            block.name,
+            block.description,
+            ...block.categories,
+          ],
+          onHighlight: () => handleBlockHighlight(block),
+          parsed: { kind: "template", slug: block.name },
+          title: block.description,
+          url: `/blocks/${block.categories[0]}#${block.name}`,
+          value: block.name,
+        })),
+        label: "Blocks",
+      });
+    }
+    return groups;
+  }, [
+    navItems,
+    treeGroups,
+    blocks,
+    handleDocPageHighlight,
+    handleBlockHighlight,
+  ]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -342,76 +365,50 @@ export const CommandMenu = ({
         </DialogHeader>
         <Command
           className="**:data-[slot=command-input-wrapper]:bg-input/50 **:data-[slot=command-input-wrapper]:border-input rounded-none bg-transparent **:data-[slot=command-input]:h-9! **:data-[slot=command-input]:py-0 **:data-[slot=command-input-wrapper]:mb-0 **:data-[slot=command-input-wrapper]:h-9! **:data-[slot=command-input-wrapper]:rounded-md **:data-[slot=command-input-wrapper]:border"
-          filter={handleFilter}
+          items={searchGroups}
+          onItemHighlighted={(item: SearchOption | undefined) => {
+            if (item) {
+              item.onHighlight();
+            } else {
+              setShowGoToPage(false);
+              setCopyPayload("");
+            }
+          }}
         >
-          <CommandInput placeholder="Search documentation..." />
+          <CommandInput
+            aria-label="Search documentation"
+            placeholder="Search documentation..."
+          />
+          <CommandEmpty className="text-muted-foreground min-h-80 py-12 text-center text-sm">
+            No results found.
+          </CommandEmpty>
           <CommandList className="no-scrollbar min-h-80 scroll-pt-2 scroll-pb-1.5">
-            <CommandEmpty className="text-muted-foreground py-12 text-center text-sm">
-              No results found.
-            </CommandEmpty>
-            {navItems && navItems.length > 0 && (
-              <CommandGroup heading="Pages" className={GROUP_HEADING_CLS}>
-                {navItems.map((item) => (
-                  <CommandMenuItem
-                    key={item.href}
-                    value={`Navigation ${item.label}`}
-                    keywords={["nav", "navigation", item.label.toLowerCase()]}
-                    onHighlight={() => {
-                      setShowGoToPage(true);
-                      setCopyPayload("");
-                    }}
-                    onSelect={() => runCommand(() => router.push(item.href))}
-                  >
-                    <ArrowRightIcon />
-                    {item.label}
-                  </CommandMenuItem>
-                ))}
-              </CommandGroup>
-            )}
-            {treeGroups.map((group) => (
+            {(group: SearchGroup) => (
               <CommandGroup
                 key={group.label}
-                className={GROUP_HEADING_CLS}
+                items={group.items}
                 heading={group.label}
+                className={GROUP_HEADING_CLS}
               >
-                {group.pages.map((page) =>
-                  renderDocPageItem(page.name, page.url, [group.label])
-                )}
+                <CommandCollection>
+                  {(item: SearchOption) => (
+                    <CommandMenuItem
+                      key={item.url}
+                      value={item}
+                      onClick={() => runCommand(() => router.push(item.url))}
+                    >
+                      <DocPageLeadingIcon parsed={item.parsed} />
+                      {item.title}
+                      {item.blockName && (
+                        <span className="text-muted-foreground ml-auto font-mono text-xs font-normal tabular-nums">
+                          {item.blockName}
+                        </span>
+                      )}
+                    </CommandMenuItem>
+                  )}
+                </CommandCollection>
               </CommandGroup>
-            ))}
-            {blocks?.length ? (
-              <CommandGroup
-                heading="Blocks"
-                className="p-0! **:[[cmdk-group-heading]]:p-3!"
-              >
-                {blocks.map((block) => (
-                  <CommandMenuItem
-                    key={block.name}
-                    value={block.name}
-                    onHighlight={() => handleBlockHighlight(block)}
-                    keywords={[
-                      "block",
-                      block.name,
-                      block.description,
-                      ...block.categories,
-                    ]}
-                    onSelect={() =>
-                      runCommand(() =>
-                        router.push(
-                          `/blocks/${block.categories[0]}#${block.name}`
-                        )
-                      )
-                    }
-                  >
-                    <SquareDashedIcon />
-                    {block.description}
-                    <span className="text-muted-foreground ml-auto font-mono text-xs font-normal tabular-nums">
-                      {block.name}
-                    </span>
-                  </CommandMenuItem>
-                ))}
-              </CommandGroup>
-            ) : null}
+            )}
           </CommandList>
         </Command>
         <div className="text-muted-foreground absolute inset-x-0 bottom-0 z-20 flex h-10 items-center gap-2 overflow-hidden rounded-b-xl border-t border-t-neutral-100 bg-neutral-50 px-4 text-xs font-medium dark:border-t-neutral-700 dark:bg-neutral-800">

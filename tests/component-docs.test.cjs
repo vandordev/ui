@@ -35,7 +35,7 @@ test("component metadata generates ordered sections from registry and shared pro
   assert.deepEqual(headings(sections.after), ["Props", "Source", "Credits"]);
   const serialized = JSON.stringify(sections);
   for (const value of [
-    "npm install class-variance-authority cn motion radix-ui",
+    "npm install class-variance-authority cn motion @base-ui/react",
     "https://vandor-ui.vercel.app/r/button.json",
     "whileTap",
     "export const Button",

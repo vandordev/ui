@@ -6,8 +6,13 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "A shadcn-based Button with subtle press feedback powered by Motion, using the new-york style and Radix primitives.",
-      "dependencies": ["class-variance-authority", "cn", "motion", "radix-ui"],
+      "description": "A shadcn-based Button with subtle press feedback powered by Motion, using the new-york style and Base UI primitives.",
+      "dependencies": [
+        "class-variance-authority",
+        "cn",
+        "motion",
+        "@base-ui/react"
+      ],
       "files": [
         {
           "path": "registry/new-york/button.tsx",

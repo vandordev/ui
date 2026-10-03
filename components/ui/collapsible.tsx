@@ -1,10 +1,17 @@
 "use client";
 
-import { Collapsible as CollapsiblePrimitive } from "radix-ui";
+import { Collapsible as BaseCollapsible } from "@base-ui/react/collapsible";
 import { useCallback, useEffect, useRef } from "react";
 
 import { collapse, expand } from "@/audio/core";
+import { adaptBase } from "@/components/ui/base-ui-adapter";
 import { useFeedback } from "@/hooks/use-feedback";
+
+const CollapsiblePrimitive = {
+  CollapsibleContent: adaptBase(BaseCollapsible.Panel),
+  CollapsibleTrigger: adaptBase(BaseCollapsible.Trigger, "button"),
+  Root: adaptBase(BaseCollapsible.Root),
+};
 
 const Collapsible = ({
   onOpenChange,
@@ -44,9 +51,9 @@ const Collapsible = ({
   }, [isControlled, playStateSound, props.open]);
 
   const handleOpenChange = useCallback(
-    (open: boolean) => {
+    (open: boolean, details: BaseCollapsible.Root.ChangeEventDetails) => {
       playStateSound(open);
-      onOpenChange?.(open);
+      onOpenChange?.(open, details);
     },
     [onOpenChange, playStateSound]
   );

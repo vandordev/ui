@@ -1,10 +1,18 @@
 "use client";
 
-import { Tabs as TabsPrimitive } from "radix-ui";
+import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 
+import { adaptBase } from "@/components/ui/base-ui-adapter";
 import type { FeedbackType } from "@/hooks/use-feedback";
 import { useFeedback } from "@/hooks/use-feedback";
 import { cn } from "@/lib/utils";
+
+const TabsPrimitive = {
+  Content: adaptBase(BaseTabs.Panel),
+  List: adaptBase(BaseTabs.List),
+  Root: adaptBase(BaseTabs.Root),
+  Trigger: adaptBase(BaseTabs.Tab, "button"),
+};
 
 const Tabs = ({
   className,
@@ -43,7 +51,9 @@ const TabsTrigger = ({
 }) => {
   const play = useFeedback({ haptic, sound });
 
-  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+  const handleClick: NonNullable<
+    React.ComponentProps<typeof TabsPrimitive.Trigger>["onClick"]
+  > = (e) => {
     play();
     onClick?.(e);
   };

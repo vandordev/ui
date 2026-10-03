@@ -80,10 +80,22 @@ export const buttonProps = {
       "Additional classes merged with the selected variant and size.",
     type: "string",
   },
-  type: {
-    defaultValue: '"submit" (native button)',
+  render: {
+    defaultValue: "Not set",
     description:
-      'Native button type: "button", "submit", or "reset". Set type="button" for non-submit actions inside a form.',
+      "Base UI composition: replace the button with an element or render function. For links, also set nativeButton={false}.",
+    type: "ReactElement | ComponentRenderFn",
+  },
+  nativeButton: {
+    defaultValue: "true",
+    description:
+      "Whether the rendered element is a native button. Set false when render supplies a link or other non-button element.",
+    type: "boolean",
+  },
+  type: {
+    defaultValue: '"button"',
+    description:
+      'Native button type: "button", "submit", or "reset". Set type="submit" for form submission.',
     type: '"button" | "submit" | "reset"',
   },
   onClick: {

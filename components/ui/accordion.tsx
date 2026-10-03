@@ -1,11 +1,21 @@
 "use client";
 
+import { Accordion as BaseAccordion } from "@base-ui/react/accordion";
 import { ChevronDownIcon } from "lucide-react";
-import { Accordion as AccordionPrimitive } from "radix-ui";
 
+import { adaptBase } from "@/components/ui/base-ui-adapter";
 import type { FeedbackType } from "@/hooks/use-feedback";
 import { useFeedback } from "@/hooks/use-feedback";
 import { cn } from "@/lib/utils";
+
+const AccordionPrimitive = {
+  ...BaseAccordion,
+  Content: adaptBase(BaseAccordion.Panel),
+  Header: adaptBase(BaseAccordion.Header, "h3"),
+  Item: adaptBase(BaseAccordion.Item),
+  Root: adaptBase(BaseAccordion.Root),
+  Trigger: adaptBase(BaseAccordion.Trigger, "button"),
+};
 
 const Accordion = ({
   ...props
@@ -37,7 +47,9 @@ const AccordionTrigger = ({
 }) => {
   const play = useFeedback({ haptic, sound });
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick: NonNullable<
+    React.ComponentProps<typeof AccordionPrimitive.Trigger>["onClick"]
+  > = (e) => {
     play();
     onClick?.(e);
   };

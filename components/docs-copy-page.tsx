@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Popover,
-  PopoverAnchor,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
@@ -180,7 +179,6 @@ export const DocsCopyPage = ({
   return (
     <Popover sounds>
       <div className="group/buttons relative flex rounded-lg bg-secondary *:data-[slot=button]:focus-visible:relative *:data-[slot=button]:focus-visible:z-10">
-        <PopoverAnchor />
         <CopyButton
           value={copyValue}
           showTooltip={false}

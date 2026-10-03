@@ -1,11 +1,12 @@
 "use client";
 
+import { Button as BaseButton } from "@base-ui/react/button";
+import { useRender } from "@base-ui/react/use-render";
 import { cva } from "class-variance-authority";
 import type { VariantProps } from "class-variance-authority";
 import { cn } from "cn";
 import { motion, useReducedMotion } from "motion/react";
 import type { HTMLMotionProps } from "motion/react";
-import { Slot } from "radix-ui";
 import type * as React from "react";
 
 const buttonVariants = cva(
@@ -43,11 +44,20 @@ const buttonVariants = cva(
   }
 );
 
-const MotionSlot = motion.create(Slot.Root);
+const Slot = ({ children, ref, ...props }: React.ComponentProps<"button">) =>
+  useRender({
+    props,
+    ref,
+    render: children as React.ReactElement,
+  });
+const MotionSlot = motion.create(Slot);
+const MotionButton = motion.create(BaseButton);
 
 type ButtonProps = Omit<HTMLMotionProps<"button">, "children" | "whileTap"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
+    render?: React.ComponentProps<typeof BaseButton>["render"];
+    nativeButton?: boolean;
     children?: React.ReactNode;
     whileTap?: HTMLMotionProps<"button">["whileTap"] | false;
   };
@@ -63,7 +73,7 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const shouldReduceMotion = useReducedMotion();
-  const Comp = asChild ? MotionSlot : motion.button;
+  const Comp = asChild ? MotionSlot : MotionButton;
 
   return (
     <Comp

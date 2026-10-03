@@ -139,7 +139,11 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
                 {control.kind === "select" ? (
                   <Select
                     value={String(values[name])}
-                    onValueChange={(value) => updateValue(name, value)}
+                    onValueChange={(value) => {
+                      if (value !== null) {
+                        updateValue(name, value);
+                      }
+                    }}
                   >
                     <SelectTrigger id={controlId} className="w-full">
                       <SelectValue />

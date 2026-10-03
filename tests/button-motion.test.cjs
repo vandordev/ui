@@ -19,10 +19,10 @@ test("distributed Button declares the motion package", () => {
 test("registry Button declares cn directly without a utils registry dependency", () => {
   const item = registry.items.find(({ name }) => name === "button");
   assert.deepEqual(item.dependencies.toSorted(), [
+    "@base-ui/react",
     "class-variance-authority",
     "cn",
     "motion",
-    "radix-ui",
   ]);
   assert.deepEqual(item.registryDependencies ?? [], []);
 });
@@ -87,4 +87,39 @@ test("animated asChild preserves a single link and native attributes", () => {
   assert.ok(!html.includes("<button"));
   assert.ok(!html.includes("<div"));
   assert.ok(!html.includes("whileTap"));
+});
+
+test("Button supports Base UI render composition and defaults to a non-submit button", () => {
+  const { Button } = jiti("../registry/new-york/button.tsx");
+  const html = renderToStaticMarkup(
+    React.createElement(
+      Button,
+      {
+        render: React.createElement("button", { "data-custom": "save" }),
+      },
+      "Save"
+    )
+  );
+  assert.ok(html.includes('data-custom="save"'));
+  assert.ok(html.includes('type="button"'));
+  assert.equal((html.match(/<button /g) ?? []).length, 1);
+});
+
+test("Base UI render can target a navigation link without nesting a button", () => {
+  const { Button } = jiti("../registry/new-york/button.tsx");
+  const html = renderToStaticMarkup(
+    React.createElement(
+      Button,
+      {
+        nativeButton: false,
+        render: React.createElement("a", { href: "/docs" }),
+        variant: "outline",
+      },
+      "Browse"
+    )
+  );
+  assert.ok(html.startsWith("<a "));
+  assert.ok(html.includes('href="/docs"'));
+  assert.ok(html.includes(">Browse</a>"));
+  assert.ok(!html.includes("<button"));
 });

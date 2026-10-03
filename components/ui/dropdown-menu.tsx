@@ -1,13 +1,29 @@
 "use client";
 
+import { Menu as BaseMenu } from "@base-ui/react/menu";
+import { Separator } from "@base-ui/react/separator";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
-import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import { useCallback, useEffect, useRef } from "react";
 
 import { dropdownClose, dropdownOpen } from "@/audio/core";
+import { adaptBase, adaptPopup } from "@/components/ui/base-ui-adapter";
 import type { FeedbackType } from "@/hooks/use-feedback";
 import { useFeedback } from "@/hooks/use-feedback";
 import { cn } from "@/lib/utils";
+
+const DropdownMenuPrimitive = {
+  ...BaseMenu,
+  CheckboxItem: adaptBase(BaseMenu.CheckboxItem),
+  Content: adaptPopup(BaseMenu.Popup, BaseMenu.Positioner),
+  Item: adaptBase(BaseMenu.Item),
+  Label: adaptBase(BaseMenu.GroupLabel),
+  RadioItem: adaptBase(BaseMenu.RadioItem),
+  Separator: adaptBase(Separator),
+  Sub: BaseMenu.SubmenuRoot,
+  SubContent: adaptPopup(BaseMenu.Popup, BaseMenu.Positioner),
+  SubTrigger: adaptBase(BaseMenu.SubmenuTrigger),
+  Trigger: adaptBase(BaseMenu.Trigger, "button"),
+};
 
 const DropdownMenu = ({
   onOpenChange,
@@ -47,9 +63,9 @@ const DropdownMenu = ({
   }, [isControlled, playStateSound, props.open]);
 
   const handleOpenChange = useCallback(
-    (open: boolean) => {
+    (open: boolean, details: BaseMenu.Root.ChangeEventDetails) => {
       playStateSound(open);
-      onOpenChange?.(open);
+      onOpenChange?.(open, details);
     },
     [onOpenChange, playStateSound]
   );
@@ -95,7 +111,7 @@ const DropdownMenuContent = ({
       data-slot="dropdown-menu-content"
       sideOffset={sideOffset}
       className={cn(
-        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md",
+        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--available-height) min-w-[8rem] origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md",
         className
       )}
       {...props}
@@ -125,7 +141,9 @@ const DropdownMenuItem = ({
 }) => {
   const play = useFeedback({ haptic, sound });
 
-  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick: NonNullable<
+    React.ComponentProps<typeof DropdownMenuPrimitive.Item>["onClick"]
+  > = (e) => {
     play();
     onClick?.(e);
   };
@@ -161,9 +179,9 @@ const DropdownMenuCheckboxItem = ({
     {...props}
   >
     <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
+      <DropdownMenuPrimitive.CheckboxItemIndicator>
         <CheckIcon className="size-4" />
-      </DropdownMenuPrimitive.ItemIndicator>
+      </DropdownMenuPrimitive.CheckboxItemIndicator>
     </span>
     {children}
   </DropdownMenuPrimitive.CheckboxItem>
@@ -192,9 +210,9 @@ const DropdownMenuRadioItem = ({
     {...props}
   >
     <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-      <DropdownMenuPrimitive.ItemIndicator>
+      <DropdownMenuPrimitive.RadioItemIndicator>
         <CircleIcon className="size-2 fill-current" />
-      </DropdownMenuPrimitive.ItemIndicator>
+      </DropdownMenuPrimitive.RadioItemIndicator>
     </span>
     {children}
   </DropdownMenuPrimitive.RadioItem>
@@ -275,14 +293,19 @@ const DropdownMenuSubContent = ({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) => (
-  <DropdownMenuPrimitive.SubContent
-    data-slot="dropdown-menu-sub-content"
-    className={cn(
-      "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md border p-1 shadow-lg",
-      className
-    )}
-    {...props}
-  />
+  <DropdownMenuPrimitive.Portal>
+    <DropdownMenuPrimitive.SubContent
+      side="right"
+      align="start"
+      sideOffset={4}
+      data-slot="dropdown-menu-sub-content"
+      className={cn(
+        "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--transform-origin) overflow-hidden rounded-md border p-1 shadow-lg",
+        className
+      )}
+      {...props}
+    />
+  </DropdownMenuPrimitive.Portal>
 );
 
 export {

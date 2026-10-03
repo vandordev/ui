@@ -64,7 +64,7 @@ export const DocsShareMenu = ({
         className="w-fit"
         alignOffset={-6}
         collisionPadding={8}
-        onCloseAutoFocus={(e) => e.preventDefault()}
+        finalFocus={false}
       >
         <DropdownMenuItem
           sound="copy"

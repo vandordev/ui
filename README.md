@@ -6,13 +6,13 @@ An open-source collection of customizable React components by Vandor, distribute
 - **Documentation:** https://vandor-ui.vercel.app/docs
 - **Repository:** https://github.com/vandordev/ui
 
-Vandor UI's **Button** offers six variants, eight sizes, a subtle raised finish, smooth hover transitions, and configurable press feedback powered by `motion/react`. It builds on shadcn/ui's new-york style and Radix primitives.
+Vandor UI's **Button** offers six variants, eight sizes, a subtle raised finish, smooth hover transitions, and configurable press feedback powered by `motion/react`. It builds on shadcn/ui's new-york style and Base UI primitives.
 
 ## Stack
 
 - Next.js 16, React 19, TypeScript, and Tailwind CSS 4
 - Fumadocs and MDX for documentation
-- shadcn/ui and Radix UI primitives
+- shadcn/ui and Base UI primitives
 - Shiki and rehype-pretty-code for syntax highlighting
 - Motion, optional audio feedback, and haptics
 - Markdown documentation, `llms.txt`, and agent discovery endpoints

@@ -9,7 +9,7 @@ description: A tactile button with configurable press feedback.
 component: button
 credits:
   - name: shadcn/ui
-    url: https://ui.shadcn.com/docs/components/radix/button
+    url: https://ui.shadcn.com/docs/components/base/button
     contribution: Original Button implementation.
 ---
 ```

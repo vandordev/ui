@@ -29,13 +29,13 @@ export const CodeCollapsibleWrapper = ({
       className={cn("group/collapsible relative mt-6 md:-mx-1", className)}
       {...props}
     >
-      <CollapsibleTrigger asChild>
-        <div
-          className={cn(
-            "absolute top-1.5 right-9 z-10 flex items-center",
-            navTriggerClassName
-          )}
-        >
+      <div
+        className={cn(
+          "absolute top-1.5 right-9 z-10 flex items-center",
+          navTriggerClassName
+        )}
+      >
+        <CollapsibleTrigger asChild>
           <Button
             variant="ghost"
             size="sm"
@@ -43,11 +43,12 @@ export const CodeCollapsibleWrapper = ({
           >
             {isOpened ? "Collapse" : "Expand"}
           </Button>
-          <Separator orientation="vertical" className="mx-1.5 h-4!" />
-        </div>
-      </CollapsibleTrigger>
+        </CollapsibleTrigger>
+        <Separator orientation="vertical" className="mx-1.5 h-4!" />
+      </div>
       <CollapsibleContent
-        forceMount
+        keepMounted
+        hidden={false}
         className="relative overflow-hidden data-[state=closed]:max-h-64 data-[state=closed]:[content-visibility:auto] data-[state=closed]:[contain-intrinsic-size:auto_16rem] [&>figure]:mt-0 [&>figure]:md:mx-0!"
       >
         {children}
