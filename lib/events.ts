@@ -17,7 +17,6 @@ const eventSchema = z.object({
     "copy_color",
     "set_layout",
     "open_command_menu",
-    "click_edit_page",
     "click_registry_add_button",
     "copy_registry_command",
     "keyboard_shortcut_navigate",

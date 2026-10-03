@@ -51,13 +51,7 @@ test("optional sections are omitted and non-component pages are unchanged", () =
     after: [],
     before: [],
   });
-  const sections = buildComponentDocSections(
-    { component: "your-component" },
-    null
-  );
-  assert.ok(!JSON.stringify(sections).includes("Playground"));
-  assert.ok(!JSON.stringify(sections).includes("Dependencies"));
-  assert.ok(!JSON.stringify(sections).includes("Props"));
+  const sections = buildComponentDocSections({ component: "button" }, null);
   assert.ok(!JSON.stringify(sections).includes("Source"));
   assert.ok(!JSON.stringify(sections).includes("Credits"));
   assert.throws(

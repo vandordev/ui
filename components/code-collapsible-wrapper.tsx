@@ -26,7 +26,7 @@ export const CodeCollapsibleWrapper = ({
       sounds
       open={isOpened}
       onOpenChange={setIsOpened}
-      className={cn("group/collapsible relative md:-mx-1", className)}
+      className={cn("group/collapsible relative mt-6 md:-mx-1", className)}
       {...props}
     >
       <CollapsibleTrigger asChild>
@@ -48,7 +48,7 @@ export const CodeCollapsibleWrapper = ({
       </CollapsibleTrigger>
       <CollapsibleContent
         forceMount
-        className="relative mt-6 overflow-hidden data-[state=closed]:max-h-64 data-[state=closed]:[content-visibility:auto] data-[state=closed]:[contain-intrinsic-size:auto_16rem] [&>figure]:mt-0 [&>figure]:md:mx-0!"
+        className="relative overflow-hidden data-[state=closed]:max-h-64 data-[state=closed]:[content-visibility:auto] data-[state=closed]:[contain-intrinsic-size:auto_16rem] [&>figure]:mt-0 [&>figure]:md:mx-0!"
       >
         {children}
       </CollapsibleContent>

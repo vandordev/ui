@@ -18,7 +18,7 @@ Technical, clear, practical. The display name is Vandor UI; package names, regis
 
 ## Anti-references
 
-Do not redesign the existing startercn documentation surface during component work. Preserve the shadcn foundation; add custom behavior only when explicitly requested. Motion should convey interaction, not decorate the interface.
+Do not redesign the existing Vandor UI documentation surface during component work. Preserve the shadcn foundation; add custom behavior only when explicitly requested. Motion should convey interaction, not decorate the interface.
 
 ## Design Principles
 

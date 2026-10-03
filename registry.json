@@ -15,19 +15,6 @@
           "target": "components/ui/button.tsx"
         }
       ]
-    },
-    {
-      "name": "your-component",
-      "type": "registry:ui",
-      "title": "Your Component",
-      "description": "A placeholder component. Replace this with your custom shadcn component.",
-      "files": [
-        {
-          "path": "registry/new-york/your-component.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/your-component.tsx"
-        }
-      ]
     }
   ]
 }

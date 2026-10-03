@@ -220,7 +220,7 @@ const Page = async (props: { params: Promise<{ slug?: string[] }> }) => {
                 <DocsTableOfContents toc={doc.toc} />
               </div>
             ) : null}
-            <DocsTocFooter docId={page.path} className="mx-8" />
+            <DocsTocFooter className="mx-8" />
           </div>
         </div>
       </PageTransition>

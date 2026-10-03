@@ -6,7 +6,7 @@ An open-source collection of customizable React components by Vandor, distribute
 - **Documentation:** https://vandor-ui.vercel.app/docs
 - **Repository:** https://github.com/vandordev/ui
 
-Built from [startercn](https://github.com/shadcn-labs/startercn). The first pilot component is a shadcn-based **Button** (new-york + Radix) with subtle press feedback powered by `motion/react`. The original `your-component` development placeholder is retained separately.
+Vandor UI's **Button** offers six variants, eight sizes, a subtle raised finish, smooth hover transitions, and configurable press feedback powered by `motion/react`. It builds on shadcn/ui's new-york style and Radix primitives.
 
 ## Stack
 
@@ -87,4 +87,4 @@ Report bugs and suggest components through [GitHub issues](https://github.com/va
 
 ## License
 
-[MIT](./LICENSE). Original startercn attribution is retained in the license.
+[MIT](./LICENSE). Required copyright notices are retained in the license.

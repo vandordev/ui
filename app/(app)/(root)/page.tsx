@@ -1,9 +1,11 @@
+import Link from "next/link";
+
 import { CommandBox } from "@/components/command-box";
 import { HomeCtas } from "@/components/home-ctas";
 import { PageTransition } from "@/components/page-transition";
 import { ROUTES } from "@/constants/routes";
 import { SITE } from "@/constants/site";
-import { YourComponent } from "@/registry/new-york/your-component";
+import { Button } from "@/registry/new-york/button";
 import { BreadcrumbJsonLd } from "@/seo/json-ld";
 
 export const dynamic = "force-static";
@@ -32,8 +34,20 @@ export default function IndexPage() {
         </section>
 
         <section className="container-wrapper pb-8 lg:pb-12">
-          <div className="container flex flex-col items-center gap-6">
-            <YourComponent className="w-full max-w-md" />
+          <div className="container grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <section className="overflow-hidden rounded-md border">
+              <div className="flex min-h-48 items-center justify-center bg-muted/20 p-6">
+                <Button>Button</Button>
+              </div>
+              <h2 className="border-t px-5 py-4 text-sm font-medium">
+                <Link
+                  href="/docs/components/button"
+                  className="underline-offset-4 hover:underline"
+                >
+                  Button
+                </Link>
+              </h2>
+            </section>
           </div>
         </section>
       </PageTransition>
