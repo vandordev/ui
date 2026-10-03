@@ -3,6 +3,20 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "A Base UI Select with smooth Motion-powered reveal and exit transitions and reduced-motion support.",
+      "dependencies": ["@base-ui/react", "cn", "lucide-react", "motion"],
+      "files": [
+        {
+          "path": "registry/new-york/select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/select.tsx"
+        }
+      ]
+    },
+    {
       "name": "button",
       "type": "registry:ui",
       "title": "Button",

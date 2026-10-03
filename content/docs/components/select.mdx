@@ -1,0 +1,76 @@
+---
+title: Select
+description: A Base UI Select with smooth Motion-powered option-menu transitions.
+component: select
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/select
+    contribution: Select composition and foundation. Vandor UI adds Motion reveal and exit transitions, reduced-motion support, and direct cn integration.
+---
+
+import { SelectDemo } from "@/examples/select-demo";
+
+## Usage
+
+```tsx
+import {
+  Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+
+const items = [
+  { label: "Apple", value: "apple" },
+  { label: "Banana", value: "banana" },
+];
+
+export function Demo() {
+  return (
+    <Select items={items}>
+      <SelectTrigger aria-label="Fruit" className="w-56">
+        <SelectValue placeholder="Select a fruit" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          {items.map((item) => (
+            <SelectItem key={item.value} value={item.value}>
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+```
+
+Use your project's configured UI alias if it differs from `@/components/ui`. Pass `items` to map stored values to readable labels.
+
+## Examples
+
+<ComponentPreview name="select-demo" title="select-demo.tsx">
+  <div className="flex justify-center rounded-md border p-6">
+    <SelectDemo />
+  </div>
+</ComponentPreview>
+
+### Sizes and Disabled Options
+
+Use `size="sm"` on `SelectTrigger` for a compact control. Set `disabled` on `Select` to disable the whole control, or on individual `SelectItem` elements to disable options.
+
+### Groups
+
+Place options inside `SelectGroup`. Use `SelectLabel` for a group heading and `SelectSeparator` between groups. Group headings do not label the control: give the trigger a visible label or `aria-label`.
+
+### Controlled Values and Forms
+
+Use `value` and `onValueChange` on `Select` for controlled selection, or `defaultValue` for an initial uncontrolled value. Set `name` to include the value in form submission. Base UI's generic value and multiple-selection APIs are preserved.
+
+## Motion & Accessibility
+
+The option menu fades and scales from `0.96` to `1` over `180ms` with an ease-out curve. Closing reverses the effect over `120ms`, keeping the popup mounted until Motion finishes. Options remain immediately interactive, without staggered delays.
+
+- Reduced-motion preferences disable scaling and animation duration.
+- Set `animated={false}` on `SelectContent` for an instant reveal and close.
+- Menus open below the trigger by default. Set `alignItemWithTrigger` to overlap the trigger and align the selected item.
+- Base UI preserves Arrow-key navigation, typeahead, Enter/Space selection, Escape dismissal, and focus restoration.
+- Long lists scroll within the available viewport height, with scroll-arrow affordances.
+- Give every control an accessible name using a visible label or `aria-label` on `SelectTrigger`.

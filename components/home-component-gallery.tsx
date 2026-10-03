@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { SelectDemo } from "@/examples/select-demo";
 import registry from "@/registry.json";
 import { Button } from "@/registry/new-york/button";
 import { Loading } from "@/registry/new-york/loading";
@@ -8,6 +9,7 @@ import { Loading } from "@/registry/new-york/loading";
 const previews: Record<string, ReactNode> = {
   button: <Button>Button</Button>,
   loading: <Loading />,
+  select: <SelectDemo />,
 };
 
 export const HomeComponentGallery = () => (

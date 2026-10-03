@@ -11,6 +11,11 @@ import {
   loadingProps,
 } from "@/lib/loading-playground";
 import type { PropDefinition } from "@/lib/playground";
+import {
+  getSelectCode,
+  getSelectDefaults,
+  selectProps,
+} from "@/lib/select-playground";
 import registry from "@/registry.json";
 
 interface ComponentDocDefinition {
@@ -28,6 +33,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   loading: {
     playground: { code: getLoadingCode(getLoadingDefaults()) },
     props: loadingProps,
+  },
+  select: {
+    playground: { code: getSelectCode(getSelectDefaults()) },
+    props: selectProps,
   },
 };
 
