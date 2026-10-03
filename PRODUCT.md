@@ -10,7 +10,7 @@ React developers evaluating components, inspecting source code, and installing r
 
 ## Product Purpose
 
-Vandor UI is Vandor's public component registry and documentation website. Components are distributed as editable source through the shadcn CLI. The first pilot is Button: its shadcn baseline is established, and the first Vandor-specific customization is subtle press feedback powered by Motion.
+Vandor UI is Vandor's public component registry and documentation website. Components are distributed as editable source through the shadcn CLI. The first pilot is Button: its shadcn foundation now includes Motion press feedback and a subtle raised finish through vertical gradients and thin borders, without decorative shadows. The registry imports class merging directly from the cn package.
 
 ## Brand Personality
 

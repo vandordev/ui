@@ -13,8 +13,13 @@ export const ComponentPreview = ({
   title?: string;
   children?: ReactNode;
 }) => (
-  <>
+  <div className="mt-6" data-slot="component-preview">
     {children}
-    <ComponentSource name={name} src={src} title={title} />
-  </>
+    <ComponentSource
+      name={name}
+      src={src}
+      title={title}
+      className="flow-root"
+    />
+  </div>
 );

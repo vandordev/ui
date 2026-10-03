@@ -28,12 +28,23 @@ const jiti = createJiti(__filename, {
 
 test("generated JSX renders the same Button across all variants and sizes", () => {
   const { Button } = jiti("../registry/new-york/button.tsx");
-  const { buttonProps, getButtonAccessibleLabel, getButtonCode, isIconSize } =
-    jiti("../lib/button-playground.ts");
+  const {
+    buttonProps,
+    getButtonDefaults,
+    getButtonAccessibleLabel,
+    getButtonCode,
+    isIconSize,
+  } = jiti("../lib/button-playground.ts");
   for (const variant of buttonProps.variant.control.options) {
     for (const size of buttonProps.size.control.options) {
       for (const children of ["Save", 'Save "draft" <now> {value}\nnext', ""]) {
-        const values = { children, disabled: true, size, variant };
+        const values = {
+          ...getButtonDefaults(),
+          children,
+          disabled: true,
+          size,
+          variant,
+        };
         const compiled = ts.transpileModule(getButtonCode(values), {
           compilerOptions: {
             jsx: ts.JsxEmit.ReactJSX,
@@ -79,21 +90,52 @@ test("generated JSX renders the same Button across all variants and sizes", () =
 
 test("Button controls derive a fresh default state from metadata", () => {
   const { getPlaygroundDefaults } = jiti("../lib/playground.ts");
-  const { buttonProps } = jiti("../lib/button-playground.ts");
-  const defaults = getPlaygroundDefaults(buttonProps);
+  const { buttonPlaygroundDefinitions } = jiti("../lib/button-playground.ts");
+  const defaults = getPlaygroundDefaults(buttonPlaygroundDefinitions);
   assert.deepEqual(defaults, {
     children: "Button",
     disabled: false,
     size: "default",
+    tapScale: 0.96,
     variant: "default",
+    whileTap: true,
   });
   defaults.children = "Changed";
-  assert.equal(getPlaygroundDefaults(buttonProps).children, "Button");
+  assert.equal(
+    getPlaygroundDefaults(buttonPlaygroundDefinitions).children,
+    "Button"
+  );
+});
+
+test("tap controls synchronize Motion targets and generated JSX", () => {
+  const { getButtonDefaults, getButtonCode, getButtonWhileTap } = jiti(
+    "../lib/button-playground.ts"
+  );
+  const defaults = getButtonDefaults();
+  assert.deepEqual(getButtonWhileTap(defaults), { scale: 0.96 });
+  assert.ok(!getButtonCode(defaults).includes("whileTap="));
+  for (const tapScale of [0.8, 0.9, 0.96, 1]) {
+    const values = { ...defaults, tapScale };
+    assert.deepEqual(getButtonWhileTap(values), { scale: tapScale });
+    if (tapScale !== 0.96) {
+      assert.ok(
+        getButtonCode(values).includes(`whileTap={{ scale: ${tapScale} }}`)
+      );
+    }
+    const off = { ...values, whileTap: false };
+    assert.equal(getButtonWhileTap(off), false);
+    assert.ok(getButtonCode(off).includes("whileTap={false}"));
+    assert.ok(!getButtonCode(off).includes("scale:"));
+  }
+  assert.equal(getButtonDefaults().tapScale, 0.96);
 });
 
 test("Button code omits default props and reflects customized controls", () => {
-  const { getButtonCode } = jiti("../lib/button-playground.ts");
+  const { getButtonCode, getButtonDefaults } = jiti(
+    "../lib/button-playground.ts"
+  );
   const code = getButtonCode({
+    ...getButtonDefaults(),
     children: "Save",
     disabled: true,
     size: "sm",
@@ -105,6 +147,7 @@ test("Button code omits default props and reflects customized controls", () => {
   assert.ok(code.includes(" disabled"));
   assert.ok(code.includes('{"Save"}'));
   const defaults = getButtonCode({
+    ...getButtonDefaults(),
     children: "Button",
     disabled: false,
     size: "default",
@@ -116,9 +159,12 @@ test("Button code omits default props and reflects customized controls", () => {
 });
 
 test("every icon size generates an icon import and accessible name", () => {
-  const { getButtonCode } = jiti("../lib/button-playground.ts");
+  const { getButtonCode, getButtonDefaults } = jiti(
+    "../lib/button-playground.ts"
+  );
   for (const size of ["icon", "icon-xs", "icon-sm", "icon-lg"]) {
     const code = getButtonCode({
+      ...getButtonDefaults(),
       children: "Add item",
       disabled: false,
       size,
@@ -132,9 +178,12 @@ test("every icon size generates an icon import and accessible name", () => {
 });
 
 test("labels are serialized safely as JSX and empty labels retain an accessible name", () => {
-  const { getButtonCode } = jiti("../lib/button-playground.ts");
+  const { getButtonCode, getButtonDefaults } = jiti(
+    "../lib/button-playground.ts"
+  );
   const label = 'Save "draft" <now> {value}\nnext';
   const code = getButtonCode({
+    ...getButtonDefaults(),
     children: label,
     disabled: false,
     size: "default",
@@ -142,6 +191,7 @@ test("labels are serialized safely as JSX and empty labels retain an accessible 
   });
   assert.ok(code.includes(`{${JSON.stringify(label)}}`));
   const empty = getButtonCode({
+    ...getButtonDefaults(),
     children: "",
     disabled: false,
     size: "default",
@@ -149,6 +199,7 @@ test("labels are serialized safely as JSX and empty labels retain an accessible 
   });
   assert.ok(empty.includes('aria-label="Button"'));
   const icon = getButtonCode({
+    ...getButtonDefaults(),
     children: label,
     disabled: false,
     size: "icon",

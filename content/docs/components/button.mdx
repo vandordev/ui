@@ -4,6 +4,7 @@ description: A shadcn-based Button with subtle press feedback powered by Motion.
 ---
 
 import { ButtonPlayground } from "@/components/button-playground";
+import { ComponentDependencies } from "@/components/component-dependencies";
 import { PropsReference } from "@/components/props-reference";
 import { buttonProps } from "@/lib/button-playground";
 import { ButtonVariants } from "@/examples/button-variants";
@@ -12,13 +13,11 @@ import { ButtonIcon } from "@/examples/button-icon";
 import { ButtonDisabled } from "@/examples/button-disabled";
 import { ButtonAsChild } from "@/examples/button-as-child";
 
-Built on the shadcn Button's **new-york** style and **Radix** primitives, with Vandor's press feedback powered by `motion/react`. The six variants, eight sizes, focus styles, and `asChild` composition remain available.
-
-The Button scales down to `0.96` while pressed and returns to its original size when released. It does not include the audio or haptic feedback used by the website's internal Button.
+A shadcn-based Button with a subtle raised finish and press feedback. Six variants, eight sizes, and `asChild` composition.
 
 ## Playground
 
-Change the controls to update the preview and its copyable usage code. Reset restores the playground defaults. These controls do not change the installed Button source.
+Adjust the controls to update the preview and code. **While Tap** toggles press feedback; **Tap Scale** adjusts `whileTap.scale` from `0.80` to `1.00`. Reset restores the defaults.
 
 <ButtonPlayground />
 
@@ -30,9 +29,13 @@ Initialize shadcn in your React project, then install the Button from the Vandor
 npx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
 ```
 
-The registry declares `class-variance-authority`, `radix-ui`, `motion`, and shadcn's `utils` helper as dependencies. The Motion package is named `motion`; the component imports from `motion/react`. The Button uses your project's existing shadcn theme tokens.
-
 The default installation target is `components/ui/button.tsx`. If you already have a Button there, review the CLI's overwrite prompt before replacing local customizations.
+
+## Dependencies
+
+Installed automatically by the registry CLI. For manual setup:
+
+<ComponentDependencies name="button" />
 
 ## Usage
 
@@ -48,13 +51,9 @@ Use your project's configured UI alias if it differs from `@/components/ui`.
 
 ## Press Feedback
 
-Press and hold a Button in the playground to try the scale feedback. Pointer presses and keyboard Enter presses use Motion's `whileTap` gesture. The scale transition takes `0.12` seconds and returns on release or cancellation, including when using `asChild` with a link.
+The Button scales to `0.96` while pressed and returns on release, with a `0.12s` transition. Hover colors transition over `200ms`. Disabled buttons and reduced-motion preferences disable animation.
 
-Hover changes to background, text, border, and focus shadow transition smoothly over `200ms` with ease-out timing. These CSS transitions remain separate from Motion's press animation, so the scale feedback stays responsive.
-
-Disabled buttons do not animate. Both press feedback and CSS transitions are disabled when the user prefers reduced motion.
-
-To disable press feedback on an individual Button, pass `whileTap={false}`. Motion animation props, including `whileTap` and `transition`, are supported. Animation and drag callbacks use Motion's API rather than the corresponding native DOM animation/drag events.
+Set `whileTap={false}` to turn off press feedback. Motion's animation props and callbacks are supported.
 
 ```tsx
 <Button whileTap={false}>No scale feedback</Button>
@@ -69,6 +68,8 @@ The reference lists component-specific props and selected native button props, n
 ## Variants
 
 The six built-in variants are `default`, `secondary`, `outline`, `ghost`, `destructive`, and `link`.
+
+Solid variants use a subtle top-to-bottom gradient and thin border, without shadows. Outline keeps its border; ghost and link stay flat. All variants retain a keyboard focus ring.
 
 <ComponentPreview name="button-variants" title="button-variants.tsx">
   <div className="rounded-md border p-6">

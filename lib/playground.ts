@@ -1,4 +1,4 @@
-export type PlaygroundValues = Record<string, string | boolean>;
+export type PlaygroundValues = Record<string, string | boolean | number>;
 
 export type ControlDefinition =
   | { kind: "text"; initialValue: string; label: string }
@@ -8,7 +8,16 @@ export type ControlDefinition =
       label: string;
       options: readonly string[];
     }
-  | { kind: "boolean"; initialValue: boolean; label: string };
+  | { kind: "boolean"; initialValue: boolean; label: string }
+  | {
+      kind: "range";
+      initialValue: number;
+      label: string;
+      min: number;
+      max: number;
+      step: number;
+      enabledBy?: string;
+    };
 
 export interface PropDefinition {
   type: string;

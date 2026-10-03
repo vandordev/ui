@@ -99,10 +99,15 @@ export const buttonProps = {
     type: "string",
   },
   whileTap: {
+    control: {
+      initialValue: true as boolean,
+      kind: "boolean",
+      label: "While Tap",
+    },
     defaultValue: "{ scale: 0.96 }",
     description:
       "Motion target while pressed. Set false to disable press feedback. Ignored when disabled or reduced motion is preferred.",
-    type: 'MotionProps["whileTap"]',
+    type: 'MotionProps["whileTap"] | false',
   },
   transition: {
     defaultValue: '{ duration: 0.12, ease: "easeOut" }',
@@ -111,9 +116,32 @@ export const buttonProps = {
   },
 } satisfies Record<string, PropDefinition>;
 
-export const getButtonDefaults = () => getPlaygroundDefaults(buttonProps);
+export const buttonPlaygroundDefinitions = {
+  ...buttonProps,
+  tapScale: {
+    control: {
+      enabledBy: "whileTap",
+      initialValue: 0.96 as number,
+      kind: "range",
+      label: "Tap Scale",
+      max: 1,
+      min: 0.8,
+      step: 0.01,
+    },
+    defaultValue: "0.96",
+    description:
+      "Playground control for the scale inside whileTap, not a Button prop.",
+    type: "number",
+  },
+} satisfies Record<string, PropDefinition>;
+
+export const getButtonDefaults = () =>
+  getPlaygroundDefaults(buttonPlaygroundDefinitions);
 
 export type ButtonPlaygroundValues = ReturnType<typeof getButtonDefaults>;
+
+export const getButtonWhileTap = (values: ButtonPlaygroundValues) =>
+  values.whileTap ? { scale: values.tapScale } : false;
 
 export const isIconSize = (size: ButtonSize) => size.startsWith("icon");
 
@@ -135,6 +163,11 @@ export const getButtonCode = (values: ButtonPlaygroundValues) => {
   }
   if (values.disabled) {
     attributes.push("disabled");
+  }
+  if (!values.whileTap) {
+    attributes.push("whileTap={false}");
+  } else if (values.tapScale !== defaults.tapScale) {
+    attributes.push(`whileTap={{ scale: ${values.tapScale} }}`);
   }
   const label = getButtonAccessibleLabel(values);
   if (label) {

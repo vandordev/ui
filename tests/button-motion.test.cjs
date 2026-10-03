@@ -16,6 +16,38 @@ test("distributed Button declares the motion package", () => {
   assert.ok(item.dependencies.includes("motion"));
 });
 
+test("registry Button declares cn directly without a utils registry dependency", () => {
+  const item = registry.items.find(({ name }) => name === "button");
+  assert.deepEqual(item.dependencies.toSorted(), [
+    "class-variance-authority",
+    "cn",
+    "motion",
+    "radix-ui",
+  ]);
+  assert.deepEqual(item.registryDependencies ?? [], []);
+});
+
+test("Button className overrides conflicting Tailwind classes", () => {
+  const { Button } = jiti("../registry/new-york/button.tsx");
+  const html = renderToStaticMarkup(
+    React.createElement(
+      Button,
+      {
+        className: "px-8 rounded-full bg-background bg-none border-0",
+      },
+      "Save"
+    )
+  );
+  const classes = html.match(/class="([^"]+)"/)[1].split(" ");
+  assert.ok(classes.includes("px-8"));
+  assert.ok(classes.includes("rounded-full"));
+  assert.ok(classes.includes("bg-background"));
+  assert.ok(!classes.includes("px-4"));
+  assert.ok(!classes.includes("rounded-md"));
+  assert.ok(!classes.includes("bg-primary"));
+  assert.ok(!classes.includes("bg-linear-to-b"));
+});
+
 test("animated Button preserves native disabled markup and filters motion props", () => {
   const { Button } = jiti("../registry/new-york/button.tsx");
   const html = renderToStaticMarkup(
