@@ -1,81 +1,68 @@
 ---
 title: Introduction
-description: Customizable React components by Vandor, distributed through the shadcn registry.
+description: Explore React components, try them live, and make the source your own.
 ---
 
-**Vandor UI** is an open-source collection of React components maintained by Vandor and distributed through the [shadcn registry](https://ui.shadcn.com/docs/registry). Install the source into your project and customize it to your needs.
-
-Start with Vandor UI's [Button](/docs/components/button): six variants, eight sizes, a subtle raised finish, smooth hover transitions, and configurable press feedback powered by Motion. It builds on shadcn/ui's new-york style and Radix primitives.
+**Vandor UI** gives you React components you can try before adding them to your project. Explore the available options, copy a working example, and customize the installed source to match your interface.
 
 ## What You Get
 
-- 📦 **Source ownership** - Install component source directly into your project
-- 📚 **Documentation site** - Powered by Fumadocs
-- 🎨 **Registry compatible** - Works with `npx shadcn add`
-- 🤖 **Agent ready** - Ships with `llms.txt`, `llms-full.txt`, API catalog routes, and agent skill discovery endpoints
-- 🔊 **[Web audio feedback](https://audio.raphaelsalaja.com/)** - Built-in interaction sounds powered by `@web-kits/audio`
-- 📳 **[Web haptics](https://haptics.lochie.me/)** - Optional haptic feedback for supported devices via `web-haptics`
-- ✨ **[Motion animations](https://motion.dev/)** - Uses `motion` for animated UI states and transitions
-- 🎯 **[Animated icons](https://lucide-animated.com/)** - Includes reusable animated icons for buttons, sharing, and navigation
-- 🔄 **[View transitions](https://nextjs.org/docs/app/api-reference/config/next-config-js/viewTransition)** - Uses Next.js view transitions for smoother page changes
-- 🚀 **Deploy ready** - Deploy anywhere
+- **Interactive previews:** change props and see how a component looks and behaves before installing it.
+- **Working examples:** copy usage code that matches your playground settings, or start from common patterns.
+- **Editable source:** keep component code in your own project and change its styles or behavior without waiting for a library update.
+- **Clear references:** find installation commands, dependencies, props, and accessibility guidance on each component page.
 
-## Tech Stack
+## Try Your First Component
 
-- `Next.js 16` + App Router
-- `React 19`
-- `Tailwind CSS 4`
-- `Fumadocs`
-- `motion`
-- `@web-kits/audio`
-- `web-haptics`
-- `shiki` + `rehype-pretty-code`
+Start with the [Button](/docs/components/button). Choose from six variants and eight sizes, adjust its press feedback, and copy the configuration you want.
 
-## How It Works
-
-1. Browse the component documentation.
-2. Install a component using its published registry URL.
-3. Customize the installed source in your project.
-
-To install the Button:
+When you are ready, add it to a project with shadcn configured:
 
 ```bash
-pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
+npx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
 ```
+
+Need help setting up your project? Follow the [installation guide](/docs/installation).
+
+## Make It Your Own
+
+The installed component belongs in your codebase. Use its props for everyday changes, or edit the source when your design needs something different.
+
+Browse [all components](/docs/components) to find your next starting point.
 
 ## FAQ
 
 <Accordion type="multiple">
 
-<AccordionItem value="faq-1">
+<AccordionItem value="faq-source">
 <AccordionTrigger>
-Why copy/paste instead of npm packages?
+Can I change the component source?
 </AccordionTrigger>
 <AccordionContent>
 
-The shadcn philosophy gives you **ownership** of the code. You can customize components to your exact needs without fighting library constraints.
+Yes. Installation copies the source into your project. You can change its styles, defaults, and behavior directly.
 
 </AccordionContent>
 </AccordionItem>
 
-<AccordionItem value="faq-2">
+<AccordionItem value="faq-frameworks">
 <AccordionTrigger>
-Which frameworks are supported?
+Can I use Vandor UI outside Next.js?
 </AccordionTrigger>
 <AccordionContent>
 
-Any React framework: Next.js, Remix, Astro, Gatsby, Vite, etc.
+Yes. Use a React project with Tailwind CSS and shadcn configured. The [installation guide](/docs/installation) links to setup instructions for your framework.
 
 </AccordionContent>
 </AccordionItem>
 
-<AccordionItem value="faq-3">
+<AccordionItem value="faq-managers">
 <AccordionTrigger>
-Can I contribute a component?
+Can I use pnpm, yarn, or bun?
 </AccordionTrigger>
 <AccordionContent>
 
-Yes! Add its source to `registry/new-york/`, register it in `registry.json`, and include documentation. Open a pull request on [GitHub](https://github.com/vandordev/ui).
+Yes. Choose your package manager in the command tabs. Component pages also include dependency commands for manual setup.
 
 </AccordionContent>
 </AccordionItem>

@@ -1,70 +1,58 @@
 ---
 title: Installation
-description: Install Vandor UI registry components in your React project.
+description: Add a Vandor UI component to your project and start using it.
 ---
 
-## Prerequisites
+Install only the components you need. Each one is added as source code in your project, ready to use and customize.
 
-Use a React project with Tailwind CSS and shadcn configured. If you have not initialized shadcn yet, run:
+## Prepare Your Project
 
-```bash
-pnpm dlx shadcn@latest init
-```
-
-See the [shadcn installation guide](https://ui.shadcn.com/docs/installation) for framework-specific setup.
-
-## Install a Component
-
-Install a registry item using its published JSON URL. Start with the shadcn-based Button with Motion press feedback:
+Use a React project with Tailwind CSS. If shadcn is not configured yet, initialize it:
 
 ```bash
-pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
+npx shadcn@latest init
 ```
 
-The CLI copies the component source into your project. You can edit the installed file directly.
+Already using shadcn? Skip this step. For a new project, follow the [setup guide for your framework](https://ui.shadcn.com/docs/installation).
+
+## Add a Component
+
+Find a component in the [component list](/docs/components), try its playground, and copy its installation command. To add the Button:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
+```
+
+Choose npm, pnpm, yarn, or bun in the command tabs. The CLI adds the component source and installs its required dependencies.
+
+If a file already exists at the installation target, review the overwrite prompt before replacing it. Keep a copy of any local changes you want to preserve.
+
+## Use It
+
+Import the installed component and use it in your interface:
 
 ```tsx
 import { Button } from "@/components/ui/button";
 
 export function Demo() {
-  return <Button variant="outline">Button</Button>;
+  return <Button variant="outline">Save changes</Button>;
 }
 ```
 
-The import path above assumes the default `@/components/ui` alias. Use your project's configured UI alias if it differs.
+This example uses the default `@/components/ui` import path. If your project uses a different alias, use the path configured for your UI components.
 
-If your project already has a Button, review the CLI's overwrite prompt before replacing it. See the [Button documentation](/docs/components/button) for variants, sizes, and source code.
+## Customize It
 
-## Develop Vandor UI Locally
+Use the component's props to change its appearance and behavior. For example, choose a Button size or turn off press feedback:
 
-To contribute components or documentation, clone the repository:
-
-```bash
-git clone https://github.com/vandordev/ui.git
-cd ui
-pnpm install
-pnpm dev
+```tsx
+<Button size="lg" whileTap={false}>
+  Save changes
+</Button>
 ```
 
-Open `http://localhost:3000` to preview the website.
+Need a deeper change? Edit the installed source directly. The [Button documentation](/docs/components/button) includes live controls, examples, a props reference, and accessibility guidance.
 
-### Add a Registry Component
+## Manual Setup
 
-1. Create its source file under `registry/new-york/`.
-2. Add an item to `registry.json`, including dependencies and file targets.
-3. Create its documentation under `content/docs/components/` and update navigation in `meta.json`.
-4. Generate the registry output:
-
-```bash
-pnpm registry:build
-```
-
-### Verify Before Publishing
-
-```bash
-pnpm check
-pnpm build
-pnpm typecheck
-```
-
-The production build also rebuilds the registry. Deploying the website serves the generated component JSON under `/r/`.
+Prefer to copy the source yourself? Open a component's documentation, install the packages listed under **Dependencies**, and copy its **Source** into your UI folder. Then import it using your project's component path.
