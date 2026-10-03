@@ -94,9 +94,9 @@ Base UI's `render` composition is also supported:
 
 ## Behavior & Accessibility
 
-The Button scales to `0.96` while pressed and returns on release, with a `0.12s` transition. Hover colors transition over `200ms`. Disabled buttons and reduced-motion preferences disable animation.
+The Button scales to `0.96` while pressed and returns on release, with a `0.12s` transition. Its appearance darkens by 10% while active, preserving the gradient. Hover colors and press brightness transition over `200ms`. Disabled buttons do not darken or animate. Reduced-motion preferences disable scaling and CSS transitions, but retain the instant color feedback.
 
-Set `whileTap={false}` to turn off press feedback. Motion's animation props and callbacks are supported.
+Set `whileTap={false}` to turn off the press animation. Active color feedback remains enabled. Motion's animation props and callbacks are supported.
 
 ```tsx
 <Button whileTap={false}>No scale feedback</Button>
