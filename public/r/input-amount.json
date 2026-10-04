@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input-amount",
+  "title": "Input Amount",
+  "description": "A formatted decimal input that emits exact raw decimal strings.",
+  "dependencies": [
+    "cn",
+    "react-number-format"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/input-amount.tsx",
+      "content": "\"use client\";\n\nimport { cn } from \"cn\";\nimport type { ComponentProps } from \"react\";\nimport { NumericFormat } from \"react-number-format\";\nimport type { NumericFormatProps } from \"react-number-format\";\n\nexport type InputAmountProps = Omit<\n  NumericFormatProps<ComponentProps<\"input\">>,\n  | \"value\"\n  | \"defaultValue\"\n  | \"onValueChange\"\n  | \"thousandSeparator\"\n  | \"decimalSeparator\"\n  | \"prefix\"\n  | \"suffix\"\n  | \"decimalScale\"\n  | \"fixedDecimalScale\"\n  | \"allowNegative\"\n> & {\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (value: string) => void;\n  thousandSeparator?: string | boolean;\n  decimalSeparator?: string;\n  prefix?: string;\n  suffix?: string;\n  decimalScale?: number;\n  fixedDecimalScale?: boolean;\n  allowNegative?: boolean;\n};\n\nconst fieldClassName =\n  \"h-9 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive dark:bg-input/30 motion-reduce:transition-none\";\n\nexport function InputAmount({\n  className,\n  thousandSeparator = false,\n  decimalSeparator = \".\",\n  prefix = \"\",\n  suffix = \"\",\n  decimalScale,\n  fixedDecimalScale = false,\n  allowNegative = false,\n  onValueChange,\n  ...props\n}: InputAmountProps) {\n  if (\n    typeof thousandSeparator === \"string\" &&\n    thousandSeparator === decimalSeparator\n  ) {\n    throw new Error(\n      \"thousandSeparator and decimalSeparator must be different.\"\n    );\n  }\n  return (\n    <NumericFormat\n      {...props}\n      data-slot=\"amount-input\"\n      thousandSeparator={thousandSeparator}\n      decimalSeparator={decimalSeparator}\n      prefix={prefix}\n      suffix={suffix}\n      decimalScale={decimalScale}\n      fixedDecimalScale={fixedDecimalScale}\n      allowNegative={allowNegative}\n      onValueChange={(values, sourceInfo) => {\n        if (sourceInfo.source === \"event\") {\n          onValueChange?.(values.value);\n        }\n      }}\n      className={cn(fieldClassName, className)}\n    />\n  );\n}\n",
+      "type": "registry:ui",
+      "target": "components/ui/input-amount.tsx"
+    }
+  ],
+  "type": "registry:ui"
+}

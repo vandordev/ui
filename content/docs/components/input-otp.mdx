@@ -1,0 +1,19 @@
+---
+title: Input OTP
+description: An accessible single-input one-time-code control with visual cells.
+component: input-otp
+---
+
+## Usage
+
+```tsx
+import { InputOTP } from "@/components/ui/input-otp";
+
+<InputOTP aria-label="Verification code" length={6} onComplete={verifyCode} />;
+```
+
+Numeric input is the default. Set `type="alphanumeric"` for letters and digits.
+
+## Behavior & Accessibility
+
+The visual cells are decorative; one native input supports keyboard editing, paste, and one-time-code autofill. `onComplete` runs only when a user edit changes the value to a complete code. Give the control an accessible name.

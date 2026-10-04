@@ -1,0 +1,24 @@
+---
+title: Date Range Picker
+description: A transactional date-range picker with optional calendar shortcuts.
+component: date-range-picker
+---
+
+## Usage
+
+```tsx
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+
+<DateRangePicker
+  label="Reporting period"
+  value={range}
+  onValueChange={setRange}
+  features={["twoMonths", "shortcuts"]}
+/>;
+```
+
+Choose `twoMonths` and `shortcuts` independently. Shortcut ranges include today; weeks begin on Monday by default. Dates represent local calendar days, and range endpoints are inclusive.
+
+## Behavior & Accessibility
+
+Calendar edits remain a draft until Apply. Cancel, Escape, and outside dismissal discard the draft. Apply is disabled for incomplete, reversed, or disabled-date ranges. Clearing is an explicit draft when `clearable` is enabled.

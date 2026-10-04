@@ -16,6 +16,10 @@ import {
   getDrawerDefaults,
 } from "@/lib/drawer-playground";
 import {
+  inputComponentProps,
+  inputPlaygroundCode,
+} from "@/lib/input-component-props";
+import {
   getLoadingCode,
   getLoadingDefaults,
   loadingProps,
@@ -34,6 +38,12 @@ interface ComponentDocDefinition {
 }
 
 export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
+  ...Object.fromEntries(
+    Object.entries(inputComponentProps).map(([name, props]) => [
+      name,
+      { playground: { code: inputPlaygroundCode[name] }, props },
+    ])
+  ),
   accordion: {
     playground: { code: getAccordionCode(getAccordionDefaults()) },
     props: accordionProps,

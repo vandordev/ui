@@ -1,0 +1,26 @@
+---
+title: Input Amount
+description: A formatted decimal input that emits exact raw decimal strings.
+component: input-amount
+---
+
+## Usage
+
+```tsx
+import { InputAmount } from "@/components/ui/input-amount";
+
+<InputAmount
+  aria-label="Amount in Rupiah"
+  prefix="Rp "
+  thousandSeparator="."
+  decimalSeparator=","
+  value={amount}
+  onValueChange={setAmount}
+/>;
+```
+
+Keep the value as decimal text, for example `"1234567.89"`. Configure separators explicitly for the display you want. Use `decimalScale` to constrain fractional digits; `fixedDecimalScale` affects display padding only.
+
+## Behavior & Accessibility
+
+Formatting preserves normal caret and paste editing. Values are never converted to floating-point numbers. `onValueChange` receives raw decimal text with `.` as the decimal separator, or `""` when cleared. The formatted display is not a substitute for caller-owned form serialization.

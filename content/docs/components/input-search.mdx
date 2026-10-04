@@ -1,0 +1,19 @@
+---
+title: Input Search
+description: A search field with an optional clear action and native input events.
+component: input-search
+---
+
+## Usage
+
+```tsx
+import { InputSearch } from "@/components/ui/input-search";
+
+<InputSearch label="Search" placeholder="Search components" clearable />;
+```
+
+Clearing is opt-in. Controlled values use the native `value` and `onChange` contract.
+
+## Behavior & Accessibility
+
+The clear button is available only for a nonempty editable value, clears the field, and restores focus to it. Search debouncing and requests remain the caller's responsibility.

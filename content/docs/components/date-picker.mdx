@@ -1,0 +1,19 @@
+---
+title: Date Picker
+description: A single-date picker combining an accessible popover and calendar.
+component: date-picker
+---
+
+## Usage
+
+```tsx
+import { DatePicker } from "@/components/ui/date-picker";
+
+<DatePicker label="Appointment date" value={date} onValueChange={setDate} />;
+```
+
+The value is a JavaScript `Date` representing a local calendar day. Set `clearable` to include an explicit clear action.
+
+## Behavior & Accessibility
+
+Selecting an allowed day commits immediately and closes the popup. Escape dismisses and returns focus to the trigger. `disabledDates` and month-navigation bounds are separate controls. Display formatting does not change the underlying date.

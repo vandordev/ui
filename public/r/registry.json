@@ -322,6 +322,226 @@
           "target": "components/loading-ui/wandering-eyes.tsx"
         }
       ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "A native input with optional floating or static labels and icon adornments.",
+      "dependencies": ["cn"],
+      "files": [
+        {
+          "path": "registry/new-york/input.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input.tsx"
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "TextArea",
+      "description": "A native multiline text field with an optional associated label.",
+      "dependencies": ["cn"],
+      "files": [
+        {
+          "path": "registry/new-york/textarea.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/textarea.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "Composable input and textarea groups with aligned addons and actions.",
+      "dependencies": ["cn"],
+      "files": [
+        {
+          "path": "registry/new-york/input-group.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input-group.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input-password",
+      "type": "registry:ui",
+      "title": "Input Password",
+      "description": "A password field with an accessible visibility toggle.",
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/button.json",
+        "https://vandor-ui.vercel.app/r/input.json"
+      ],
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/input-password.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input-password.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input-search",
+      "type": "registry:ui",
+      "title": "Input Search",
+      "description": "A search field with an optional clear action and native input events.",
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/button.json",
+        "https://vandor-ui.vercel.app/r/input.json"
+      ],
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/input-search.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input-search.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input-amount",
+      "type": "registry:ui",
+      "title": "Input Amount",
+      "description": "A formatted decimal input that emits exact raw decimal strings.",
+      "dependencies": ["cn", "react-number-format"],
+      "files": [
+        {
+          "path": "registry/new-york/input-amount.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input-amount.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input-phone",
+      "type": "registry:ui",
+      "title": "Input Phone",
+      "description": "An international phone input with a localized country calling-code selector.",
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/input.json",
+        "https://vandor-ui.vercel.app/r/input-group.json",
+        "https://vandor-ui.vercel.app/r/select.json"
+      ],
+      "dependencies": ["cn", "libphonenumber-js"],
+      "files": [
+        {
+          "path": "registry/new-york/input-phone.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input-phone.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input-otp",
+      "type": "registry:ui",
+      "title": "Input OTP",
+      "description": "An accessible single-input one-time-code control with visual cells.",
+      "dependencies": ["cn"],
+      "files": [
+        {
+          "path": "registry/new-york/input-otp.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input-otp.tsx"
+        }
+      ]
+    },
+    {
+      "name": "input-secret",
+      "type": "registry:ui",
+      "title": "Input Secret",
+      "description": "A secret field with visibility and accessible copy feedback.",
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/button.json",
+        "https://vandor-ui.vercel.app/r/input.json"
+      ],
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/input-secret.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/input-secret.tsx"
+        }
+      ]
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "An accessible Base UI popover composition with viewport-aware positioning.",
+      "dependencies": ["@base-ui/react", "cn"],
+      "files": [
+        {
+          "path": "registry/new-york/popover.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/popover.tsx"
+        }
+      ]
+    },
+    {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "A keyboard-accessible calendar with single, multiple, and range selection.",
+      "registryDependencies": ["https://vandor-ui.vercel.app/r/button.json"],
+      "dependencies": ["cn", "lucide-react", "react-day-picker"],
+      "files": [
+        {
+          "path": "registry/new-york/calendar.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/calendar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "Date Picker",
+      "description": "A single-date picker combining an accessible popover and calendar.",
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/button.json",
+        "https://vandor-ui.vercel.app/r/calendar.json",
+        "https://vandor-ui.vercel.app/r/popover.json"
+      ],
+      "dependencies": ["date-fns", "lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/date-picker.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/date-picker.tsx"
+        },
+        {
+          "path": "registry/new-york/date-picker-utils.ts",
+          "type": "registry:ui",
+          "target": "components/ui/date-picker-utils.ts"
+        }
+      ]
+    },
+    {
+      "name": "date-range-picker",
+      "type": "registry:ui",
+      "title": "Date Range Picker",
+      "description": "A transactional date-range picker with optional calendar shortcuts.",
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/button.json",
+        "https://vandor-ui.vercel.app/r/calendar.json",
+        "https://vandor-ui.vercel.app/r/popover.json"
+      ],
+      "dependencies": ["date-fns", "lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/date-range-picker.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/date-range-picker.tsx"
+        },
+        {
+          "path": "registry/new-york/date-picker-utils.ts",
+          "type": "registry:ui",
+          "target": "components/ui/date-picker-utils.ts"
+        }
+      ]
     }
   ]
 }

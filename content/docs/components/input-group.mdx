@@ -1,0 +1,29 @@
+---
+title: Input Group
+description: Composable input and textarea groups with aligned addons and actions.
+component: input-group
+---
+
+## Usage
+
+```tsx
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
+
+<InputGroup>
+  <InputGroupAddon>
+    <InputGroupText>https://</InputGroupText>
+  </InputGroupAddon>
+  <InputGroupInput aria-label="Website" placeholder="example.com" />
+</InputGroup>;
+```
+
+`InputGroupAddon` supports inline-start/end and block-start/end placement. Use `InputGroupButton` for an interactive action.
+
+## Behavior & Accessibility
+
+The editable child remains a native input or textarea. Give it its own accessible name; decorative addons do not add tab stops. Group focus and invalid styles follow the contained control.

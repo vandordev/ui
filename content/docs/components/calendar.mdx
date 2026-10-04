@@ -1,0 +1,19 @@
+---
+title: Calendar
+description: A keyboard-accessible calendar with single, multiple, and range selection.
+component: calendar
+---
+
+## Usage
+
+```tsx
+import { Calendar } from "@/components/ui/calendar";
+
+<Calendar mode="single" selected={date} onSelect={setDate} />;
+```
+
+`Calendar` preserves react-day-picker's discriminated selection modes, localization, date matchers, and component overrides.
+
+## Behavior & Accessibility
+
+Use keyboard navigation to move between dates and months. `disabled` matchers prevent selection; `startMonth` and `endMonth` constrain navigation but do not independently disable dates.

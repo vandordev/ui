@@ -1,0 +1,19 @@
+---
+title: Input
+description: A native input with optional floating or static labels and icon adornments.
+component: input
+---
+
+## Usage
+
+```tsx
+import { Input } from "@/components/ui/input";
+
+<Input label="Full name" placeholder="Your name" />;
+```
+
+`Input` forwards native input props and its ref. Labels default to floating; set `labelStyle="static"` for a conventional label. An icon is decorative and does not replace the accessible name.
+
+## Behavior & Accessibility
+
+Labels remain associated with the native field. Floating labels stay raised while the field is focused or nonempty. Use `aria-invalid` and `aria-describedby` to connect validation feedback. Native disabled and read-only behavior is preserved.

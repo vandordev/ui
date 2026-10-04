@@ -5,6 +5,7 @@ import { ButtonPlayground } from "@/components/button-playground";
 import { CodeCollapsibleWrapper } from "@/components/code-collapsible-wrapper";
 import { ComponentDependencies } from "@/components/component-dependencies";
 import { DrawerPlayground } from "@/components/drawer-playground";
+import { InputFamilyPlayground } from "@/components/input-family-playground";
 import { LoadingPlayground } from "@/components/loading-playground";
 import { PropsReference } from "@/components/props-reference";
 import { SelectPlayground } from "@/components/select-playground";
@@ -13,9 +14,24 @@ import { componentDocDefinitions } from "@/lib/component-docs";
 const playgrounds: Record<string, () => ReactNode> = {
   accordion: AccordionPlayground,
   button: ButtonPlayground,
+  calendar: () => <InputFamilyPlayground component="calendar" />,
+  "date-picker": () => <InputFamilyPlayground component="date-picker" />,
+  "date-range-picker": () => (
+    <InputFamilyPlayground component="date-range-picker" />
+  ),
   drawer: DrawerPlayground,
+  input: () => <InputFamilyPlayground component="input" />,
+  "input-amount": () => <InputFamilyPlayground component="input-amount" />,
+  "input-group": () => <InputFamilyPlayground component="input-group" />,
+  "input-otp": () => <InputFamilyPlayground component="input-otp" />,
+  "input-password": () => <InputFamilyPlayground component="input-password" />,
+  "input-phone": () => <InputFamilyPlayground component="input-phone" />,
+  "input-search": () => <InputFamilyPlayground component="input-search" />,
+  "input-secret": () => <InputFamilyPlayground component="input-secret" />,
   loading: LoadingPlayground,
+  popover: () => <InputFamilyPlayground component="popover" />,
   select: SelectPlayground,
+  textarea: () => <InputFamilyPlayground component="textarea" />,
 };
 
 export const ComponentDocumentation = ({

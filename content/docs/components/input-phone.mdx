@@ -1,0 +1,24 @@
+---
+title: Input Phone
+description: An international phone input with a localized country calling-code selector.
+component: input-phone
+---
+
+## Usage
+
+```tsx
+import { InputPhone } from "@/components/ui/input-phone";
+
+<InputPhone
+  label="Phone number"
+  defaultCountry="ID"
+  value={phone}
+  onValueChange={setPhone}
+/>;
+```
+
+The default country is Indonesia. The public value contains international digits without a leading plus sign.
+
+## Behavior & Accessibility
+
+Country names follow `locale`; the calling-code picker has an accessible name. Partial numbers remain editable and preserve the draft. Formatting does not validate that a number exists, is reachable, or satisfies application rules. Empty input emits `undefined`.

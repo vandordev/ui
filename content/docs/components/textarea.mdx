@@ -1,0 +1,19 @@
+---
+title: TextArea
+description: A native multiline text field with an optional associated label.
+component: textarea
+---
+
+## Usage
+
+```tsx
+import { TextArea } from "@/components/ui/textarea";
+
+<TextArea label="Message" placeholder="Write a message" rows={4} />;
+```
+
+`TextArea` forwards native textarea props and ref. Native resizing remains enabled.
+
+## Behavior & Accessibility
+
+The optional static label is associated with the textarea. `aria-invalid` and `aria-describedby` can expose validation state and supporting text. Disabled and read-only states follow native semantics.

@@ -1,0 +1,26 @@
+---
+title: Popover
+description: An accessible Base UI popover composition with viewport-aware positioning.
+component: popover
+---
+
+## Usage
+
+```tsx
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+<Popover>
+  <PopoverTrigger>Open details</PopoverTrigger>
+  <PopoverContent>Additional information</PopoverContent>
+</Popover>;
+```
+
+Use controlled `open` and `onOpenChange` when the surrounding feature owns popup state. `PopoverContent` supports `side`, `align`, and `sideOffset`.
+
+## Behavior & Accessibility
+
+The trigger retains button semantics. Escape and outside dismissal use Base UI behavior, and focus returns to the trigger. Keep content usable at narrow viewport widths.

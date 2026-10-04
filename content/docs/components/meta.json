@@ -1,4 +1,24 @@
 {
   "title": "Components",
-  "pages": ["index", "accordion", "button", "drawer", "loading", "select"]
+  "pages": [
+    "index",
+    "accordion",
+    "button",
+    "drawer",
+    "loading",
+    "select",
+    "input",
+    "textarea",
+    "input-group",
+    "input-password",
+    "input-search",
+    "input-amount",
+    "input-phone",
+    "input-otp",
+    "input-secret",
+    "popover",
+    "calendar",
+    "date-picker",
+    "date-range-picker"
+  ]
 }
