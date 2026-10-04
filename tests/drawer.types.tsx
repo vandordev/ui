@@ -12,6 +12,12 @@ export const DrawerTypeContracts = () => {
     <Drawer
       control={control}
       title="Settings"
+      renderHeader={({ title, description }) => (
+        <>
+          {description}
+          {title}
+        </>
+      )}
       contentProps={{ finalFocus: false }}
       onOpenChange={(_, details) => details.cancel()}
     >

@@ -372,6 +372,92 @@ test("keepMounted preserves form values across closure without leaking portal pr
   );
 });
 
+test("renderHeader reorders semantic elements without replacing the stationary header or close control", async () => {
+  await ready;
+  const el = React.createElement;
+  await mount(
+    el(
+      drawer.Drawer,
+      {
+        defaultOpen: true,
+        description: "Update project details",
+        modal: false,
+        renderHeader: ({ title, description }) =>
+          el(
+            React.Fragment,
+            null,
+            description,
+            el(
+              "div",
+              { id: "custom-title-row" },
+              el("span", { "aria-hidden": true }, "★"),
+              title
+            )
+          ),
+        title: "Edit project",
+      },
+      el(drawer.DrawerBody, null, "Fields")
+    )
+  );
+  const header = document.querySelector('[data-slot="drawer-header"]');
+  const title = header.querySelector('[data-slot="drawer-title"]');
+  const description = header.querySelector('[data-slot="drawer-description"]');
+  const popup = document.querySelector('[data-slot="drawer-popup"]');
+  assert.equal(header.firstElementChild, description);
+  assert.equal(title.parentElement.id, "custom-title-row");
+  assert.equal(popup.getAttribute("aria-labelledby"), title.id);
+  assert.equal(popup.getAttribute("aria-describedby"), description.id);
+  assert.ok(header.classList.contains("shrink-0"));
+  assert.ok(header.className.includes("pr-14"));
+  assert.equal(
+    document.querySelector('[data-slot="drawer-body"]').contains(header),
+    false
+  );
+  assert.ok(document.querySelector('[data-slot="drawer-close-button"]'));
+});
+
+test("renderHeader receives null for absent description and supports a hook-based custom child", async () => {
+  await ready;
+  const el = React.createElement;
+  let description;
+  let selected;
+  const CustomHeader = ({ title }) => {
+    selected = drawer.useDrawer();
+    return el(
+      React.Fragment,
+      null,
+      title,
+      el(
+        "button",
+        { id: "header-action", onClick: selected.close, type: "button" },
+        "Done"
+      )
+    );
+  };
+  await mount(
+    el(drawer.Drawer, {
+      defaultOpen: true,
+      modal: false,
+      renderHeader: ({ title, description: providedDescription }) => {
+        description = providedDescription;
+        return el(CustomHeader, { title });
+      },
+      title: "Settings",
+    })
+  );
+  assert.equal(description, null);
+  assert.equal(
+    document.querySelector('[data-slot="drawer-description"]'),
+    null
+  );
+  assert.equal(
+    document.querySelectorAll('[data-slot="drawer-title"]').length,
+    1
+  );
+  await React.act(async () => document.querySelector("#header-action").click());
+  assert.equal(selected.isOpen, false);
+});
+
 test("unmounted controls ignore actions and do not queue them for remount", async () => {
   await ready;
   const el = React.createElement;

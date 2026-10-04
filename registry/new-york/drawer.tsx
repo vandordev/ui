@@ -387,12 +387,18 @@ type DrawerStateProps<T = DrawerRootProps> = T extends unknown
   ? Omit<T, "children">
   : never;
 
+interface DrawerHeaderElements {
+  title: ReactElement;
+  description: ReactElement | null;
+}
+
 type DrawerProps = DrawerStateProps & {
   title: ReactNode;
   description?: ReactNode;
   trigger?: ReactElement;
   children?: DrawerContentProps["children"];
   contentProps?: Omit<DrawerContentProps, "children">;
+  renderHeader?: (elements: DrawerHeaderElements) => ReactNode;
 };
 
 const Drawer = ({
@@ -401,26 +407,40 @@ const Drawer = ({
   trigger,
   children,
   contentProps,
+  renderHeader,
   ...props
-}: DrawerProps) => (
-  <DrawerRoot {...props}>
-    {trigger && <DrawerTrigger render={trigger} />}
-    <DrawerContent {...contentProps}>
-      {(control) => (
-        <>
-          <DrawerHeader>
-            <DrawerTitle>{title}</DrawerTitle>
-            {description !== null && description !== undefined && (
-              <DrawerDescription>{description}</DrawerDescription>
-            )}
-          </DrawerHeader>
-          {typeof children === "function" ? children(control) : children}
-        </>
-      )}
-    </DrawerContent>
-  </DrawerRoot>
-);
+}: DrawerProps) => {
+  const headerElements: DrawerHeaderElements = {
+    description:
+      description === null || description === undefined ? null : (
+        <DrawerDescription>{description}</DrawerDescription>
+      ),
+    title: <DrawerTitle>{title}</DrawerTitle>,
+  };
+  return (
+    <DrawerRoot {...props}>
+      {trigger && <DrawerTrigger render={trigger} />}
+      <DrawerContent {...contentProps}>
+        {(control) => (
+          <>
+            <DrawerHeader>
+              {renderHeader ? (
+                renderHeader(headerElements)
+              ) : (
+                <>
+                  {headerElements.title}
+                  {headerElements.description}
+                </>
+              )}
+            </DrawerHeader>
+            {typeof children === "function" ? children(control) : children}
+          </>
+        )}
+      </DrawerContent>
+    </DrawerRoot>
+  );
+};
 
 export { Drawer, DrawerBody, DrawerFooter, useDrawer, useDrawerControl };
 
-export type { DrawerControl, DrawerProps };
+export type { DrawerControl, DrawerHeaderElements, DrawerProps };

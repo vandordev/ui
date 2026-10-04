@@ -41,6 +41,12 @@ export const drawerProps = {
     description: "Drawer: meaningful accessible panel title.",
     type: "ReactNode",
   },
+  renderHeader: {
+    defaultValue: "Not set",
+    description:
+      "Drawer: custom header contents receiving ready-to-render title and optional description elements. Keep title in the returned content.",
+    type: "(elements: DrawerHeaderElements) => ReactNode",
+  },
   description: {
     defaultValue: "Not set",
     description: "Drawer: optional supporting content beneath the title.",

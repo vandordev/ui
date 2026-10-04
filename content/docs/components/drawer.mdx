@@ -64,6 +64,33 @@ The registry installs editable source into your project. Use your configured UI 
 
 The top-right X is visible by default, with a compact 32px button and a 16px icon. The header reserves space for it. Use `contentProps={{ closeButtonLabel: "Close settings" }}` to translate its accessible label. Set `showCloseButton: false` only when supplying another visible dismissal control.
 
+### Custom Header Contents
+
+Use `renderHeader` to reorder the title and description or add an icon, badge, or action. Its arguments are ready-to-render semantic elements, not the original text props. The header wrapper stays above the body and outside its scroll area, retaining its padding and space for the X.
+
+```tsx
+<Drawer
+  title="Edit project"
+  description="Update project details"
+  trigger={<button type="button">Edit</button>}
+  renderHeader={({ title, description }) => (
+    <>
+      {description}
+      <div className="flex items-center gap-2">
+        <span aria-hidden="true">✎</span>
+        {title}
+      </div>
+    </>
+  )}
+>
+  <DrawerBody>Your project form</DrawerBody>
+</Drawer>
+```
+
+Always include the provided `title` exactly once to preserve the panel's accessible name. `description` is `null` when not supplied; if provided, render it once to keep the supporting description association. Do not replace these elements with plain text. Without `renderHeader`, title is followed by description as before.
+
+`renderHeader` returns contents, not a replacement for the wrapper or a way to move the header below the body. Keep hooks inside a component rendered by the callback, not inside the callback itself. The exported `DrawerHeaderElements` type describes the callback's elements.
+
 ### Migration from the Compound API
 
 This is a breaking API change. Replace the old root, trigger, content, and header composition with `Drawer` props. `DrawerPanel` is now named `Drawer`, without a compatibility alias. Primitive components such as `DrawerContent`, `DrawerTrigger`, and `DrawerHeader` are internal and no longer exported. Replace action buttons using the old close primitive with `useDrawer().close()` or the children render function.
