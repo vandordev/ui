@@ -5,3 +5,7 @@ These instructions apply to this repository only and supplement ancestor instruc
 Before starting frontend implementation or verification, read and follow
 [`.agent/frontend-workflow.md`](.agent/frontend-workflow.md). This applies to
 OpenChamber, OpenCode, Codex, and other agents working in this checkout.
+
+Before implementing or substantially improving registry components, their docs,
+or playgrounds, also read and follow
+[`.agent/component-implementation.md`](.agent/component-implementation.md).
