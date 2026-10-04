@@ -501,13 +501,29 @@
       "type": "registry:ui",
       "title": "Calendar",
       "description": "A keyboard-accessible calendar with single, multiple, and range selection.",
-      "registryDependencies": ["https://vandor-ui.vercel.app/r/button.json"],
-      "dependencies": ["cn", "lucide-react", "react-day-picker"],
+      "dependencies": [
+        "@base-ui/react",
+        "cn",
+        "lucide-react",
+        "motion",
+        "react-day-picker@^10.0.2"
+      ],
       "files": [
         {
           "path": "registry/new-york/calendar.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/calendar.tsx"
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "calendar-stories",
+      "type": "registry:item",
+      "title": "Calendar Stories",
+      "description": "Optional portable stories. Install Calendar first; use your existing React Storybook setup.",
+      "files": [
+        {
+          "path": "registry/new-york/calendar.stories.tsx",
+          "type": "registry:ui"
         }
       ]
     },

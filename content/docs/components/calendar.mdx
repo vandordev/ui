@@ -2,10 +2,19 @@
 title: Calendar
 description: A keyboard-accessible calendar with single, multiple, and range selection.
 component: calendar
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/calendar
+    contribution: Calendar adapted from the MIT-licensed base-nova component, with Vandor motion and theme adjustments.
+  - name: React DayPicker
+    url: https://daypicker.dev
+    contribution: Accessible calendar, date selection, localization, and keyboard navigation.
 ---
 
 import { ComponentPreview } from "@/components/component-preview";
 import { CalendarDemo } from "@/examples/calendar-demo";
+import { CalendarRangeDemo } from "@/examples/calendar-range-demo";
+import { CalendarDropdownDemo } from "@/examples/calendar-dropdown-demo";
 
 ## Usage
 
@@ -25,6 +34,59 @@ This controlled single-date example is the smallest complete selection loop. The
   <CalendarDemo />
 </ComponentPreview>
 
+### Date range
+
+Range endpoints use the primary highlight; intervening dates form a connected muted band. Two months stack vertically on narrow screens. Range values can be incomplete while the user selects an end date.
+
+<ComponentPreview name="calendar-range-demo" title="calendar-range-demo.tsx">
+  <CalendarRangeDemo />
+</ComponentPreview>
+
+### Localized dropdowns and disabled dates
+
+Indonesian labels, Monday-first weeks, month/year selectors, and disabled weekends. Navigation bounds limit the displayed months, not the dates that may be selected.
+
+<ComponentPreview
+  name="calendar-dropdown-demo"
+  title="calendar-dropdown-demo.tsx"
+>
+  <CalendarDropdownDemo />
+</ComponentPreview>
+
+## Motion
+
+Vandor adds a directional 8px slide/fade on month changes (200ms), a selection-highlight transition (160ms), and press feedback (120ms, scale 0.96). There is no entrance animation or staggered day reveal. Month changes update the existing container rather than rendering duplicate grids. Selection and callbacks remain immediate.
+
+Set `motion={false}` to disable these animations. System `prefers-reduced-motion` disables them automatically, including press scaling. Custom `components` replace the corresponding Vandor behavior. DayPicker's separate `animate` prop requires its own animation CSS; it is not needed for Vandor motion.
+
+The playground's generated code reproduces configuration, not the dates/month reached through interaction. Reset restores configuration and clears transient selection/navigation.
+
+## Consumer setup
+
+Use React 19, Tailwind CSS 4, Motion 12, and React DayPicker 10. Include your installed UI directory in Tailwind source scanning and provide the standard shadcn theme tokens. The default cell size is 36px; override it with `className="[--cell-size:2.75rem]"`. No DayPicker stylesheet is required for Vandor's default styling/motion.
+
+Calendar installs as one UI file in your configured UI directory. Its shadcn-inspired native buttons are self-contained: it does not install or overwrite Vandor Button or Loading. Base UI's `useRender` composes the native refs/handlers with Motion gestures. For manual installation, install all declared packages and copy Source into your UI directory with the theme setup above.
+
+## Storybook Stories (Optional)
+
+Install Calendar first, then add portable stories to your existing React Storybook:
+
+```bash
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/calendar-stories.json
+```
+
+This item only installs `calendar.stories.tsx` beside Calendar in your configured UI directory. It does not reinstall Calendar, install packages, or modify `.storybook/`. Keep `@storybook/react` aligned with your existing Storybook packages. Stories are typechecked and composed against Storybook React 10.6.1.
+
+Include `../components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)` in your existing story discovery patterns, adjusted to your UI directory. Import your application's global Tailwind stylesheet in `.storybook/preview.ts`; include the stories directory in Tailwind scanning. Stories inherit consumer theme/decorators. The `autodocs` tag requires your existing `@storybook/addon-docs` configuration; Canvas and Controls do not.
+
+Playground controls selection mode, captions, week start, week numbers, outside days, visible months, navigation appearance, and motion. Dedicated stories cover controlled single/multiple/range selection, a populated range, disabled weekends, Indonesian localization, dropdowns, and motion opt-out.
+
 ## Behavior & Accessibility
 
 Use keyboard navigation to move between dates and months. `disabled` matchers prevent selection; `startMonth` and `endMonth` constrain navigation but do not independently disable dates.
+
+`selected` and `onSelect` are controlled and mode-specific: `Date | undefined`, `Date[] | undefined`, or `DateRange | undefined`. Clearing is allowed unless `required` is set. Omitting `mode` renders a calendar without selection, not an implicit single-select calendar. Use `month`/`onMonthChange` for controlled navigation, or `defaultMonth` for an initial month.
+
+Arrow keys move day focus; Page Up/Down changes months. Dropdowns retain native select semantics and visible focus rings. Date buttons preserve native refs and caller event handlers. Calendar does not submit a form field; serialize selection explicitly in your application.
+
+Dates represent calendar days in the local timezone unless `timeZone` is supplied. Locale changes visible and accessible labels; `weekStartsOn` overrides the locale's first weekday. Keep timezone handling consistent when persisting dates, rather than treating a local midnight as a universal UTC date.

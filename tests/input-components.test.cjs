@@ -12,7 +12,11 @@ let host;
 let jiti;
 const ready = (async () => {
   const { Window } = await import("happy-dom");
-  dom = new Window({ url: "http://localhost" });
+  // DOM-only behavior checks run without animation; browser checks cover motion.
+  dom = new Window({
+    settings: { device: { prefersReducedMotion: "reduce" } },
+    url: "http://localhost",
+  });
   for (const name of [
     "window",
     "document",
@@ -70,6 +74,182 @@ afterEach(async () => {
 after(async () => {
   await ready;
   await dom.happyDOM.abort();
+});
+
+test("Calendar preserves selection callbacks, disabled dates, keyboard focus and month bounds", async () => {
+  await ready;
+  const { Calendar } = jiti("../registry/new-york/calendar.tsx");
+  const values = [];
+  const changes = [];
+  const Fixture = () => {
+    const [selected, setSelected] = React.useState();
+    return React.createElement(Calendar, {
+      defaultMonth: new Date(2026, 9, 1),
+      disabled: { dayOfWeek: [0, 6] },
+      endMonth: new Date(2026, 10, 1),
+      mode: "single",
+      motion: false,
+      onMonthChange: (next) => changes.push(next),
+      onSelect: (next) => {
+        values.push(next);
+        setSelected(next);
+      },
+      selected,
+      startMonth: new Date(2026, 9, 1),
+    });
+  };
+  await mount(React.createElement(Fixture));
+  const day = host.querySelector('button[data-day="2026-10-05"]');
+  await React.act(() => day.click());
+  assert.equal(values.length, 1);
+  assert.equal(values[0].getDate(), 5);
+  assert.equal(
+    host.querySelector('button[data-day="2026-10-05"]').dataset.selectedSingle,
+    "true"
+  );
+  assert.equal(
+    host.querySelector('button[data-day="2026-10-04"]').disabled,
+    true
+  );
+  await React.act(() => {
+    day.focus();
+    day.dispatchEvent(
+      new KeyboardEvent("keydown", { bubbles: true, key: "ArrowRight" })
+    );
+  });
+  assert.equal(document.activeElement.dataset.day, "2026-10-06");
+  assert.equal(
+    host.querySelector('button[aria-label="Go to the Previous Month"]')
+      .disabled,
+    true
+  );
+  const next = host.querySelector('button[aria-label="Go to the Next Month"]');
+  await React.act(() => next.click());
+  assert.equal(changes.length, 1);
+  assert.equal(changes[0].getMonth(), 10);
+  assert.equal(
+    host.querySelector('button[aria-label="Go to the Next Month"]').disabled,
+    true
+  );
+});
+
+test("CalendarDayButton preserves caller refs and native event handlers through Motion", async () => {
+  await ready;
+  const { Calendar, CalendarDayButton } = jiti(
+    "../registry/new-york/calendar.tsx"
+  );
+  const ref = React.createRef();
+  let clicks = 0;
+  const CustomDay = (props) =>
+    React.createElement(CalendarDayButton, {
+      ...props,
+      onClick: (event) => {
+        clicks += 1;
+        props.onClick?.(event);
+      },
+      ref: props.day.isoDate === "2026-10-05" ? ref : undefined,
+    });
+  await mount(
+    React.createElement(Calendar, {
+      components: { DayButton: CustomDay },
+      defaultMonth: new Date(2026, 9, 1),
+      mode: "single",
+      motion: false,
+    })
+  );
+  assert.equal(ref.current.dataset.day, "2026-10-05");
+  await React.act(() => {
+    ref.current.focus();
+    ref.current.click();
+  });
+  assert.equal(clicks, 1);
+  assert.equal(document.activeElement, ref.current);
+});
+
+test("Calendar playground resets selection and navigation", async () => {
+  await ready;
+  const { InputFamilyPlayground } = jiti(
+    "../components/input-family-playground.tsx"
+  );
+  await mount(
+    React.createElement(InputFamilyPlayground, { component: "calendar" })
+  );
+  const preview = () => host.querySelector('[data-slot="playground-preview"]');
+  const day = preview().querySelector("button[data-day]");
+  await React.act(() => day.click());
+  assert.ok(preview().querySelector('[data-selected-single="true"]'));
+  const originalMonth = preview()
+    .querySelector('[role="grid"]')
+    .getAttribute("aria-label");
+  await React.act(() =>
+    preview().querySelector('button[aria-label="Go to the Next Month"]').click()
+  );
+  assert.notEqual(
+    preview().querySelector('[role="grid"]').getAttribute("aria-label"),
+    originalMonth
+  );
+  await React.act(() =>
+    [...host.querySelectorAll("button")]
+      .find((button) => button.textContent.trim() === "Reset")
+      .click()
+  );
+  assert.equal(preview().querySelector('[data-selected-single="true"]'), null);
+  assert.equal(
+    preview().querySelector('[role="grid"]').getAttribute("aria-label"),
+    originalMonth
+  );
+});
+
+test("Calendar preview uses every exposed option with the same generated configuration", async () => {
+  await ready;
+  const { AdvancedInputPreview } = jiti(
+    "../components/input-family-playground.tsx"
+  );
+  const { getInputPlaygroundCode } = jiti("../lib/input-component-props.ts");
+  const values = {
+    buttonVariant: "outline",
+    captionLayout: "dropdown",
+    mode: "range",
+    motion: false,
+    numberOfMonths: "2",
+    showOutsideDays: false,
+    showWeekNumber: true,
+    weekStartsOn: "1",
+  };
+  await mount(
+    React.createElement(AdvancedInputPreview, { component: "calendar", values })
+  );
+  assert.equal(host.querySelectorAll('[role="grid"]').length, 2);
+  assert.equal(host.querySelectorAll("select").length, 4);
+  assert.ok(host.querySelector(".rdp-week_number"));
+  assert.equal(host.querySelector(".rdp-outside button"), null);
+  assert.equal(
+    host.querySelector(".rdp-weekday").getAttribute("aria-label"),
+    "Monday"
+  );
+  assert.ok(
+    host.querySelector(".rdp-button_next").classList.contains("border")
+  );
+  const first = host.querySelector("button[data-day]");
+  const firstDate = first.dataset.day;
+  await React.act(() => first.click());
+  assert.equal(
+    host.querySelector(`button[data-day="${firstDate}"]`).dataset.rangeStart,
+    "true"
+  );
+  assert.equal(
+    host.querySelector(`button[data-day="${firstDate}"]`).style.transform,
+    ""
+  );
+  const code = getInputPlaygroundCode("calendar", values);
+  assert.match(code, /mode="range"/);
+  assert.match(code, /motion=\{false\}/);
+  assert.match(code, /showOutsideDays=\{false\}/);
+  assert.match(code, /showWeekNumber=\{true\}/);
+  assert.match(code, /numberOfMonths=\{2\}/);
+  assert.match(code, /weekStartsOn=\{1\}/);
+  assert.match(code, /captionLayout="dropdown"/);
+  assert.match(code, /buttonVariant="outline"/);
 });
 
 test("Input floating label stays associated and elevated for a default value", async () => {

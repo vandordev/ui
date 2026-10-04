@@ -42,6 +42,23 @@ export const inputComponentProps: Record<
   Record<string, PropDefinition>
 > = {
   calendar: {
+    buttonVariant: p(
+      '"ghost" | "outline" | "default" | "secondary" | "destructive" | "link"',
+      '"ghost"',
+      "Navigation button appearance.",
+      select("Navigation buttons", "ghost", ["ghost", "outline"])
+    ),
+    captionLayout: p(
+      '"label" | "dropdown" | "dropdown-months" | "dropdown-years"',
+      '"label"',
+      "Month/year caption layout.",
+      select("Caption", "label", [
+        "label",
+        "dropdown",
+        "dropdown-months",
+        "dropdown-years",
+      ])
+    ),
     className: p(
       "string",
       "undefined",
@@ -60,7 +77,7 @@ export const inputComponentProps: Record<
     ),
     mode: p(
       '"single" | "multiple" | "range"',
-      '"single"',
+      "undefined",
       "Calendar: selection mode and corresponding selected/onSelect types.",
       select("Selection mode", "single", ["single", "multiple", "range"])
     ),
@@ -68,6 +85,18 @@ export const inputComponentProps: Record<
       "DayPicker selection callback",
       "undefined",
       "Calendar: receives the selection for the chosen mode."
+    ),
+    motion: p(
+      "boolean",
+      "true",
+      "Vandor month, selection, and press motion. Reduced-motion preferences take priority.",
+      boolean("Motion", true)
+    ),
+    numberOfMonths: p(
+      "number",
+      "1",
+      "Number of visible months; stacks on narrow screens.",
+      select("Visible months", "1", ["1", "2"])
     ),
     selected: p(
       "Date | Date[] | DateRange",
@@ -77,9 +106,57 @@ export const inputComponentProps: Record<
     showOutsideDays: p(
       "boolean",
       "true",
-      "Calendar: displays adjacent-month days."
+      "Calendar: displays adjacent-month days.",
+      boolean("Outside days", true)
+    ),
+    showWeekNumber: p(
+      "boolean",
+      "false",
+      "Displays ISO/locale week numbers.",
+      boolean("Week numbers")
     ),
     startMonth: p("Date", "undefined", "Calendar: earliest navigable month."),
+    weekStartsOn: p(
+      "0 | 1 | 2 | 3 | 4 | 5 | 6",
+      "locale default",
+      "First weekday; 0 is Sunday.",
+      select("Week starts on", "0", ["0", "1", "6"])
+    ),
+    month: p(
+      "Date",
+      "undefined",
+      "Controlled visible month; pair with onMonthChange."
+    ),
+    defaultMonth: p(
+      "Date",
+      "current month",
+      "Initial visible month in uncontrolled usage."
+    ),
+    onMonthChange: p(
+      "(month: Date) => void",
+      "undefined",
+      "Called when the visible month changes."
+    ),
+    classNames: p(
+      "Partial<ClassNames>",
+      "undefined",
+      "Overrides individual DayPicker slot classes."
+    ),
+    components: p(
+      "Partial<CustomComponents>",
+      "undefined",
+      "Overrides slots, replacing Vandor motion for those slots."
+    ),
+    required: p(
+      "boolean",
+      "false",
+      "Prevents clearing a selection in a selection mode."
+    ),
+    timeZone: p(
+      "string",
+      "local timezone",
+      "DayPicker timezone for interpreting calendar dates."
+    ),
   },
   "date-picker": {
     className: p("string", "undefined", "DatePicker: trigger class name."),
@@ -898,14 +975,15 @@ const resolveRangeFeatures = (value: string | boolean | number) => {
   return [String(value)];
 };
 
-const getCalendarCode = (mode: string) => {
+const getCalendarCode = (mode: string, values: InputPlaygroundValues) => {
+  const options = `\n  captionLayout=${stringLiteral(String(values.captionLayout ?? "label"))}\n  buttonVariant=${stringLiteral(String(values.buttonVariant ?? "ghost"))}\n  showOutsideDays={${Boolean(values.showOutsideDays ?? true)}}\n  showWeekNumber={${Boolean(values.showWeekNumber)}}\n  numberOfMonths={${Number(values.numberOfMonths ?? 1)}}\n  weekStartsOn={${Number(values.weekStartsOn ?? 0)}}\n  motion={${Boolean(values.motion ?? true)}}`;
   if (mode === "range") {
-    return `const [range, setRange] = useState<DateRange>();\n\n<Calendar mode="range" selected={range} onSelect={setRange} />`;
+    return `const [range, setRange] = useState<DateRange>();\n\n<Calendar mode="range" selected={range} onSelect={setRange}${options}\n/>`;
   }
   if (mode === "multiple") {
-    return `const [dates, setDates] = useState<Date[]>([]);\n\n<Calendar mode="multiple" selected={dates} onSelect={(next) => setDates(next ?? [])} />`;
+    return `const [dates, setDates] = useState<Date[]>([]);\n\n<Calendar mode="multiple" selected={dates} onSelect={(next) => setDates(next ?? [])}${options}\n/>`;
   }
-  return `const [date, setDate] = useState<Date>();\n\n<Calendar mode="single" selected={date} onSelect={setDate} />`;
+  return `const [date, setDate] = useState<Date>();\n\n<Calendar mode="single" selected={date} onSelect={setDate}${options}\n/>`;
 };
 
 export const getInputPlaygroundCode = (
@@ -914,7 +992,7 @@ export const getInputPlaygroundCode = (
 ) => {
   const configs: Record<string, { imports: string; code: string }> = {
     calendar: {
-      code: getCalendarCode(String(values.mode ?? "single")),
+      code: getCalendarCode(String(values.mode ?? "single"), values),
       imports:
         'import { useState } from "react";\nimport type { DateRange } from "react-day-picker";\nimport { Calendar } from "@/components/ui/calendar";',
     },

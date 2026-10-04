@@ -190,7 +190,7 @@ const BasicInputPreview = ({
   }
 };
 
-const AdvancedInputPreview = ({
+export const AdvancedInputPreview = ({
   component,
   values,
 }: {
@@ -233,19 +233,49 @@ const AdvancedInputPreview = ({
     }
     case "calendar": {
       const mode = String(values.mode ?? "single");
+      const calendarProps = {
+        buttonVariant: String(values.buttonVariant ?? "ghost") as
+          | "ghost"
+          | "outline",
+        captionLayout: String(values.captionLayout ?? "label") as
+          | "label"
+          | "dropdown"
+          | "dropdown-months"
+          | "dropdown-years",
+        motion: Boolean(values.motion ?? true),
+        numberOfMonths: Number(values.numberOfMonths ?? 1),
+        showOutsideDays: Boolean(values.showOutsideDays ?? true),
+        showWeekNumber: Boolean(values.showWeekNumber),
+        weekStartsOn: Number(values.weekStartsOn ?? 0) as 0 | 1 | 6,
+      };
       if (mode === "range") {
-        return <Calendar mode="range" selected={range} onSelect={setRange} />;
+        return (
+          <Calendar
+            {...calendarProps}
+            mode="range"
+            selected={range}
+            onSelect={setRange}
+          />
+        );
       }
       if (mode === "multiple") {
         return (
           <Calendar
+            {...calendarProps}
             mode="multiple"
             selected={multiple}
             onSelect={(next) => setMultiple(next ?? [])}
           />
         );
       }
-      return <Calendar mode="single" selected={date} onSelect={setDate} />;
+      return (
+        <Calendar
+          {...calendarProps}
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+        />
+      );
     }
     case "date-picker": {
       return (
