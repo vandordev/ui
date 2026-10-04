@@ -70,131 +70,144 @@ function stateFromValue(value: string | undefined, country: CountryCode) {
   return { ...parsed, controlledValue: value };
 }
 
-export function InputPhone({
-  value,
-  defaultValue,
-  onValueChange,
-  defaultCountry = "ID",
-  locale = "en",
-  countrySelectLabel = "Country calling code",
-  label,
-  labelClassName,
-  containerClassName,
-  className,
-  id,
-  disabled,
-  readOnly,
-  ...props
-}: InputPhoneProps) {
-  const generatedId = React.useId();
-  const inputId = id ?? generatedId;
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const pendingCaret = React.useRef<number | null>(null);
-  const [state, setState] = React.useState(() => ({
-    ...stateFromValue(value ?? defaultValue, defaultCountry),
-    controlledValue: value,
-  }));
-  if (value !== state.controlledValue) {
-    setState(
-      value === state.value
-        ? { ...state, controlledValue: value }
-        : { ...stateFromValue(value, state.country), controlledValue: value }
+export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
+  function InputPhone(
+    {
+      value,
+      defaultValue,
+      onValueChange,
+      defaultCountry = "ID",
+      locale = "en",
+      countrySelectLabel = "Country calling code",
+      label,
+      labelClassName,
+      containerClassName,
+      className,
+      id,
+      disabled,
+      readOnly,
+      ...props
+    },
+    forwardedRef
+  ) {
+    const generatedId = React.useId();
+    const inputId = id ?? generatedId;
+    const inputRef = React.useRef<HTMLInputElement>(null);
+    React.useImperativeHandle(
+      forwardedRef,
+      () => inputRef.current as HTMLInputElement
+    );
+    const pendingCaret = React.useRef<number | null>(null);
+    const [state, setState] = React.useState(() => ({
+      ...stateFromValue(value ?? defaultValue, defaultCountry),
+      controlledValue: value,
+    }));
+    if (value !== state.controlledValue) {
+      setState(
+        value === state.value
+          ? { ...state, controlledValue: value }
+          : { ...stateFromValue(value, state.country), controlledValue: value }
+      );
+    }
+    React.useLayoutEffect(() => {
+      const input = inputRef.current;
+      if (
+        input &&
+        document.activeElement === input &&
+        pendingCaret.current !== null
+      ) {
+        input.setSelectionRange(pendingCaret.current, pendingCaret.current);
+      }
+      pendingCaret.current = null;
+    }, [state]);
+
+    const options = React.useMemo(() => {
+      const names = new Intl.DisplayNames([locale], { type: "region" });
+      return countries
+        .map((country) => ({
+          country,
+          label: `${names.of(country) ?? country} (+${getCountryCallingCode(country)})`,
+        }))
+        .toSorted((left, right) =>
+          left.label.localeCompare(right.label, locale)
+        );
+    }, [locale]);
+
+    function update(draft: string, country: CountryCode) {
+      const parsed = parseDraft(draft, country);
+      const caretPosition = inputRef.current?.selectionStart;
+      if (caretPosition !== null && caretPosition !== undefined) {
+        const digitCount = draft
+          .slice(0, caretPosition)
+          .replaceAll(/\D/g, "").length;
+        let seen = 0;
+        let nextCaret = parsed.draft.length;
+        for (let index = 0; index < parsed.draft.length; index += 1) {
+          if (/\d/.test(parsed.draft[index])) {
+            seen += 1;
+          }
+          if (seen >= digitCount) {
+            nextCaret = index + 1;
+            break;
+          }
+        }
+        pendingCaret.current = nextCaret;
+      }
+      setState({ ...parsed, controlledValue: value });
+      onValueChange?.(parsed.value);
+    }
+
+    const selectedOption = options.find(
+      (option) => option.country === state.country
+    );
+
+    return (
+      <div
+        data-slot="phone-input"
+        className={cn("grid min-w-0 gap-1.5", containerClassName)}
+      >
+        {label ? (
+          <label htmlFor={inputId} className={labelClassName}>
+            {label}
+          </label>
+        ) : null}
+        <InputGroup>
+          <Select
+            data={options.map((option) => ({
+              label: option.label,
+              value: option.country,
+            }))}
+            value={state.country}
+            disabled={disabled || readOnly}
+            aria-label={`${countrySelectLabel}: ${selectedOption?.label ?? state.country}`}
+            className="h-auto w-24 shrink-0 rounded-none border-0 bg-transparent px-2 shadow-none focus-visible:ring-0"
+            onValueChange={(country) => {
+              if (country) {
+                update(state.draft, country);
+              }
+            }}
+          />
+          <Input
+            {...props}
+            ref={inputRef}
+            id={inputId}
+            type="tel"
+            inputMode="tel"
+            autoComplete={props.autoComplete ?? "tel-national"}
+            value={state.draft}
+            disabled={disabled}
+            readOnly={readOnly}
+            aria-invalid={props["aria-invalid"]}
+            onChange={(event) =>
+              update(event.currentTarget.value, state.country)
+            }
+            className={cn(
+              "rounded-l-none border-0 bg-transparent shadow-none focus-visible:ring-0",
+              className
+            )}
+          />
+        </InputGroup>
+      </div>
     );
   }
-  React.useLayoutEffect(() => {
-    const input = inputRef.current;
-    if (
-      input &&
-      document.activeElement === input &&
-      pendingCaret.current !== null
-    ) {
-      input.setSelectionRange(pendingCaret.current, pendingCaret.current);
-    }
-    pendingCaret.current = null;
-  }, [state]);
-
-  const options = React.useMemo(() => {
-    const names = new Intl.DisplayNames([locale], { type: "region" });
-    return countries
-      .map((country) => ({
-        country,
-        label: `${names.of(country) ?? country} (+${getCountryCallingCode(country)})`,
-      }))
-      .toSorted((left, right) => left.label.localeCompare(right.label, locale));
-  }, [locale]);
-
-  function update(draft: string, country: CountryCode) {
-    const parsed = parseDraft(draft, country);
-    const caretPosition = inputRef.current?.selectionStart;
-    if (caretPosition !== null && caretPosition !== undefined) {
-      const digitCount = draft
-        .slice(0, caretPosition)
-        .replaceAll(/\D/g, "").length;
-      let seen = 0;
-      let nextCaret = parsed.draft.length;
-      for (let index = 0; index < parsed.draft.length; index += 1) {
-        if (/\d/.test(parsed.draft[index])) {
-          seen += 1;
-        }
-        if (seen >= digitCount) {
-          nextCaret = index + 1;
-          break;
-        }
-      }
-      pendingCaret.current = nextCaret;
-    }
-    setState({ ...parsed, controlledValue: value });
-    onValueChange?.(parsed.value);
-  }
-
-  const selectedOption = options.find(
-    (option) => option.country === state.country
-  );
-
-  return (
-    <div
-      data-slot="phone-input"
-      className={cn("grid min-w-0 gap-1.5", containerClassName)}
-    >
-      {label ? (
-        <label htmlFor={inputId} className={labelClassName}>
-          {label}
-        </label>
-      ) : null}
-      <InputGroup>
-        <Select
-          data={options.map((option) => ({
-            label: option.label,
-            value: option.country,
-          }))}
-          value={state.country}
-          disabled={disabled || readOnly}
-          aria-label={`${countrySelectLabel}: ${selectedOption?.label ?? state.country}`}
-          className="h-auto w-24 shrink-0 rounded-none border-0 bg-transparent px-2 shadow-none focus-visible:ring-0"
-          onValueChange={(country) => {
-            if (country) {
-              update(state.draft, country);
-            }
-          }}
-        />
-        <Input
-          {...props}
-          ref={inputRef}
-          id={inputId}
-          type="tel"
-          inputMode="tel"
-          autoComplete={props.autoComplete ?? "tel-national"}
-          value={state.draft}
-          disabled={disabled}
-          readOnly={readOnly}
-          aria-invalid={props["aria-invalid"]}
-          onChange={(event) => update(event.currentTarget.value, state.country)}
-          className={cn(
-            "rounded-l-none border-0 bg-transparent shadow-none focus-visible:ring-0",
-            className
-          )}
-        />
-      </InputGroup>
-    </div>
-  );
-}
+);

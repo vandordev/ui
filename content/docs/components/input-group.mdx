@@ -4,6 +4,9 @@ description: Composable input and textarea groups with aligned addons and action
 component: input-group
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { InputGroupDemo } from "@/examples/input-group-demo";
+
 ## Usage
 
 ```tsx
@@ -23,6 +26,14 @@ import {
 ```
 
 `InputGroupAddon` supports inline-start/end and block-start/end placement. Use `InputGroupButton` for an interactive action.
+
+## Examples
+
+The addon is decorative; the editable field keeps its own accessible name.
+
+<ComponentPreview name="input-group-demo" title="input-group-demo.tsx">
+  <InputGroupDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 

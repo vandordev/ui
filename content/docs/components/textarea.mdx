@@ -4,6 +4,9 @@ description: A native multiline text field with an optional associated label.
 component: textarea
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { TextAreaDemo } from "@/examples/textarea-demo";
+
 ## Usage
 
 ```tsx
@@ -13,6 +16,14 @@ import { TextArea } from "@/components/ui/textarea";
 ```
 
 `TextArea` forwards native textarea props and ref. Native resizing remains enabled.
+
+## Examples
+
+The example sets a native row count and preserves the multiline input semantics.
+
+<ComponentPreview name="textarea-demo" title="textarea-demo.tsx">
+  <TextAreaDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 

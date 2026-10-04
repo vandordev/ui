@@ -4,6 +4,9 @@ description: A transactional date-range picker with optional calendar shortcuts.
 component: date-range-picker
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { DateRangePickerDemo } from "@/examples/date-range-picker-demo";
+
 ## Usage
 
 ```tsx
@@ -18,6 +21,17 @@ import { DateRangePicker } from "@/components/ui/date-range-picker";
 ```
 
 Choose `twoMonths` and `shortcuts` independently. Shortcut ranges include today; weeks begin on Monday by default. Dates represent local calendar days, and range endpoints are inclusive.
+
+## Examples
+
+The controlled value changes only on Apply. Try a shortcut, alter its draft, then cancel to discard it.
+
+<ComponentPreview
+  name="date-range-picker-demo"
+  title="date-range-picker-demo.tsx"
+>
+  <DateRangePickerDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 

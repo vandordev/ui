@@ -4,6 +4,9 @@ description: A single-date picker combining an accessible popover and calendar.
 component: date-picker
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { DatePickerDemo } from "@/examples/date-picker-demo";
+
 ## Usage
 
 ```tsx
@@ -13,6 +16,14 @@ import { DatePicker } from "@/components/ui/date-picker";
 ```
 
 The value is a JavaScript `Date` representing a local calendar day. Set `clearable` to include an explicit clear action.
+
+## Examples
+
+This controlled picker exposes a clear action and commits each selected local calendar day immediately.
+
+<ComponentPreview name="date-picker-demo" title="date-picker-demo.tsx">
+  <DatePickerDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 

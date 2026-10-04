@@ -35,6 +35,7 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
 }) => {
   const id = useId();
   const [values, setValues] = useState<T>(() => ({ ...initialValues }));
+  const [previewReset, setPreviewReset] = useState(0);
   const code = getCode(values);
   const updateValue = (name: string, value: string | boolean | number) => {
     setValues((previous) => ({ ...previous, [name]: value }));
@@ -60,7 +61,9 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
               backgroundSize: "24px 24px",
             }}
           >
-            {renderPreview(values)}
+            <div key={previewReset} className="contents">
+              {renderPreview(values)}
+            </div>
           </div>
           {hint ? (
             <div className="px-5 py-5 text-xs leading-relaxed text-muted-foreground">
@@ -76,7 +79,10 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => setValues({ ...initialValues })}
+              onClick={() => {
+                setValues({ ...initialValues });
+                setPreviewReset((current) => current + 1);
+              }}
             >
               <RotateCcwIcon data-icon="inline-start" /> Reset
             </Button>

@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "cn";
 import type { ComponentProps } from "react";
 import * as React from "react";

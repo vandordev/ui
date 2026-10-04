@@ -4,6 +4,9 @@ description: A search field with an optional clear action and native input event
 component: input-search
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { InputSearchDemo } from "@/examples/input-search-demo";
+
 ## Usage
 
 ```tsx
@@ -13,6 +16,14 @@ import { InputSearch } from "@/components/ui/input-search";
 ```
 
 Clearing is opt-in. Controlled values use the native `value` and `onChange` contract.
+
+## Examples
+
+This uncontrolled example starts populated so the clear action and focus restoration can be tried.
+
+<ComponentPreview name="input-search-demo" title="input-search-demo.tsx">
+  <InputSearchDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 

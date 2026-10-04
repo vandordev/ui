@@ -4,6 +4,9 @@ description: A native input with optional floating or static labels and icon ado
 component: input
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { InputDemo } from "@/examples/input-demo";
+
 ## Usage
 
 ```tsx
@@ -13,6 +16,14 @@ import { Input } from "@/components/ui/input";
 ```
 
 `Input` forwards native input props and its ref. Labels default to floating; set `labelStyle="static"` for a conventional label. An icon is decorative and does not replace the accessible name.
+
+## Examples
+
+The preview contrasts floating and static labels while keeping each field natively labeled.
+
+<ComponentPreview name="input-demo" title="input-demo.tsx">
+  <InputDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 

@@ -4,6 +4,9 @@ description: An international phone input with a localized country calling-code 
 component: input-phone
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { InputPhoneDemo } from "@/examples/input-phone-demo";
+
 ## Usage
 
 ```tsx
@@ -18,6 +21,14 @@ import { InputPhone } from "@/components/ui/input-phone";
 ```
 
 The default country is Indonesia. The public value contains international digits without a leading plus sign.
+
+## Examples
+
+The controlled output shows the application value: international digits without `+`.
+
+<ComponentPreview name="input-phone-demo" title="input-phone-demo.tsx">
+  <InputPhoneDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 

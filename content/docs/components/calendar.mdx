@@ -4,6 +4,9 @@ description: A keyboard-accessible calendar with single, multiple, and range sel
 component: calendar
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { CalendarDemo } from "@/examples/calendar-demo";
+
 ## Usage
 
 ```tsx
@@ -13,6 +16,14 @@ import { Calendar } from "@/components/ui/calendar";
 ```
 
 `Calendar` preserves react-day-picker's discriminated selection modes, localization, date matchers, and component overrides.
+
+## Examples
+
+This controlled single-date example is the smallest complete selection loop. The playground also supports multiple and range modes.
+
+<ComponentPreview name="calendar-demo" title="calendar-demo.tsx">
+  <CalendarDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 

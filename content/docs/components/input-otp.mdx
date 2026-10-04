@@ -4,6 +4,9 @@ description: An accessible single-input one-time-code control with visual cells.
 component: input-otp
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { InputOTPDemo } from "@/examples/input-otp-demo";
+
 ## Usage
 
 ```tsx
@@ -13,6 +16,14 @@ import { InputOTP } from "@/components/ui/input-otp";
 ```
 
 Numeric input is the default. Set `type="alphanumeric"` for letters and digits.
+
+## Examples
+
+Completion feedback reports that the code is ready without printing the code itself.
+
+<ComponentPreview name="input-otp-demo" title="input-otp-demo.tsx">
+  <InputOTPDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 

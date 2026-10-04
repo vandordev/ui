@@ -211,6 +211,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
               disabled={matcher}
               startMonth={startMonth}
               endMonth={endMonth}
+              weekStartsOn={weekStartsOn}
               onSelect={(range) => {
                 setDraft(range);
                 setClearedDraft(false);

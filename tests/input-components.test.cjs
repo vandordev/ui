@@ -260,3 +260,111 @@ test("date range validator rejects partial, reversed, and disabled-date ranges",
   );
   assert.equal(dateUtils.isSelectableDateRange({ from, to }), true);
 });
+
+test("input family playground code follows configured values and safely serializes text", async () => {
+  await ready;
+  const playground = jiti("../lib/input-component-props.ts");
+  const ts = require("typescript");
+  const componentNames = Object.keys(playground.inputComponentProps);
+  for (const component of componentNames) {
+    const values = playground.getInputPlaygroundDefaults(component);
+    const source = playground.getInputPlaygroundCode(component, values);
+    const result = ts.transpileModule(source, {
+      compilerOptions: {
+        jsx: ts.JsxEmit.ReactJSX,
+        target: ts.ScriptTarget.ES2022,
+      },
+      reportDiagnostics: true,
+    });
+    assert.deepEqual(
+      result.diagnostics?.map((diagnostic) => diagnostic.code) ?? [],
+      [],
+      `${component} generated runnable TSX`
+    );
+    assert.match(source, /^"use client";/, `${component} client boundary`);
+    assert.doesNotMatch(source, /@\/registry\/new-york\//);
+  }
+
+  const defaults = playground.getInputPlaygroundDefaults("input");
+  assert.equal(defaults.label, "Full name");
+  assert.equal(defaults.disabled, false);
+
+  const code = playground.getInputPlaygroundCode("input", {
+    ...defaults,
+    label: `O'Neil \\ family`,
+    placeholder: `Say "hello"`,
+    disabled: true,
+  });
+
+  assert.match(code, /label=\{\\?"O'Neil/);
+  assert.match(code, /Say \\\"hello\\\"/);
+  assert.match(code, /disabled/);
+  assert.match(code, /export function InputDemo/);
+});
+
+test("input family playground offers a typed preview contract for every registry item", async () => {
+  await ready;
+  const playground = jiti("../lib/input-component-props.ts");
+  const components = [
+    "input",
+    "textarea",
+    "input-group",
+    "input-password",
+    "input-search",
+    "input-amount",
+    "input-phone",
+    "input-otp",
+    "input-secret",
+    "calendar",
+    "date-picker",
+    "date-range-picker",
+    "popover",
+  ];
+  assert.deepEqual(
+    Object.keys(playground.inputComponentProps).sort(),
+    components.sort()
+  );
+  for (const component of components) {
+    const definitions = playground.inputComponentProps[component];
+    const values = playground.getInputPlaygroundDefaults(component);
+    assert.ok(
+      Object.values(definitions).some((definition) => definition.control)
+    );
+    assert.match(
+      playground.getInputPlaygroundCode(component, values),
+      /export function/
+    );
+  }
+});
+
+test("internal input refs are also delivered to consumer refs", async () => {
+  await ready;
+  const { InputSearch } = jiti("../registry/new-york/input-search.tsx");
+  const { InputSecret } = jiti("../registry/new-york/input-secret.tsx");
+  const { InputPhone } = jiti("../registry/new-york/input-phone.tsx");
+  const received = {};
+  await mount(
+    React.createElement(
+      React.Fragment,
+      null,
+      React.createElement(InputSearch, {
+        ref: (node) => (received.search = node),
+        "aria-label": "Search",
+      }),
+      React.createElement(InputSecret, {
+        ref: (node) => (received.secret = node),
+        "aria-label": "Secret",
+      }),
+      React.createElement(InputPhone, {
+        ref: (node) => (received.phone = node),
+        "aria-label": "Phone",
+      })
+    )
+  );
+  assert.equal(received.search, document.querySelector('input[type="search"]'));
+  assert.equal(
+    received.secret,
+    document.querySelector('input[type="password"]')
+  );
+  assert.equal(received.phone, document.querySelector('input[type="tel"]'));
+});

@@ -4,6 +4,9 @@ description: An accessible Base UI popover composition with viewport-aware posit
 component: popover
 ---
 
+import { ComponentPreview } from "@/components/component-preview";
+import { PopoverDemo } from "@/examples/popover-demo";
+
 ## Usage
 
 ```tsx
@@ -20,6 +23,14 @@ import {
 ```
 
 Use controlled `open` and `onOpenChange` when the surrounding feature owns popup state. `PopoverContent` supports `side`, `align`, and `sideOffset`.
+
+## Examples
+
+Use the compound API to choose placement and keep arbitrary content inside the positioned popup.
+
+<ComponentPreview name="popover-demo" title="popover-demo.tsx">
+  <PopoverDemo />
+</ComponentPreview>
 
 ## Behavior & Accessibility
 
