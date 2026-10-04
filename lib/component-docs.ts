@@ -26,6 +26,11 @@ import {
 } from "@/lib/loading-playground";
 import type { PropDefinition } from "@/lib/playground";
 import {
+  getPopoverCode,
+  getPopoverDefaults,
+  popoverProps,
+} from "@/lib/popover-playground";
+import {
   getSelectCode,
   getSelectDefaults,
   selectProps,
@@ -61,6 +66,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   loading: {
     playground: { code: getLoadingCode(getLoadingDefaults()) },
     props: loadingProps,
+  },
+  popover: {
+    playground: { code: getPopoverCode(getPopoverDefaults()) },
+    props: popoverProps,
   },
   select: {
     playground: { code: getSelectCode(getSelectDefaults()) },

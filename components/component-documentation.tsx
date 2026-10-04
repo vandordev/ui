@@ -7,6 +7,7 @@ import { ComponentDependencies } from "@/components/component-dependencies";
 import { DrawerPlayground } from "@/components/drawer-playground";
 import { InputFamilyPlayground } from "@/components/input-family-playground";
 import { LoadingPlayground } from "@/components/loading-playground";
+import { PopoverPlayground } from "@/components/popover-playground";
 import { PropsReference } from "@/components/props-reference";
 import { SelectPlayground } from "@/components/select-playground";
 import { componentDocDefinitions } from "@/lib/component-docs";
@@ -29,7 +30,7 @@ const playgrounds: Record<string, () => ReactNode> = {
   "input-search": () => <InputFamilyPlayground component="input-search" />,
   "input-secret": () => <InputFamilyPlayground component="input-secret" />,
   loading: LoadingPlayground,
-  popover: () => <InputFamilyPlayground component="popover" />,
+  popover: PopoverPlayground,
   select: SelectPlayground,
   textarea: () => <InputFamilyPlayground component="textarea" />,
 };

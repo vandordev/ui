@@ -1,11 +1,16 @@
 ---
 title: Popover
-description: An accessible Base UI popover composition with viewport-aware positioning.
+description: A shadcn-based popover with clear composition and smooth Motion transitions.
 component: popover
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/popover
+    contribution: Adapted Base Nova Popover composition, with Vandor styling and Motion transitions.
 ---
 
 import { ComponentPreview } from "@/components/component-preview";
 import { PopoverDemo } from "@/examples/popover-demo";
+import { PopoverControlledDemo } from "@/examples/popover-controlled-demo";
 
 ## Usage
 
@@ -14,15 +19,27 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverDescription,
 } from "@/components/ui/popover";
 
 <Popover>
   <PopoverTrigger>Open details</PopoverTrigger>
-  <PopoverContent>Additional information</PopoverContent>
+  <PopoverContent>
+    <PopoverHeader>
+      <PopoverTitle>Workspace access</PopoverTitle>
+      <PopoverDescription>
+        Only invited members can view this workspace.
+      </PopoverDescription>
+    </PopoverHeader>
+  </PopoverContent>
 </Popover>;
 ```
 
-Use controlled `open` and `onOpenChange` when the surrounding feature owns popup state. `PopoverContent` supports `side`, `align`, and `sideOffset`.
+The compound API keeps arbitrary content explicit. `PopoverContent` includes its portal and positioner. `PopoverHeader` handles spacing; `PopoverTitle` and `PopoverDescription` provide the accessible name and description. Use `PopoverClose` for an explicit exit.
+
+Compose a Vandor Button with `PopoverTrigger render={<Button variant="outline" />}` or `PopoverClose render={<Button />}`. This is the Base UI `render` API, not Radix `asChild`. Install [Button](/docs/components/button) separately when using these examples.
 
 ## Examples
 
@@ -32,6 +49,41 @@ Use the compound API to choose placement and keep arbitrary content inside the p
   <PopoverDemo />
 </ComponentPreview>
 
+### Controlled visibility
+
+Use `open` and `onOpenChange` when the surrounding feature owns visibility. The callback receives the requested state and Base UI event details; call `details.cancel()` to reject a request. Dismissal does not commit or revert application data automatically.
+
+<ComponentPreview
+  name="popover-controlled-demo"
+  title="popover-controlled-demo.tsx"
+>
+  <PopoverControlledDemo />
+</ComponentPreview>
+
+### Placement and motion
+
+Content defaults to bottom/start with a 6px offset, preserving existing Vandor usage. Use `side`, `align`, `sideOffset`, and `alignOffset` to adjust placement. Base UI flips or shifts near viewport edges; the popup uses the actual placement's transform origin. Available-height scrolling keeps long content reachable.
+
+Motion replaces shadcn's CSS entrance/exit animations with an 180ms reveal and 120ms dismissal, using subtle scale and opacity with no bounce. Set `animated={false}` for immediate transitions. Reduced-motion preferences also disable transitions. Do not add CSS transform or animation utilities to the same popup, since they can compete with Motion.
+
+### Consumer setup and optional stories
+
+Requires React 19, Tailwind CSS 4, Base UI 1.8+, Motion 12.38+, and `cn`. Use shadcn semantic theme tokens, including `popover`, `popover-foreground`, `border`, and `muted-foreground`. No website-only animation CSS, sound, or provider is required. The registry's `new-york` directory name does not imply a Radix foundation; this component adapts shadcn Base Nova.
+
+Install Popover first. Portable stories are a separate optional item and do not reinstall or overwrite the component:
+
+```bash
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/popover-stories.json
+```
+
+Use your existing `@storybook/react` setup with matching Storybook package versions (types/composition checked with 10.6.1). Discover `**/*.stories.tsx` in your configured UI directory and load your global Tailwind/theme stylesheet in the preview. No extra addons or providers are required for Canvas and Controls; the `autodocs` tag uses your existing `@storybook/addon-docs` setup. Stories inherit your consumer theme. This repository has no Storybook server; Storybook UI appearance is not verified here.
+
+Popover and its stories now follow the UI alias in your `components.json`. On the default layout this remains `components/ui/popover.tsx`. If you previously installed the fixed-target version with a custom alias, migrate your existing Popover and imports to that UI directory before adding stories. Installing the component can replace a customized Popover at its destination; review the CLI diff before accepting an overwrite. The stories-only item does not replace it.
+
 ## Behavior & Accessibility
 
-The trigger retains button semantics. Escape and outside dismissal use Base UI behavior, and focus returns to the trigger. Keep content usable at narrow viewport widths.
+The trigger retains button semantics, refs, and consumer event handlers. Escape and outside interaction use Base UI dismissal; default focus placement and restoration follow the primitive, including touch-device behavior. `initialFocus` and `finalFocus` override these defaults on Content. Title and Description connect to the popup automatically.
+
+The default is non-modal. If using `modal={true}` or `modal="trap-focus"`, include a reachable `PopoverClose`, including for touch screen-reader users. Disabled triggers prevent trigger interaction, not externally controlled opening. Use Dialog instead for substantial modal workflows, and Tooltip for short non-interactive hints.
+
+Root inherits [Base UI Root props](https://base-ui.com/react/components/popover); Trigger, Close, Title, and Description inherit their corresponding primitive props. Content forwards Popup props and the positioning options listed below, not every Positioner prop. Header forwards native div props. Consumer refs and custom `render` elements are retained during motion composition.

@@ -486,13 +486,24 @@
       "name": "popover",
       "type": "registry:ui",
       "title": "Popover",
-      "description": "An accessible Base UI popover composition with viewport-aware positioning.",
-      "dependencies": ["@base-ui/react", "cn"],
+      "description": "A shadcn-based popover with accessible composition, collision-aware placement, and smooth Motion transitions.",
+      "dependencies": ["@base-ui/react@^1.8.0", "cn", "motion@^12.38.0"],
       "files": [
         {
           "path": "registry/new-york/popover.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/popover.tsx"
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "popover-stories",
+      "type": "registry:item",
+      "title": "Popover Stories",
+      "description": "Optional portable stories. Install Popover first and use your existing Storybook React setup.",
+      "files": [
+        {
+          "path": "registry/new-york/popover.stories.tsx",
+          "type": "registry:ui"
         }
       ]
     },
