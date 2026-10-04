@@ -45,6 +45,21 @@ website's internal UI components.
 - Browser-first does not replace meaningful unit tests or typechecking. Keep
   runtime logic and regression protection covered by repository-native checks.
 
+## Storybook stories without a server
+
+- Every public registry UI component must provide portable stories as defined in
+  [`component-implementation.md`](component-implementation.md).
+- This project has no Storybook server. Do not require Storybook UI verification
+  for completion or ask for a server URL solely to verify stories. Do not install
+  or launch a Storybook server unless the user explicitly requests it.
+- Verify stories using actual Storybook types, meaningful composition/rendering
+  checks, and the applicable registry/consumer checks. These do not establish
+  appearance or interaction inside the Storybook UI.
+- Report Storybook UI verification as not performed because no server exists;
+  this is an accepted limitation, not a gate requiring a separate waiver.
+- This exception is only for Storybook UI. Continue to verify changed website and
+  playground surfaces through the approved primary dev server/browser workflow.
+
 ## Library integration and staged checks
 
 - Check public library exports and TypeScript declarations before implementing

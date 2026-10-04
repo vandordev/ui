@@ -166,7 +166,9 @@ export const buildComponentDocSections = (
     ),
     code(`npx shadcn@latest add ${registry.homepage}/r/${name}.json`, "bash")
   );
-  const target = item.files[0]?.target;
+  const [firstFile] = item.files;
+  const target =
+    firstFile && "target" in firstFile ? firstFile.target : undefined;
   if (target) {
     before.push(
       paragraph(

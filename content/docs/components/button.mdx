@@ -97,6 +97,44 @@ Base UI's `render` composition is also supported:
   <ButtonAsChild />
 </ComponentPreview>
 
+## Storybook Stories (Optional)
+
+Add editable stories to **your existing React Storybook**. This is a stories file, not a hosted Storybook or a replacement for your configuration. The normal Button installation does not include it.
+
+Install Button first using the Installation instructions above, then run:
+
+```bash
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/button-stories.json
+```
+
+The stories-only item installs `button.stories.tsx` beside Button in your configured UI directory. It does not reinstall Button or Loading, add packages, or modify `.storybook/`. If a stories file already exists, review the CLI diff rather than overwriting your customizations.
+
+The stories import `Button` relatively (`./button`) and use only `@storybook/react` types and `lucide-react` icons. Ensure these packages are available in your project; keep `@storybook/react` on the same version as the rest of your Storybook packages. The stories are typechecked and composed against Storybook React 10.6.1; other versions are not verified. A working Button and its Loading dependency remain required.
+
+### Discover the stories
+
+Include your UI directory in the `stories` patterns of your existing `.storybook/main.ts`. For the default directory, add this entry without replacing your existing patterns:
+
+```ts
+"../components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)";
+```
+
+Adjust the path if your UI directory differs. In `.storybook/preview.ts`, import your application's global stylesheet so Tailwind utilities and the Button theme tokens are available:
+
+```ts
+import "../styles/globals.css";
+```
+
+Use your own stylesheet path and ensure your Storybook framework processes Tailwind CSS, including the stories directory in source scanning. The stories inherit your existing decorators and theme setup. For dark mode, apply your application's dark-theme selector inside the preview iframe; changing only the Storybook manager theme will not theme the component. The `autodocs` tag requires `@storybook/addon-docs` configured in your Storybook to show a generated Docs page; Canvas stories and Controls do not require that addon.
+
+### Customize and compare
+
+Under **Vandor UI / Button**, use **Playground** to edit the label, variant, size, disabled/loading state, custom classes, and accessible label. Set an `aria-label` when selecting an icon-only size. Dedicated stories show all six variants, all eight sizes, disabled/loading states, icons, native link composition, and disabled press animation. Multi-example stories disable controls for the props they demonstrate explicitly.
+
+Edit your installed `button.tsx` to customize the component, and edit `button.stories.tsx` to add application-specific examples or rename the sidebar group. Hover, focus, and pressed states can be inspected directly in Canvas; use your browser or OS reduced-motion setting to check motion preferences. These stories do not configure automated visual regression testing.
+
+For manual installation, copy the `content` of the stories file from the [stories registry artifact](https://vandor-ui.vercel.app/r/button-stories.json) into `button.stories.tsx` beside your installed Button. Keep the relative import, or update it if you move the file elsewhere.
+
 ## Behavior & Accessibility
 
 The Button scales to `0.96` while pressed and returns on release, with a `0.12s` transition. Its appearance darkens by 10% while active, preserving the gradient. Hover colors and press brightness transition over `200ms`. Disabled buttons do not darken or animate. Reduced-motion preferences disable scaling and CSS transitions, but retain the instant color feedback.

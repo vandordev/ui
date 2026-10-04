@@ -48,6 +48,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@storybook/react": "^10.6.1",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/mdx": "^2.0.13",
     "@types/node": "^25.6.0",

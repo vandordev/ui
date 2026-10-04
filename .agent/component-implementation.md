@@ -4,7 +4,7 @@ This guide applies to new registry components and substantive improvements to
 existing components. Read it together with
 [`frontend-workflow.md`](frontend-workflow.md). A component is not finished when
 it renders: the distributable implementation, documentation, playground, examples,
-and verification must form one polished, coherent product.
+portable Storybook stories, and verification must form one polished, coherent product.
 
 ## Quality baseline
 
@@ -12,6 +12,8 @@ Use the original Accordion, Button, Drawer, Loading, and Select as references fo
 completeness and attention to detail, not as templates to copy blindly:
 
 - `registry/new-york/`: public component implementation.
+- `registry/new-york/<name>.stories.tsx`: portable consumer Storybook stories;
+  Button stories are the initial reference.
 - `components/*-playground.tsx`: interactive preview adapters.
 - `lib/*-playground.ts`: prop metadata, defaults, and generated code.
 - `content/docs/components/`: usage, scenarios, and behavioral guidance.
@@ -226,7 +228,57 @@ supplies the filename:
   demo files retain the documentation fallback; existing demos with invalid exports
   or import failures must not silently fall back.
 
-## 7. Verification and acceptance
+## 7. Portable Storybook stories are required
+
+Every public UI component registered in `registry.json` must have a corresponding
+`registry/new-york/<registry-name>.stories.tsx`. Stories are part of the component's
+delivery contract, not an optional authoring task. This requirement applies to new
+components and substantive updates to existing components; add missing stories
+when touching an existing component. It does not require a stories file for every
+supporting module, internal website component, or stories-only registry item.
+
+Use `registry/new-york/button.stories.tsx` as the initial reference:
+
+- Use typed CSF metadata (`Meta` and `StoryObj` from `@storybook/react`) and a
+  predictable `Vandor UI/<Component>` sidebar title.
+- Provide a default/Playground story with Controls for meaningful public props.
+  Controls must affect the rendered example. Disable controls for props a story
+  intentionally fixes, and do not expose non-serializable React elements or
+  callbacks as editable values.
+- Cover relevant variants, sizes, disabled/loading/error states, accessible
+  icon-only usage, and materially different composition or controlled-state
+  examples as supported by the component. Select scenarios by the actual API,
+  not a fixed story count; do not invent unsupported states.
+- Keep stories self-contained. Import the public component relatively when
+  colocated, use declared consumer dependencies, and include any local demo state.
+  Do not import website-only examples, playground adapters, helpers, routes, or
+  assets. Required providers must be portable and documented.
+- Inherit the consumer's global CSS, theme, and decorators rather than hardcoding
+  Vandor website configuration. Preserve accessible labels and native semantics.
+- Keep stories synchronized with public API changes. Document their optional
+  installation, story discovery pattern, stylesheet/theme/provider requirements,
+  verified Storybook version, and any optional addon requirements in the component
+  documentation. Do not replace the existing website playground or examples.
+- Distribute stories as a separate `<registry-name>-stories` item following
+  `registry-distribution.md`. Ordinary component installation remains stories-free.
+
+### Verification without a Storybook server
+
+This project has no Storybook server. Storybook UI/browser verification is not a
+required acceptance gate, and its absence does not require an exception approval.
+Do not install or start a Storybook server merely to satisfy this requirement.
+
+Instead, typecheck the stories against actual Storybook React types and public
+component imports. Use `composeStories` or `composeStory` for focused rendering or
+behavior checks where meaningful; verify Controls/args wiring and representative
+states without claiming that these checks prove visual appearance. Validate
+generated artifacts and consumer installation according to the distribution guide.
+Keep meaningful regression checks in the repository and running in CI.
+
+Record "Storybook UI not verified: this project has no Storybook server" in the
+handoff. Website/playground browser verification requirements remain unchanged.
+
+## 8. Verification and acceptance
 
 Follow `frontend-workflow.md`: use the agreed primary dev server and OpenChamber
 browser panel. Do not guess ports, start another server, or run Playwright without
@@ -290,8 +342,12 @@ and a working website do not establish consumer installability.
 - [ ] Labels, errors, focus, keyboard, and asynchronous feedback are accessible.
 - [ ] A real playground provides controls, Reset, synchronized code, and Copy.
 - [ ] Usage and focused examples cover the component's meaningful scenarios.
+- [ ] Portable, typed stories cover meaningful props and states and stay synchronized
+      with the public API; their optional registry item and setup guidance are complete.
 - [ ] Props, defaults, behavior, limitations, and attribution are accurate.
 - [ ] Fresh automated checks and browser evidence cover the applicable risks.
+- [ ] Stories pass applicable non-UI checks; Storybook UI verification is explicitly
+      reported as not performed and is not a completion blocker without a server.
 - [ ] Handoff separates verified results from remaining limitations or blockers.
 
 Do not present a minimally wired component as polished or fully complete while

@@ -65,6 +65,18 @@
       ]
     },
     {
+      "name": "button-stories",
+      "type": "registry:item",
+      "title": "Button Stories",
+      "description": "Optional, portable Button stories for an existing React Storybook. Install Button first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/button.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "loading",
       "type": "registry:ui",
       "title": "Loading",

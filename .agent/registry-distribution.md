@@ -90,3 +90,30 @@ artifact works in a consumer project.
   changes, missing support files, target changes, and license loss.
 - Durable regression tests must run in CI. Building and typechecking do not replace
   runtime or distribution tests; adding an unexecuted test is not an acceptance gate.
+
+## 6. Required stories, optional installation
+
+- Every public UI component must have a portable stories file and a separate
+  `<registry-name>-stories` registry item. Follow the Button pilot: item type
+  `registry:item`, with the stories file registered as `registry:ui` and no fixed
+  target so the CLI places it in the consumer's configured UI directory.
+- Keep the ordinary component item free of stories files and Storybook packages.
+  Authoring stories is mandatory; installing them is the consumer's choice.
+- Stories-only items must not reinstall the component or its transitive registry
+  dependencies, overwrite component targets, or modify `.storybook/` configuration.
+  Require the component to be installed first and document that prerequisite.
+- Do not force-install or upgrade a consumer's Storybook packages. State required
+  type/runtime packages and require Storybook package versions to match the
+  consumer's existing setup. Declare any additional example dependencies without
+  coupling stories to website-only code.
+- Use relative public component imports for colocated stories. Verify stories-only
+  CLI installation with a non-default UI alias/layout when introducing or changing
+  packaging, and confirm an existing customized component remains unchanged.
+- Generate stories artifacts through `pnpm registry:build`. Check manifest/source
+  parity, consumer compilation, and meaningful story composition as applicable.
+  A Storybook server and Storybook UI verification are not required in this project;
+  report that limitation without claiming visual verification.
+- Provide executable separate-install guidance and story discovery/CSS/theme setup
+  in the component docs. Never imply the standard shadcn CLI offers an interactive
+  "also install stories" prompt; an optional combined command, if provided, must
+  explicitly name both registry items.
