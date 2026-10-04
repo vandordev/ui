@@ -249,6 +249,39 @@ Choose fresh checks proportional to risk:
   content, and reduced motion where applicable. Do not claim visual verification
   from reading class names or running DOM-only tests.
 
+For registry artifacts and consumer installation, also follow
+[`registry-distribution.md`](registry-distribution.md). Repository source imports
+and a working website do not establish consumer installability.
+
+### Match claims to evidence
+
+- **Valid generated syntax:** parse or transpile the generated TSX.
+- **Correct generated types and imports:** compile/typecheck against the intended
+  consumer files and dependencies; transpilation alone is insufficient.
+- **Working public behavior:** exercise the relevant interaction/state transition
+  and assert its observable result.
+- **Playground/code parity:** change each exposed control to a meaningful
+  non-default value and verify both preview props/behavior and generated code.
+- **Fresh Reset:** change configuration and applicable transient state, then
+  exercise Reset and verify both are restored.
+- **Correct rendering:** inspect in the approved browser workflow; DOM markup or
+  class assertions alone are insufficient.
+- **Correct installation:** verify the generated artifact in an isolated consumer
+  using the distribution guide.
+
+- Test each exposed control, not only the default configuration or existence of
+  metadata. Remove or complete controls that do not affect the preview and code.
+  Include representative combinations where controls interact.
+- For code/preview parity, prefer shared typed configuration or adapters, then test
+  the actual connection to the preview. A `Record<string, ...>`, a generated export,
+  or a substring assertion alone does not prove a typed preview contract.
+- Tests claiming Cancel, dismissal, rejected changes, or failures must exercise
+  those paths and assert both state and relevant callback effects. Testing Apply
+  alone does not establish cancellation behavior.
+- Keep these regression checks in the repository and running in CI. In handoffs,
+  name the evidence actually obtained instead of upgrading syntax or DOM checks
+  into claims about types, appearance, or installability.
+
 ### Definition of done
 
 - [ ] Public API, native semantics, client boundary, refs, and callbacks are correct.

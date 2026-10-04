@@ -9,3 +9,7 @@ OpenChamber, OpenCode, Codex, and other agents working in this checkout.
 Before implementing or substantially improving registry components, their docs,
 or playgrounds, also read and follow
 [`.agent/component-implementation.md`](.agent/component-implementation.md).
+
+Before changing registry items, distributable source, installation instructions,
+or distribution checks, also read and follow
+[`.agent/registry-distribution.md`](.agent/registry-distribution.md).
