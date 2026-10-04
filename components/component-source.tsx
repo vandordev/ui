@@ -24,12 +24,12 @@ const ComponentCode = ({
   <figure data-rehype-pretty-code-figure="" className="[&>pre]:max-h-96">
     {title ? (
       <figcaption
-        className="text-code-foreground flex items-center gap-2 [&_svg]:size-4 [&_svg]:opacity-70"
+        className="text-code-foreground flex min-w-0 items-center gap-2 [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:opacity-70"
         data-language={language}
         data-rehype-pretty-code-title=""
       >
         {getIconForLanguageExtension(language)}
-        {title}
+        <span className="truncate">{title}</span>
       </figcaption>
     ) : null}
     <CopyButton event="copy_primitive_code" value={code} />
@@ -44,6 +44,8 @@ export const ComponentSource = async ({
   collapsible = true,
   className,
   language,
+  expandLabel,
+  collapseLabel,
 }: {
   name?: string;
   src?: string;
@@ -51,6 +53,8 @@ export const ComponentSource = async ({
   collapsible?: boolean;
   className?: string;
   language?: string;
+  expandLabel?: string;
+  collapseLabel?: string;
 }) => {
   let code: string | null = null;
 
@@ -88,6 +92,8 @@ export const ComponentSource = async ({
     <CodeCollapsibleWrapper
       className={className}
       navTriggerClassName={cn(!title && "top-3")}
+      expandLabel={expandLabel}
+      collapseLabel={collapseLabel}
     >
       <ComponentCode
         code={code}

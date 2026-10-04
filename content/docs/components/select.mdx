@@ -66,9 +66,7 @@ The callback receives `value`, `selectedLabel`, `placeholder`, `open`, and `disa
 The callback must return a React element, not text or a fragment. Custom components must forward props and ref to a single interactive element. Prefer a native button; for non-button triggers, set `triggerProps={{ nativeButton: false }}` and provide appropriate styling. Keep custom trigger content non-interactive. `triggerProps.render` is not accepted: use `trigger` instead.
 
 <ComponentPreview src="examples/select-demo.tsx" title="select-demo.tsx">
-  <div className="flex justify-center rounded-md border p-6">
-    <SelectCustomTriggerDemo />
-  </div>
+  <SelectCustomTriggerDemo />
 </ComponentPreview>
 
 ### Advanced Composition
@@ -115,9 +113,7 @@ Use your project's configured UI alias if it differs from `@/components/ui`. Pas
 ## Examples
 
 <ComponentPreview name="select-demo" title="select-demo.tsx">
-  <div className="flex justify-center rounded-md border p-6">
-    <SelectDemo />
-  </div>
+  <SelectDemo />
 </ComponentPreview>
 
 ### Sizes and Disabled Options
@@ -143,9 +139,9 @@ const data = [
 <Select data={data} aria-label="Fruit" placeholder="Select a fruit" />;
 ```
 
-<div className="flex justify-center rounded-md border p-6">
+<ComponentPreview src="examples/select-demo.tsx" title="select-demo.tsx">
   <SelectGroupedDemo />
-</div>
+</ComponentPreview>
 
 Groups support one level only. Use unique group labels and option values across the control. Labels are strings and values are strings or numbers. Readonly arrays are supported. An empty array renders no options and still displays the placeholder when no value is selected.
 

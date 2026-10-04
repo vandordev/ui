@@ -173,6 +173,20 @@ sections. Do not manually duplicate Installation, Props, or Source.
 
 ### Usage and examples
 
+Use the unified preview-and-code frame supplied by `ComponentPreview` for every
+runnable documentation example: one rounded border, centered preview, divider,
+and collapsible source. Do not add a second border, presentation padding, or
+centering wrapper in MDX or a demo just to style its surrounding preview. Layout
+wrappers inside demos remain appropriate for related controls, hints, and output;
+keep these inside the preview. `name` or `src` identifies the source, and `title`
+supplies the filename:
+
+```mdx
+<ComponentPreview name="input-phone-demo" title="input-phone-demo.tsx">
+  <InputPhoneDemo />
+</ComponentPreview>
+```
+
 - Provide the simplest valid usage and enough context to reproduce it. Clearly
   distinguish an illustrative fragment from a complete runnable example.
 - Add focused, runnable examples through `ComponentPreview` and `examples/`.

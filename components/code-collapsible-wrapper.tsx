@@ -15,9 +15,13 @@ export const CodeCollapsibleWrapper = ({
   className,
   children,
   navTriggerClassName,
+  expandLabel = "Expand",
+  collapseLabel = "Collapse",
   ...props
 }: React.ComponentProps<typeof Collapsible> & {
   navTriggerClassName?: string;
+  expandLabel?: string;
+  collapseLabel?: string;
 }) => {
   const [isOpened, setIsOpened] = useState(false);
 
@@ -30,6 +34,7 @@ export const CodeCollapsibleWrapper = ({
       {...props}
     >
       <div
+        data-slot="code-expand-navigation"
         className={cn(
           "absolute top-1.5 right-9 z-10 flex items-center",
           navTriggerClassName
@@ -41,7 +46,7 @@ export const CodeCollapsibleWrapper = ({
             size="sm"
             className="text-muted-foreground h-7 rounded-md px-2"
           >
-            {isOpened ? "Collapse" : "Expand"}
+            {isOpened ? collapseLabel : expandLabel}
           </Button>
         </CollapsibleTrigger>
         <Separator orientation="vertical" className="mx-1.5 h-4!" />
@@ -57,7 +62,7 @@ export const CodeCollapsibleWrapper = ({
       <div className="absolute inset-x-0 -bottom-2 flex h-20 items-center justify-center rounded-b-lg bg-linear-to-b from-code/70 to-code group-data-[state=open]/collapsible:hidden">
         <CollapsibleTrigger asChild>
           <Button variant="outline" size="sm">
-            Expand
+            {expandLabel}
           </Button>
         </CollapsibleTrigger>
       </div>
