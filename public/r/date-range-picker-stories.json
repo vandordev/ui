@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-range-picker-stories",
+  "title": "Date Range Picker Stories",
+  "description": "Portable stories for an already installed DateRangePicker.",
+  "files": [
+    {
+      "path": "registry/new-york/date-range-picker.stories.tsx",
+      "content": "/* eslint-disable sort-keys */\nimport type { Meta, StoryObj } from \"@storybook/react\";\nimport { useState } from \"react\";\nimport type { DateRange } from \"react-day-picker\";\n\nimport { DateRangePicker } from \"./date-range-picker\";\n\nconst meta = {\n  argTypes: {\n    clearable: { control: \"boolean\" },\n    defaultValue: { control: false },\n    disabled: { control: \"boolean\" },\n    disabledDates: { control: false },\n    features: { control: \"check\", options: [\"twoMonths\", \"shortcuts\"] },\n    label: { control: \"text\" },\n    locale: { control: false },\n    motion: { control: \"boolean\" },\n    now: { control: false },\n    onOpenChange: { control: false },\n    onValueChange: { control: false },\n    open: { control: false },\n    placeholder: { control: \"text\" },\n    readOnly: { control: \"boolean\" },\n    value: { control: false },\n    weekStartsOn: { control: \"select\", options: [0, 1, 6] },\n  },\n  args: {\n    clearable: true,\n    disabled: false,\n    features: [],\n    label: \"Reporting period\",\n    motion: true,\n    placeholder: \"Select dates\",\n    readOnly: false,\n    weekStartsOn: 1,\n  },\n  component: DateRangePicker,\n  parameters: { layout: \"centered\" },\n  tags: [\"autodocs\"],\n  title: \"Vandor UI/DateRangePicker\",\n} satisfies Meta<typeof DateRangePicker>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\nexport const Playground: Story = {};\nexport const Populated: Story = {\n  args: {\n    defaultValue: { from: new Date(2026, 9, 5), to: new Date(2026, 9, 12) },\n  },\n};\nexport const Shortcuts: Story = {\n  args: { features: [\"shortcuts\", \"twoMonths\"] },\n};\nexport const ReadOnly: Story = { args: { ...Populated.args, readOnly: true } };\nexport const Disabled: Story = { args: { disabled: true } };\nexport const WithoutMotion: Story = { args: { motion: false } };\nexport const Controlled: Story = {\n  render: function ControlledRange(args) {\n    const [range, setRange] = useState<DateRange>();\n    return <DateRangePicker {...args} value={range} onValueChange={setRange} />;\n  },\n};\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:item"
+}

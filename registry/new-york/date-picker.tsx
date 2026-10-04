@@ -9,7 +9,14 @@ import type { Matcher } from "react-day-picker";
 
 import { Button } from "./button";
 import { Calendar } from "./calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "./popover";
+
+// Composes shadcn's Date Picker pattern with Vandor's Button, Popover and Calendar.
 
 interface CalendarOptions {
   disabledDates?: Matcher | Matcher[];
@@ -33,6 +40,7 @@ export type DatePickerProps = CalendarOptions & {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   className?: string;
+  motion?: boolean;
 };
 
 export const DatePicker = (props: DatePickerProps) => {
@@ -52,9 +60,12 @@ export const DatePicker = (props: DatePickerProps) => {
     defaultOpen = false,
     onOpenChange,
     className,
+    motion = true,
     ...calendarOptions
   } = props;
   const controlled = Object.hasOwn(props, "value");
+  const generatedId = React.useId();
+  const triggerId = id ?? generatedId;
   const [internal, setInternal] = React.useState(defaultValue);
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
   const current = controlled ? value : internal;
@@ -74,30 +85,48 @@ export const DatePicker = (props: DatePickerProps) => {
 
   return (
     <div data-slot="date-picker" className="grid min-w-0 gap-1.5">
-      <span id={id ? `${id}-label` : undefined} className="text-sm font-medium">
+      <label
+        htmlFor={triggerId}
+        id={`${triggerId}-label`}
+        className="text-sm font-medium"
+      >
         {label}
-      </span>
+      </label>
       <Popover open={isOpen} onOpenChange={setOpen}>
         <PopoverTrigger
+          id={triggerId}
           disabled={disabled}
-          aria-labelledby={id ? `${id}-label` : undefined}
-          aria-label={id ? undefined : label}
+          aria-labelledby={`${triggerId}-label ${triggerId}-value`}
+          render={
+            <Button
+              variant="outline"
+              whileTap={motion ? { scale: 0.96 } : false}
+            />
+          }
           className={cn(
             "inline-flex h-9 min-w-0 items-center justify-start gap-2 rounded-md border border-input bg-background px-3 text-sm font-normal shadow-xs outline-none hover:bg-accent focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30",
             className
           )}
         >
           <CalendarDays aria-hidden="true" className="size-4 shrink-0" />
-          <span className={cn("truncate", !current && "text-muted-foreground")}>
+          <span
+            id={`${triggerId}-value`}
+            className={cn("truncate", !current && "text-muted-foreground")}
+          >
             {current ? format(current, dateFormat, { locale }) : placeholder}
           </span>
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="w-auto max-w-[calc(100vw-1rem)] p-2"
+          animated={motion}
+          className="w-auto gap-0 p-0"
         >
+          <PopoverTitle className="sr-only">{label}</PopoverTitle>
           <Calendar
             mode="single"
+            motion={motion}
+            autoFocus
+            defaultMonth={current}
             locale={locale}
             selected={current}
             disabled={readOnly ? () => true : calendarOptions.disabledDates}
@@ -112,7 +141,8 @@ export const DatePicker = (props: DatePickerProps) => {
             <Button
               type="button"
               variant="ghost"
-              className="mt-1 w-full"
+              whileTap={motion ? { scale: 0.96 } : false}
+              className="m-2 mt-0 w-auto"
               onClick={() => {
                 selectDate();
                 setOpen(false);

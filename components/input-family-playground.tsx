@@ -208,6 +208,7 @@ export const AdvancedInputPreview = ({
   const label = (fallback: string) => String(values.label ?? fallback);
   const disabled = Boolean(values.disabled);
   const readOnly = Boolean(values.readOnly);
+  const motion = Boolean(values.motion ?? true);
 
   switch (component) {
     case "input-phone": {
@@ -280,6 +281,7 @@ export const AdvancedInputPreview = ({
     case "date-picker": {
       return (
         <DatePicker
+          motion={motion}
           label={label("Appointment date")}
           placeholder={String(values.placeholder)}
           value={date}
@@ -300,6 +302,7 @@ export const AdvancedInputPreview = ({
       const features = featureSets[feature] ?? [feature];
       return (
         <DateRangePicker
+          motion={motion}
           label={label("Reporting period")}
           placeholder={String(values.placeholder)}
           value={range}

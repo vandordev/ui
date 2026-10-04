@@ -159,6 +159,12 @@ export const inputComponentProps: Record<
     ),
   },
   "date-picker": {
+    motion: p(
+      "boolean",
+      "true",
+      "Enables popup, calendar, and button motion; system reduced-motion takes priority.",
+      boolean("Motion", true)
+    ),
     className: p("string", "undefined", "DatePicker: trigger class name."),
     clearable: p(
       "boolean",
@@ -245,6 +251,12 @@ export const inputComponentProps: Record<
     ),
   },
   "date-range-picker": {
+    motion: p(
+      "boolean",
+      "true",
+      "Enables popup, calendar, and button motion; system reduced-motion takes priority.",
+      boolean("Motion", true)
+    ),
     applyLabel: p("string", '"Apply"', "DateRangePicker: apply button text."),
     cancelLabel: p(
       "string",
@@ -925,8 +937,11 @@ const propLine = (
   if (value === undefined) {
     return "";
   }
-  if (name === "aria-invalid" && typeof value === "boolean") {
-    return `    aria-invalid={${value}}`;
+  if (
+    (name === "aria-invalid" || name === "motion") &&
+    typeof value === "boolean"
+  ) {
+    return `    ${name}={${value}}`;
   }
   if (typeof value === "boolean") {
     return value ? `    ${name}` : "";
@@ -997,12 +1012,12 @@ export const getInputPlaygroundCode = (
         'import { useState } from "react";\nimport type { DateRange } from "react-day-picker";\nimport { Calendar } from "@/components/ui/calendar";',
     },
     "date-picker": {
-      code: `const [date, setDate] = useState<Date>();\n\n<DatePicker\n    label={${stringLiteral(String(values.label ?? "Appointment date"))}}\n    value={date}\n    onValueChange={setDate}\n${propsBlock(values, ["placeholder", "dateFormat", "clearable", "disabled", "readOnly"])}\n/>`,
+      code: `const [date, setDate] = useState<Date>();\n\n<DatePicker\n    label={${stringLiteral(String(values.label ?? "Appointment date"))}}\n    value={date}\n    onValueChange={setDate}\n${propsBlock(values, ["placeholder", "dateFormat", "clearable", "disabled", "readOnly", "motion"])}\n/>`,
       imports:
         'import { useState } from "react";\nimport { DatePicker } from "@/components/ui/date-picker";',
     },
     "date-range-picker": {
-      code: `const [range, setRange] = useState<DateRange>();\n\n<DateRangePicker\n    label={${stringLiteral(String(values.label ?? "Reporting period"))}}\n    value={range}\n    onValueChange={setRange}\n${propsBlock(values, ["placeholder", "clearable", "disabled", "readOnly"])}\n    weekStartsOn={${Number(values.weekStartsOn ?? 1)}}\n    features={${JSON.stringify(resolveRangeFeatures(values.features))}}\n/>`,
+      code: `const [range, setRange] = useState<DateRange>();\n\n<DateRangePicker\n    label={${stringLiteral(String(values.label ?? "Reporting period"))}}\n    value={range}\n    onValueChange={setRange}\n${propsBlock(values, ["placeholder", "clearable", "disabled", "readOnly", "motion"])}\n    weekStartsOn={${Number(values.weekStartsOn ?? 1)}}\n    features={${JSON.stringify(resolveRangeFeatures(values.features))}}\n/>`,
       imports:
         'import { useState } from "react";\nimport type { DateRange } from "react-day-picker";\nimport { DateRangePicker } from "@/components/ui/date-range-picker";',
     },

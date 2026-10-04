@@ -2,6 +2,10 @@
 title: Date Picker
 description: A single-date picker combining an accessible popover and calendar.
 component: date-picker
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/date-picker
+    contribution: Button, Popover, and Calendar composition pattern; Vandor adds clear/read-only behavior and motion controls.
 ---
 
 import { ComponentPreview } from "@/components/component-preview";
@@ -17,6 +21,22 @@ import { DatePicker } from "@/components/ui/date-picker";
 
 The value is a JavaScript `Date` representing a local calendar day. Set `clearable` to include an explicit clear action.
 
+This follows shadcn's Date Picker composition, not a separate upstream DatePicker registry component. It uses Vandor's new animated Popover. `motion={false}` disables popup, Calendar, and button animations; system reduced-motion preferences take priority. Popup reveal takes 180ms and dismissal 120ms. There is no delayed commit.
+
+## Consumer setup
+
+Requires React 19.2+, Tailwind CSS 4 with shadcn theme tokens, and the declared dependencies. CLI installation includes Button (and its Loading files), Calendar, and Popover; review existing primitive overwrite prompts. Copying Source alone is insufficient for manual installation: install these registry dependencies too. No additional animation stylesheet is needed.
+
+### Storybook stories (optional)
+
+Install DatePicker first, then:
+
+```bash
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/date-picker-stories.json
+```
+
+Only the stories file is installed; no component or Storybook configuration is overwritten. Add your UI directory to your existing `**/*.stories.@(js|jsx|mjs|ts|tsx)` discovery pattern and import your app's global Tailwind CSS in Storybook preview. Stories use `@storybook/react` 10.6.1 types/composition; keep Storybook packages aligned. `autodocs` needs your existing docs addon. Stories inherit consumer themes.
+
 ## Examples
 
 This controlled picker exposes a clear action and commits each selected local calendar day immediately.
@@ -28,3 +48,7 @@ This controlled picker exposes a clear action and commits each selected local ca
 ## Behavior & Accessibility
 
 Selecting an allowed day commits immediately and closes the popup. Escape dismisses and returns focus to the trigger. `disabledDates` and month-navigation bounds are separate controls. Display formatting does not change the underlying date.
+
+Opening starts on the selected date's month and focuses an eligible date. The popup has an accessible title; the trigger's name includes its label and displayed value. Read-only permits inspection/navigation but disables selection and clearing. Disabled prevents trigger interaction. `value` (including explicit `undefined`) is controlled; otherwise `defaultValue` initializes internal state. `open`/`onOpenChange` independently control visibility.
+
+This is not a native form input: serialize your date explicitly. Dates use local calendar days; avoid converting local midnight to UTC without a deliberate timezone policy. The public API is restricted to the listed props, not arbitrary native input attributes. Playground Reset clears selection and closes the popup; generated code reproduces configuration rather than transient selection.

@@ -2,6 +2,10 @@
 title: Date Range Picker
 description: A transactional date-range picker with optional calendar shortcuts.
 component: date-range-picker
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/date-picker
+    contribution: Date range Button, Popover, and Calendar composition; Vandor adds transactional Apply/Cancel, shortcuts, and motion controls.
 ---
 
 import { ComponentPreview } from "@/components/component-preview";
@@ -22,6 +26,22 @@ import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 Choose `twoMonths` and `shortcuts` independently. Shortcut ranges include today; weeks begin on Monday by default. Dates represent local calendar days, and range endpoints are inclusive.
 
+This extends shadcn's range composition with Vandor's animated Popover and existing transactional behavior. `motion={false}` disables popup, Calendar, and all button motion. System reduced-motion preferences take priority. Popup reveal is 180ms and exit 120ms; draft/commit callbacks do not wait for animation.
+
+## Consumer setup
+
+Requires React 19.2+, Tailwind CSS 4 and shadcn theme tokens. CLI installation includes Button (and Loading files), Calendar, Popover, and `date-picker-utils.ts`. Review overwrite prompts for customized primitives. Copying Source alone is insufficient: manual installation also needs these registered files/dependencies. No separate animation CSS is required.
+
+### Storybook stories (optional)
+
+Install DateRangePicker first, then:
+
+```bash
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/date-range-picker-stories.json
+```
+
+The stories-only item does not reinstall components, packages, or Storybook configuration. Discover your UI directory using `**/*.stories.@(js|jsx|mjs|ts|tsx)` and import your application's global Tailwind CSS in the existing preview. Stories are typed/composed with `@storybook/react` 10.6.1; align your Storybook packages. `autodocs` requires the existing docs addon. Consumer themes/decorators are inherited.
+
 ## Examples
 
 The controlled value changes only on Apply. Try a shortcut, alter its draft, then cancel to discard it.
@@ -34,5 +54,11 @@ The controlled value changes only on Apply. Try a shortcut, alter its draft, the
 </ComponentPreview>
 
 ## Behavior & Accessibility
+
+The popup opens at the committed range's starting month and focuses an eligible date. Label and displayed value name the trigger; the popup has an accessible title. Two-month mode shows one month below 768px. Popup scrolling respects the available viewport height.
+
+`value` (including explicit `undefined`) is controlled; otherwise `defaultValue` initializes internal state. `open` controls visibility independently. Read-only permits inspection/navigation, disables shortcuts/clear/Apply, and leaves Cancel available. Clearing changes the draft only; Apply commits `undefined`. Incomplete or disabled-date ranges cannot be applied.
+
+The picker is not a native form field; serialize committed values explicitly. Dates are local calendar days; formatting is display-only. Generated playground code reproduces configuration, not transient draft/selection. Reset clears the value and closes the popup.
 
 Calendar edits remain a draft until Apply. Cancel, Escape, and outside dismissal discard the draft. Apply is disabled for incomplete, reversed, or disabled-date ranges. Clearing is an explicit draft when `clearable` is enabled.

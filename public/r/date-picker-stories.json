@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-picker-stories",
+  "title": "Date Picker Stories",
+  "description": "Portable stories for an already installed DatePicker.",
+  "files": [
+    {
+      "path": "registry/new-york/date-picker.stories.tsx",
+      "content": "/* eslint-disable sort-keys */\nimport type { Meta, StoryObj } from \"@storybook/react\";\nimport { id } from \"date-fns/locale\";\nimport { useState } from \"react\";\n\nimport { DatePicker } from \"./date-picker\";\n\nconst meta = {\n  argTypes: {\n    clearable: { control: \"boolean\" },\n    dateFormat: { control: \"text\" },\n    defaultValue: { control: false },\n    disabled: { control: \"boolean\" },\n    disabledDates: { control: false },\n    label: { control: \"text\" },\n    locale: { control: false },\n    motion: { control: \"boolean\" },\n    onOpenChange: { control: false },\n    onValueChange: { control: false },\n    open: { control: false },\n    placeholder: { control: \"text\" },\n    readOnly: { control: \"boolean\" },\n    value: { control: false },\n  },\n  args: {\n    clearable: true,\n    dateFormat: \"PPP\",\n    disabled: false,\n    label: \"Appointment date\",\n    motion: true,\n    placeholder: \"Select a date\",\n    readOnly: false,\n  },\n  component: DatePicker,\n  parameters: { layout: \"centered\" },\n  tags: [\"autodocs\"],\n  title: \"Vandor UI/DatePicker\",\n} satisfies Meta<typeof DatePicker>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\nexport const Playground: Story = {};\nexport const Populated: Story = {\n  args: { defaultValue: new Date(2026, 9, 5) },\n};\nexport const ReadOnly: Story = { args: { ...Populated.args, readOnly: true } };\nexport const Disabled: Story = { args: { disabled: true } };\nexport const Indonesian: Story = { args: { ...Populated.args, locale: id } };\nexport const WithoutMotion: Story = { args: { motion: false } };\nexport const Controlled: Story = {\n  render: function ControlledPicker(args) {\n    const [date, setDate] = useState<Date>();\n    return <DatePicker {...args} value={date} onValueChange={setDate} />;\n  },\n};\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:item"
+}

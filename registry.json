@@ -554,11 +554,6 @@
           "path": "registry/new-york/date-picker.tsx",
           "type": "registry:ui",
           "target": "components/ui/date-picker.tsx"
-        },
-        {
-          "path": "registry/new-york/date-picker-utils.ts",
-          "type": "registry:ui",
-          "target": "components/ui/date-picker-utils.ts"
         }
       ]
     },
@@ -583,6 +578,30 @@
           "path": "registry/new-york/date-picker-utils.ts",
           "type": "registry:ui",
           "target": "components/ui/date-picker-utils.ts"
+        }
+      ]
+    },
+    {
+      "name": "date-picker-stories",
+      "type": "registry:item",
+      "title": "Date Picker Stories",
+      "description": "Portable stories for an already installed DatePicker.",
+      "files": [
+        {
+          "path": "registry/new-york/date-picker.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "date-range-picker-stories",
+      "type": "registry:item",
+      "title": "Date Range Picker Stories",
+      "description": "Portable stories for an already installed DateRangePicker.",
+      "files": [
+        {
+          "path": "registry/new-york/date-range-picker.stories.tsx",
+          "type": "registry:ui"
         }
       ]
     }

@@ -14,7 +14,14 @@ import {
   resolveDateShortcut,
 } from "./date-picker-utils";
 import type { DateShortcut } from "./date-picker-utils";
-import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "./popover";
+
+// shadcn Date Picker composition, extended with transactional range selection.
 
 export type DateRangeFeature = "twoMonths" | "shortcuts";
 
@@ -64,6 +71,7 @@ export interface DateRangePickerProps {
   cancelLabel?: string;
   clearLabel?: string;
   className?: string;
+  motion?: boolean;
 }
 
 const getShownValue = (
@@ -75,11 +83,6 @@ const getShownValue = (
   committed?.from
     ? `${format(committed.from, dateFormat, { locale })}${committed.to ? ` – ${format(committed.to, dateFormat, { locale })}` : ""}`
     : placeholder;
-
-const getLabelAttributes = (id: string | undefined, label: string) => ({
-  "aria-label": id ? undefined : label,
-  "aria-labelledby": id ? `${id}-label` : undefined,
-});
 
 const getCurrentDate = () => new Date();
 
@@ -96,6 +99,7 @@ const withRangePickerDefaults = ({
   applyLabel = "Apply",
   cancelLabel = "Cancel",
   clearLabel = "Clear",
+  motion = true,
   ...props
 }: DateRangePickerProps) => ({
   ...props,
@@ -107,6 +111,7 @@ const withRangePickerDefaults = ({
   defaultOpen,
   disabledDates,
   features,
+  motion,
   now,
   placeholder,
   shortcuts,
@@ -140,8 +145,11 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     cancelLabel,
     clearLabel,
     className,
+    motion,
   } = withRangePickerDefaults(props);
   const controlled = Object.hasOwn(props, "value");
+  const generatedId = React.useId();
+  const triggerId = id ?? generatedId;
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const committed = controlled ? value : internalValue;
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
@@ -193,16 +201,23 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
   const canApply =
     !readOnly && (clearedDraft || isSelectableDateRange(draft, disabledDates));
   const shownValue = getShownValue(committed, dateFormat, locale, placeholder);
+  const whileTap = motion ? { scale: 0.96 } : false;
 
   return (
     <div data-slot="date-range-picker" className="grid min-w-0 gap-1.5">
-      <span id={id ? `${id}-label` : undefined} className="text-sm font-medium">
+      <label
+        htmlFor={triggerId}
+        id={`${triggerId}-label`}
+        className="text-sm font-medium"
+      >
         {label}
-      </span>
+      </label>
       <Popover open={isOpen} onOpenChange={setOpen}>
         <PopoverTrigger
+          id={triggerId}
           disabled={disabled}
-          {...getLabelAttributes(id, label)}
+          aria-labelledby={`${triggerId}-label ${triggerId}-value`}
+          render={<Button variant="outline" whileTap={whileTap} />}
           className={cn(
             "inline-flex h-9 min-w-0 items-center justify-start gap-2 rounded-md border border-input bg-background px-3 text-sm font-normal shadow-xs outline-none hover:bg-accent focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30",
             className
@@ -210,6 +225,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
         >
           <CalendarDays aria-hidden="true" className="size-4 shrink-0" />
           <span
+            id={`${triggerId}-value`}
             className={cn(
               "truncate",
               !committed?.from && "text-muted-foreground"
@@ -220,8 +236,10 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="max-h-[calc(100dvh-1rem)] w-auto max-w-[calc(100vw-1rem)] overflow-auto p-2"
+          animated={motion}
+          className="w-auto gap-0 p-2"
         >
+          <PopoverTitle className="sr-only">{label}</PopoverTitle>
           <div className="flex flex-col gap-3 sm:flex-row">
             {features.includes("shortcuts") ? (
               <div className="flex flex-wrap gap-1 sm:w-32 sm:flex-col sm:flex-nowrap">
@@ -231,6 +249,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                     type="button"
                     variant="ghost"
                     size="sm"
+                    whileTap={whileTap}
                     className="justify-start whitespace-nowrap"
                     disabled={readOnly}
                     onClick={() => {
@@ -247,6 +266,9 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
             ) : null}
             <Calendar
               mode="range"
+              motion={motion}
+              autoFocus
+              defaultMonth={draft?.from}
               locale={locale}
               selected={draft}
               numberOfMonths={
@@ -267,6 +289,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
               <Button
                 type="button"
                 variant="ghost"
+                whileTap={whileTap}
                 disabled={readOnly}
                 onClick={() => {
                   setDraft(undefined);
@@ -279,6 +302,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
             <Button
               type="button"
               variant="outline"
+              whileTap={whileTap}
               onClick={() => setOpen(false)}
             >
               {cancelLabel}
@@ -286,6 +310,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
             <Button
               type="button"
               disabled={!canApply}
+              whileTap={whileTap}
               onClick={() => {
                 const next = clearedDraft ? undefined : draft;
                 if (!controlled) {

@@ -63,6 +63,11 @@ const mount = async (element) => {
   await React.act(() => root.render(element));
 };
 
+const buttonByText = (text) =>
+  [...document.querySelectorAll("button")].find(
+    (button) => button.textContent.trim() === text
+  );
+
 afterEach(async () => {
   if (root) {
     await React.act(() => root.unmount());
@@ -74,6 +79,148 @@ afterEach(async () => {
 after(async () => {
   await ready;
   await dom.happyDOM.abort();
+});
+
+test("DatePicker opens at the selected month and commits once through the new Popover", async () => {
+  await ready;
+  const { DatePicker } = jiti("../registry/new-york/date-picker.tsx");
+  const changes = [];
+  await mount(
+    React.createElement(DatePicker, {
+      defaultOpen: true,
+      defaultValue: new Date(2025, 1, 12),
+      label: "Appointment",
+      motion: false,
+      onValueChange: (next) => changes.push(next),
+    })
+  );
+  const popup = document.querySelector('[data-slot="popover-content"]');
+  assert.ok(popup.querySelector('button[data-day="2025-02-12"]'));
+  assert.equal(
+    popup.getAttribute("aria-labelledby"),
+    popup.querySelector('[data-slot="popover-title"]').id
+  );
+  await React.act(() =>
+    popup.querySelector('button[data-day="2025-02-14"]').click()
+  );
+  assert.equal(changes.length, 1);
+  assert.equal(changes[0].getDate(), 14);
+  assert.equal(
+    host
+      .querySelector('[data-slot="popover-trigger"]')
+      .getAttribute("aria-expanded"),
+    "false"
+  );
+});
+
+test("DateRangePicker opens at committed range and Cancel discards its draft", async () => {
+  await ready;
+  const { DateRangePicker } = jiti(
+    "../registry/new-york/date-range-picker.tsx"
+  );
+  const changes = [];
+  await mount(
+    React.createElement(DateRangePicker, {
+      defaultOpen: true,
+      defaultValue: { from: new Date(2025, 1, 12), to: new Date(2025, 1, 14) },
+      label: "Period",
+      motion: false,
+      onValueChange: (next) => changes.push(next),
+    })
+  );
+  assert.ok(document.querySelector('button[data-day="2025-02-12"]'));
+  await React.act(() =>
+    document.querySelector('button[data-day="2025-02-20"]').click()
+  );
+  await React.act(() =>
+    [...document.querySelectorAll("button")]
+      .find((button) => button.textContent.trim() === "Cancel")
+      .click()
+  );
+  assert.equal(changes.length, 0);
+  await React.act(() =>
+    host.querySelector('[data-slot="popover-trigger"]').click()
+  );
+  assert.equal(
+    document.querySelector('button[data-day="2025-02-12"]').dataset.rangeStart,
+    "true"
+  );
+  assert.equal(
+    document.querySelector('button[data-day="2025-02-14"]').dataset.rangeEnd,
+    "true"
+  );
+});
+
+test("DatePicker clear commits undefined and read-only prevents changes", async () => {
+  await ready;
+  const { DatePicker } = jiti("../registry/new-york/date-picker.tsx");
+  const changes = [];
+  await mount(
+    React.createElement(DatePicker, {
+      clearable: true,
+      defaultOpen: true,
+      defaultValue: new Date(2025, 1, 12),
+      label: "Date",
+      motion: false,
+      onValueChange: (next) => changes.push(next),
+    })
+  );
+  await React.act(() =>
+    [...document.querySelectorAll("button")]
+      .find((button) => button.textContent.trim() === "Clear date")
+      .click()
+  );
+  assert.deepEqual(changes, [undefined]);
+  assert.match(host.textContent, /Select a date/);
+  await React.act(() =>
+    root.render(
+      React.createElement(DatePicker, {
+        clearable: true,
+        defaultOpen: true,
+        key: "readonly",
+        label: "Date",
+        motion: false,
+        onValueChange: (next) => changes.push(next),
+        readOnly: true,
+        value: new Date(2025, 1, 12),
+      })
+    )
+  );
+  assert.equal(
+    document.querySelector('button[data-day="2025-02-12"]').disabled,
+    true
+  );
+  assert.equal(
+    [...document.querySelectorAll("button")].some(
+      (button) => button.textContent.trim() === "Clear date"
+    ),
+    false
+  );
+  assert.deepEqual(changes, [undefined]);
+});
+
+test("DateRangePicker clear remains a draft until Apply", async () => {
+  await ready;
+  const { DateRangePicker } = jiti(
+    "../registry/new-york/date-range-picker.tsx"
+  );
+  const changes = [];
+  await mount(
+    React.createElement(DateRangePicker, {
+      clearable: true,
+      defaultOpen: true,
+      defaultValue: { from: new Date(2025, 1, 12), to: new Date(2025, 1, 14) },
+      label: "Period",
+      motion: false,
+      onValueChange: (next) => changes.push(next),
+    })
+  );
+  await React.act(() => buttonByText("Clear").click());
+  assert.deepEqual(changes, []);
+  assert.match(host.textContent, /2025/);
+  await React.act(() => buttonByText("Apply").click());
+  assert.deepEqual(changes, [undefined]);
+  assert.match(host.textContent, /Select dates/);
 });
 
 test("Calendar preserves selection callbacks, disabled dates, keyboard focus and month bounds", async () => {
