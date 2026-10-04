@@ -78,6 +78,7 @@ const BasicInputPreview = ({
       return (
         <InputPassword
           label={label("Password")}
+          placeholder={String(values.placeholder ?? "")}
           autoComplete={
             String(values.autoComplete) as "current-password" | "new-password"
           }

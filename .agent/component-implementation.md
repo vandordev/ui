@@ -206,6 +206,11 @@ sections. Do not manually duplicate Installation, Props, or Source.
 - Register the component consistently in `registry.json`, docs metadata, and any
   existing discovery surfaces. Inspect existing discovery tests rather than assuming
   a new registry entry automatically provides a polished gallery preview.
+- The home gallery discovers `examples/<registry-name>-demo.tsx` automatically.
+  Export the matching `<ComponentName>Demo` (case-insensitive after removing name
+  hyphens), and keep that default demo suitable for a narrow gallery card. Missing
+  demo files retain the documentation fallback; existing demos with invalid exports
+  or import failures must not silently fall back.
 
 ## 7. Verification and acceptance
 

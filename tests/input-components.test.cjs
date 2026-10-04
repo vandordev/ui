@@ -88,6 +88,12 @@ test("Input floating label stays associated and elevated for a default value", a
   assert.equal(label.htmlFor, input.id);
   assert.equal(label.textContent, "Name");
   assert.equal(label.dataset.floating, "true");
+  const outline = host.querySelector('[data-slot="input-outline"]');
+  assert.equal(outline.tagName, "FIELDSET");
+  assert.equal(outline.getAttribute("aria-hidden"), "true");
+  assert.equal(outline.querySelector("legend").textContent, "Name");
+  assert.ok(input.classList.contains("h-10"));
+  assert.equal(input.classList.contains("h-12"), false);
 });
 
 test("InputGroupInput supports an associated floating label and controlled value updates", async () => {
@@ -113,6 +119,7 @@ test("InputGroupInput supports an associated floating label and controlled value
   assert.equal(label.dataset.floating, "true");
   await React.act(() => root.render(render("")));
   assert.equal(host.querySelector("label").dataset.floating, "false");
+  assert.ok(host.querySelector('[data-slot="input-outline"]'));
 });
 
 test("InputPhone forwards floating and static label presentation to its grouped field", async () => {
@@ -134,6 +141,7 @@ test("InputPhone forwards floating and static label presentation to its grouped 
     )
   );
   assert.equal(host.querySelector("label").dataset.floating, undefined);
+  assert.equal(host.querySelector('[data-slot="input-outline"]'), null);
 });
 
 test("InputOTP sanitizes values and announces completion only for changed user input", async () => {
@@ -437,6 +445,56 @@ test("input family playground offers a typed preview contract for every registry
     assert.match(
       playground.getInputPlaygroundCode(component, values),
       /export function/
+    );
+  }
+});
+
+test("password playground forwards its configured placeholder to the native field", async () => {
+  await ready;
+  const { InputFamilyPlayground } = jiti(
+    "../components/input-family-playground.tsx"
+  );
+  await mount(
+    React.createElement(InputFamilyPlayground, { component: "input-password" })
+  );
+  const input = host.querySelector(
+    '[data-slot="playground-preview"] input[type="password"]'
+  );
+  assert.ok(input);
+  assert.equal(input.placeholder, "Enter password");
+});
+
+test("InputGroup preserves block addon placement and native input props", async () => {
+  await ready;
+  const { InputGroup, InputGroupAddon, InputGroupInput } = jiti(
+    "../registry/new-york/input-group.tsx"
+  );
+  for (const align of ["block-start", "block-end"]) {
+    const element = React.createElement(
+      InputGroup,
+      null,
+      React.createElement(InputGroupAddon, { align }, "https://"),
+      React.createElement(InputGroupInput, {
+        label: "Website",
+        name: "website",
+        placeholder: "example.com",
+      })
+    );
+    const mountedRoot = root;
+    await (mountedRoot
+      ? React.act(() => mountedRoot.render(element))
+      : mount(element));
+    assert.equal(
+      host.querySelector('[data-slot="input-group-addon"]').dataset.align,
+      align
+    );
+    assert.equal(
+      host.querySelector('input[name="website"]').placeholder,
+      "example.com"
+    );
+    assert.equal(
+      host.querySelector("label").htmlFor,
+      host.querySelector("input").id
     );
   }
 });

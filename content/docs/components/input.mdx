@@ -27,4 +27,4 @@ The preview contrasts floating and static labels while keeping each field native
 
 ## Behavior & Accessibility
 
-Labels remain associated with the native field. Floating labels stay raised inside the field while focused or nonempty, without an opaque background patch. Their horizontal position stays fixed when values are cleared, including fields with icons. Use `aria-invalid` and `aria-describedby` to connect validation feedback. Native disabled and read-only behavior is preserved.
+Labels remain associated with the native field. Floating fields are 40px tall: labels rise to a notch in the top border while focused, autofilled, or nonempty. The decorative `fieldset`/`legend` opens the border without an opaque background patch or a second accessible label. Their horizontal position stays fixed when values are cleared, including fields with icons. Use `aria-invalid` and `aria-describedby` to connect validation feedback. Native disabled and read-only behavior is preserved.

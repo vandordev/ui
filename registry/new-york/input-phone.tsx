@@ -12,7 +12,7 @@ import { ChevronDown } from "lucide-react";
 import * as React from "react";
 
 import type { InputProps } from "./input";
-import { InputGroup, InputGroupInput } from "./input-group";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "./input-group";
 import { Select } from "./select";
 
 export type InputPhoneProps = Omit<
@@ -162,30 +162,34 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
         className={cn("grid min-w-0 gap-1.5", containerClassName)}
       >
         <InputGroup className="flex-nowrap">
-          <Select
-            data={options.map((option) => ({
-              label: option.label,
-              value: option.country,
-            }))}
-            value={state.country}
-            disabled={disabled || readOnly}
-            aria-label={`${countrySelectLabel}: ${selectedOption?.label ?? state.country}`}
-            className="flex w-20 shrink-0 items-center justify-center gap-1 self-end rounded-l-md px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed"
-            trigger={
-              <button
-                type="button"
-                className={label && labelStyle === "floating" ? "h-12" : "h-9"}
-              >
-                +{getCountryCallingCode(state.country)}
-                <ChevronDown aria-hidden="true" className="size-4" />
-              </button>
-            }
-            onValueChange={(country) => {
-              if (country) {
-                update(state.draft, country);
+          <InputGroupAddon className="self-end p-0">
+            <Select
+              data={options.map((option) => ({
+                label: option.label,
+                value: option.country,
+              }))}
+              value={state.country}
+              disabled={disabled || readOnly}
+              aria-label={`${countrySelectLabel}: ${selectedOption?.label ?? state.country}`}
+              className="flex w-20 shrink-0 items-center justify-center gap-1 self-end rounded-l-md px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed"
+              trigger={
+                <button
+                  type="button"
+                  className={
+                    label && labelStyle === "floating" ? "h-[38px]" : "h-9"
+                  }
+                >
+                  +{getCountryCallingCode(state.country)}
+                  <ChevronDown aria-hidden="true" className="size-4" />
+                </button>
               }
-            }}
-          />
+              onValueChange={(country) => {
+                if (country) {
+                  update(state.draft, country);
+                }
+              }}
+            />
+          </InputGroupAddon>
           <InputGroupInput
             {...props}
             ref={inputRef}
