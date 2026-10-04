@@ -18,7 +18,7 @@ export const selectProps = {
       label: "Placeholder",
     },
     defaultValue: "Not set",
-    description: "SelectInput: text shown before choosing a value.",
+    description: "Select: text shown before choosing a value.",
     type: "ReactNode",
   },
   size: {
@@ -29,7 +29,7 @@ export const selectProps = {
       options: ["default", "sm"],
     },
     defaultValue: '"default"',
-    description: "SelectInput: control height.",
+    description: "Select: default trigger height.",
     type: '"default" | "sm"',
   },
   disabled: {
@@ -50,13 +50,13 @@ export const selectProps = {
     },
     defaultValue: "true",
     description:
-      "SelectInput: enables Motion reveal and exit. Respects reduced motion.",
+      "Select: enables popup reveal and exit. Respects reduced motion.",
     type: "boolean",
   },
   alignItemWithTrigger: {
     defaultValue: "false",
     description:
-      "SelectContent: overlaps the trigger to align the selected option.",
+      "contentProps.alignItemWithTrigger: overlaps the trigger to align the selected option.",
     type: "boolean",
   },
   value: {
@@ -75,32 +75,32 @@ export const selectProps = {
       "Select: receives the selected value and Base UI event details.",
     type: "(value, details) => void",
   },
-  items: {
-    defaultValue: "Not set",
-    description: "Select: maps values to displayed labels.",
-    type: "Array<{ label, value }> | Record<string, ReactNode>",
-  },
   data: {
     defaultValue: "Required",
-    description:
-      "SelectInput: options and one-level groups rendered automatically.",
+    description: "Select: options and one-level groups rendered automatically.",
     type: "readonly (SelectOption<Value> | SelectOptionGroup<Value>)[]",
   },
   renderItem: {
     defaultValue: "Not set",
     description:
-      "SelectInput: custom option content; label remains the trigger and typeahead text.",
-    type: "(item: SelectOption<Value>) => ReactNode",
+      "Select: custom option content; label remains the default trigger and typeahead text. Retains option metadata.",
+    type: "(item: Option) => ReactNode",
+  },
+  trigger: {
+    defaultValue: "Built-in trigger",
+    description:
+      "Select: custom trigger element or callback receiving value, selectedLabel, placeholder, open and disabled. Owns its visual content.",
+    type: "ReactElement | ((context: SelectTriggerContext) => ReactElement)",
   },
   triggerProps: {
     defaultValue: "Not set",
     description:
-      "SelectInput: additional trigger props, including ref and event handlers.",
-    type: "Omit<SelectTriggerProps, 'children' | 'className' | 'size'>",
+      "Select: additional trigger props, including ref and event handlers.",
+    type: "Omit<SelectTriggerProps, 'children' | 'className' | 'size' | 'render'>",
   },
   contentProps: {
     defaultValue: "Not set",
-    description: "SelectInput: popup props and positioning options.",
+    description: "Select: popup props and positioning options.",
     type: "Omit<SelectContentProps, 'children' | 'animated'>",
   },
   name: {
@@ -115,12 +115,12 @@ export type SelectPlaygroundValues = ReturnType<typeof getSelectDefaults>;
 
 export const getSelectCode = (
   values: SelectPlaygroundValues
-) => `import { SelectInput } from "@/components/ui/select";
+) => `import { Select } from "@/components/ui/select";
 
 const items = ${JSON.stringify(selectItems, null, 2)};
 
 export const SelectDemo = () => (
-  <SelectInput
+  <Select
     data={items}
     aria-label="Fruit"
     className="w-56"

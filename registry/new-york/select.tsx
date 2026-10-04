@@ -7,7 +7,12 @@ import { cn } from "cn";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { createContext, useContext, useRef } from "react";
-import type { AriaAttributes, ComponentProps, ReactNode } from "react";
+import type {
+  AriaAttributes,
+  ComponentProps,
+  ReactElement,
+  ReactNode,
+} from "react";
 
 const PopupElement = ({
   nativeProps,
@@ -43,7 +48,7 @@ const MotionTriggerElement = motion.create(TriggerElement);
 
 const SelectActionsContext = createContext<(() => void) | null>(null);
 
-const Select = <Value, Multiple extends boolean | undefined = false>({
+const SelectRoot = <Value, Multiple extends boolean | undefined = false>({
   actionsRef,
   children,
   ...props
@@ -283,34 +288,61 @@ interface SelectOption<Value extends string | number = string> {
   disabled?: boolean;
 }
 
-interface SelectOptionGroup<Value extends string | number = string> {
+interface SelectOptionGroup<
+  Value extends string | number = string,
+  Option extends SelectOption<Value> = SelectOption<Value>,
+> {
   label: string;
-  items: readonly SelectOption<Value>[];
+  items: readonly Option[];
 }
 
-type SelectInputProps<
+interface SelectTriggerContext<
   Value extends string | number = string,
   Multiple extends boolean | undefined = false,
+> {
+  value: Multiple extends true ? Value[] : Value | null;
+  selectedLabel: string | null;
+  placeholder: ReactNode;
+  open: boolean;
+  disabled: boolean;
+}
+
+type SelectProps<
+  Value extends string | number = string,
+  Multiple extends boolean | undefined = false,
+  Option extends SelectOption<Value> = SelectOption<Value>,
 > = Omit<
   SelectPrimitive.Root.Props<NoInfer<Value>, Multiple>,
   "children" | "items"
 > &
   AriaAttributes & {
-    data: readonly (SelectOption<Value> | SelectOptionGroup<Value>)[];
+    data: readonly (Option | SelectOptionGroup<Value, Option>)[];
     placeholder?: ReactNode;
     size?: ComponentProps<typeof SelectTrigger>["size"];
     className?: string;
     animated?: boolean;
+    trigger?:
+      | ReactElement
+      | ((context: SelectTriggerContext<Value, Multiple>) => ReactElement);
     triggerProps?: Omit<
       ComponentProps<typeof SelectTrigger>,
-      "children" | "className" | "size"
+      "children" | "className" | "size" | "render"
     >;
     contentProps?: Omit<SelectContentProps, "children" | "animated">;
-    renderItem?: (item: SelectOption<Value>) => ReactNode;
+    renderItem?: (item: Option) => ReactNode;
   };
 
-const SelectInput = <
-  Value extends string | number,
+type SelectDataOption<Entry> = Entry extends {
+  items: readonly (infer Option)[];
+}
+  ? Option
+  : Entry;
+
+const Select = <
+  const Data extends readonly (
+    | SelectOption<string | number>
+    | SelectOptionGroup<string | number>
+  )[],
   Multiple extends boolean | undefined = false,
 >({
   data,
@@ -318,14 +350,28 @@ const SelectInput = <
   size,
   className,
   animated,
+  trigger,
   triggerProps,
   contentProps,
   renderItem,
   ...props
-}: SelectInputProps<Value, Multiple>) => {
+}: Omit<
+  SelectProps<
+    SelectDataOption<Data[number]>["value"],
+    Multiple,
+    SelectDataOption<Data[number]>
+  >,
+  "data"
+> & { data: Data }) => {
+  type Option = SelectDataOption<Data[number]>;
   // Keep adjacent ungrouped options together, preserving mixed data order.
-  const groups: { label?: string; items: SelectOption<Value>[] }[] = [];
-  for (const entry of data) {
+  const groups: { label?: string; items: Option[] }[] = [];
+  // Data's constraint validates the shape; the conditional type preserves option metadata.
+  const entries = data as unknown as readonly (
+    | Option
+    | SelectOptionGroup<Option["value"], Option>
+  )[];
+  for (const entry of entries) {
     if ("items" in entry) {
       groups.push({ items: [...entry.items], label: entry.label });
     } else {
@@ -349,15 +395,60 @@ const SelectInput = <
   }
 
   return (
-    <Select {...rootProps} items={items}>
-      <SelectTrigger
-        {...triggerProps}
-        {...ariaProps}
-        className={className}
-        size={size}
-      >
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
+    <SelectRoot {...rootProps} items={items}>
+      {trigger === undefined ? (
+        <SelectTrigger
+          {...triggerProps}
+          {...ariaProps}
+          className={className}
+          size={size}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+      ) : (
+        <SelectPrimitive.Trigger
+          {...triggerProps}
+          {...ariaProps}
+          data-slot="select-trigger"
+          data-size={size}
+          className={className}
+          render={
+            typeof trigger === "function"
+              ? (nativeProps, state) => {
+                  let values: Option["value"][] = [];
+                  if (Array.isArray(state.value)) {
+                    values = state.value;
+                  } else if (
+                    state.value !== null &&
+                    state.value !== undefined
+                  ) {
+                    values = [state.value];
+                  }
+                  const labels = values.flatMap((value) => {
+                    const item = items.find((option) => option.value === value);
+                    return item ? [item.label] : [];
+                  });
+                  return (
+                    <TriggerElement
+                      nativeProps={nativeProps}
+                      state={state}
+                      render={trigger({
+                        disabled: state.disabled,
+                        open: state.open,
+                        placeholder,
+                        selectedLabel: labels.length ? labels.join(", ") : null,
+                        value: state.value as SelectTriggerContext<
+                          Option["value"],
+                          Multiple
+                        >["value"],
+                      })}
+                    />
+                  );
+                }
+              : trigger
+          }
+        />
+      )}
       <SelectContent {...contentProps} animated={animated}>
         {groups.map((group) => (
           <SelectGroup
@@ -383,17 +474,22 @@ const SelectInput = <
           </SelectGroup>
         ))}
       </SelectContent>
-    </Select>
+    </SelectRoot>
   );
 };
 
-export type { SelectInputProps, SelectOption, SelectOptionGroup };
+export type {
+  SelectProps,
+  SelectTriggerContext,
+  SelectOption,
+  SelectOptionGroup,
+};
 
 export {
   Select,
   SelectContent,
   SelectGroup,
-  SelectInput,
+  SelectRoot,
   SelectItem,
   SelectLabel,
   SelectScrollDownButton,

@@ -8,14 +8,18 @@ credits:
     contribution: Select composition and foundation. Vandor UI adds Motion reveal and exit transitions, reduced-motion support, and direct cn integration.
 ---
 
-import { SelectDemo, SelectGroupedDemo } from "@/examples/select-demo";
+import {
+  SelectCustomTriggerDemo,
+  SelectDemo,
+  SelectGroupedDemo,
+} from "@/examples/select-demo";
 
 ## Usage
 
-Use `SelectInput` for a ready-to-use control. It renders the trigger, popup, options, and groups using the same Select primitives.
+Use `Select` for a ready-to-use control. It renders the trigger, popup, options, and groups automatically.
 
 ```tsx
-import { SelectInput } from "@/components/ui/select";
+import { Select } from "@/components/ui/select";
 
 const data = [
   { label: "Apple", value: "apple" },
@@ -24,7 +28,7 @@ const data = [
 
 export function Demo() {
   return (
-    <SelectInput
+    <Select
       data={data}
       aria-label="Fruit"
       placeholder="Select a fruit"
@@ -34,15 +38,46 @@ export function Demo() {
 }
 ```
 
-`className`, `size`, and `aria-*` props apply to the trigger. Use `triggerProps` for additional trigger attributes, event handlers, or a ref. Use `contentProps` for popup positioning and styling. Root props such as `value`, `defaultValue`, `onValueChange`, `name`, `required`, and `multiple` are forwarded to Select. `data` is the single source for option rendering and selected labels; do not also pass `items` or `children`.
+`className` and `aria-*` props apply to the trigger. `size` controls the built-in trigger's height. Use `triggerProps` for additional trigger attributes, event handlers, or a ref. Use `contentProps` for popup positioning and styling. Root props such as `value`, `defaultValue`, `onValueChange`, `name`, `required`, and `multiple` are forwarded to Base UI. `data` is the single source for option rendering and selected labels; do not also pass `items` or `children`.
 
-### Custom Composition
+### Custom Trigger
+
+Pass a `trigger` element for fixed content, or a callback to display the current selection. Select attaches Base UI's trigger behavior to the element without adding a wrapper button, default styling, press animation, or chevron.
+
+```tsx
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
+
+<Select
+  data={data}
+  aria-label="Fruit"
+  placeholder="Select a fruit"
+  trigger={({ selectedLabel, placeholder, open }) => (
+    <Button variant="outline" aria-label="Fruit">
+      {selectedLabel ?? placeholder}
+      <span aria-hidden="true">{open ? "▴" : "▾"}</span>
+    </Button>
+  )}
+/>;
+```
+
+The callback receives `value`, `selectedLabel`, `placeholder`, `open`, and `disabled`. `selectedLabel` is `null` when no data option matches; multiple labels are joined with `", "` in selected-value order. An empty-string label is preserved. Both controlled and uncontrolled selection are supported.
+
+The callback must return a React element, not text or a fragment. Custom components must forward props and ref to a single interactive element. Prefer a native button; for non-button triggers, set `triggerProps={{ nativeButton: false }}` and provide appropriate styling. Keep custom trigger content non-interactive. `triggerProps.render` is not accepted: use `trigger` instead.
+
+<ComponentPreview src="examples/select-demo.tsx" title="select-demo.tsx">
+  <div className="flex justify-center rounded-md border p-6">
+    <SelectCustomTriggerDemo />
+  </div>
+</ComponentPreview>
+
+### Advanced Composition
 
 The existing primitives remain available when you need a custom trigger, value display, or popup layout.
 
 ```tsx
 import {
-  Select,
+  SelectRoot,
   SelectContent,
   SelectGroup,
   SelectItem,
@@ -57,7 +92,7 @@ const items = [
 
 export function Demo() {
   return (
-    <Select items={items}>
+    <SelectRoot items={items}>
       <SelectTrigger aria-label="Fruit" className="w-56">
         <SelectValue placeholder="Select a fruit" />
       </SelectTrigger>
@@ -70,7 +105,7 @@ export function Demo() {
           ))}
         </SelectGroup>
       </SelectContent>
-    </Select>
+    </SelectRoot>
   );
 }
 ```
@@ -87,11 +122,11 @@ Use your project's configured UI alias if it differs from `@/components/ui`. Pas
 
 ### Sizes and Disabled Options
 
-Use `size="sm"` on `SelectTrigger` for a compact control. Set `disabled` on `Select` to disable the whole control, or on individual `SelectItem` elements to disable options.
+Use `size="sm"` on `Select` for a compact built-in trigger. Set `disabled` on `Select` to disable the whole control, or on individual data options to disable them. For advanced composition, use `SelectTrigger` and `SelectItem` respectively.
 
 ### Groups
 
-`SelectInput` accepts options and groups in the same array, preserving their order. A group uses `label` and `items`; an option uses `label`, `value`, and optionally `disabled`.
+`Select` accepts options and groups in the same array, preserving their order. A group uses `label` and `items`; an option uses `label`, `value`, and optionally `disabled`.
 
 ```tsx
 const data = [
@@ -105,7 +140,7 @@ const data = [
   },
 ];
 
-<SelectInput data={data} aria-label="Fruit" placeholder="Select a fruit" />;
+<Select data={data} aria-label="Fruit" placeholder="Select a fruit" />;
 ```
 
 <div className="flex justify-center rounded-md border p-6">
@@ -118,10 +153,10 @@ Place options inside `SelectGroup`. Use `SelectLabel` for a group heading and `S
 
 ### Custom Option Content
 
-Use `renderItem` to add icons or other non-interactive content. The option's original `label` remains the selected text and keyboard typeahead label.
+Use `renderItem` to add icons or other non-interactive content. Additional option fields are inferred and available in the callback. The option's original `label` remains the built-in trigger text and keyboard typeahead label. Select still owns the option wrapper, selected indicator, groups, scrolling, portal, and popup; arbitrary popup children are not accepted.
 
 ```tsx
-<SelectInput
+<Select
   data={data}
   aria-label="Fruit"
   renderItem={(item) => <span>{item.label}</span>}
@@ -129,7 +164,7 @@ Use `renderItem` to add icons or other non-interactive content. The option's ori
 />
 ```
 
-Set `size="sm"`, `disabled`, or `animated={false}` directly on `SelectInput`. For searchable or very large lists, prefer a Combobox instead of extending Select with search.
+Set `size="sm"`, `disabled`, or `animated={false}` directly on `Select`. `animated` controls popup reveal and exit only. The built-in trigger retains its press feedback; custom triggers own their styling and motion. For searchable or very large lists, prefer a Combobox instead of extending Select with search.
 
 ### Controlled Values and Forms
 
@@ -147,3 +182,7 @@ The option menu fades and scales from `0.96` to `1` over `180ms` with an ease-ou
 - Base UI preserves Arrow-key navigation, typeahead, Enter/Space selection, Escape dismissal, and focus restoration.
 - Long lists scroll within the available viewport height, with scroll-arrow affordances.
 - Give every control an accessible name using a visible label or `aria-label` on `SelectTrigger`.
+
+## Migration
+
+`SelectInput` is now `Select`, with the same `data`-driven usage. The previous compositional `Select` is now `SelectRoot`; its child primitives remain available. Update imports and JSX names accordingly. `SelectInput` is no longer exported.

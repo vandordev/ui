@@ -1,6 +1,9 @@
 "use client";
 
-import { SelectInput } from "@/registry/new-york/select";
+import { ChevronDownIcon } from "lucide-react";
+
+import { Button } from "@/registry/new-york/button";
+import { Select } from "@/registry/new-york/select";
 
 const items = [
   { label: "Apple", value: "apple" },
@@ -9,7 +12,7 @@ const items = [
 ];
 
 export const SelectDemo = () => (
-  <SelectInput
+  <Select
     data={items}
     aria-label="Fruit"
     className="w-56 max-w-full"
@@ -18,7 +21,7 @@ export const SelectDemo = () => (
 );
 
 export const SelectGroupedDemo = () => (
-  <SelectInput
+  <Select
     data={[
       { label: "Apple", value: "apple" },
       {
@@ -32,5 +35,22 @@ export const SelectGroupedDemo = () => (
     aria-label="Grouped fruit"
     className="w-56 max-w-full"
     placeholder="Select a fruit"
+  />
+);
+
+export const SelectCustomTriggerDemo = () => (
+  <Select
+    data={items}
+    aria-label="Fruit"
+    placeholder="Select a fruit"
+    trigger={({ selectedLabel, placeholder, open }) => (
+      <Button variant="outline" className="w-56 max-w-full justify-between">
+        {selectedLabel ?? placeholder}
+        <ChevronDownIcon
+          aria-hidden="true"
+          className={open ? "rotate-180" : undefined}
+        />
+      </Button>
+    )}
   />
 );

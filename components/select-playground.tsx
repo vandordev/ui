@@ -7,7 +7,7 @@ import {
   selectItems,
   selectProps,
 } from "@/lib/select-playground";
-import { SelectInput } from "@/registry/new-york/select";
+import { Select } from "@/registry/new-york/select";
 
 export const SelectPlayground = () => (
   <ComponentPlayground
@@ -17,7 +17,7 @@ export const SelectPlayground = () => (
     getCode={getSelectCode}
     hint="Open the menu to preview the motion. Arrow keys navigate, Enter selects, and Escape closes."
     renderPreview={(values) => (
-      <SelectInput
+      <Select
         data={selectItems}
         disabled={values.disabled}
         aria-label="Fruit"

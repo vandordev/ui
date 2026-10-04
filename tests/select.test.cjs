@@ -11,9 +11,9 @@ const jiti = createJiti(__filename, {
 });
 const el = React.createElement;
 
-test("SelectInput resolves flat and grouped labels without leaking wrapper props to the trigger", () => {
-  const { SelectInput } = jiti("../registry/new-york/select.tsx");
-  assert.equal(typeof SelectInput, "function");
+test("Select resolves flat and grouped labels without leaking wrapper props to the trigger", () => {
+  const { Select } = jiti("../registry/new-york/select.tsx");
+  assert.equal(typeof Select, "function");
   const data = [
     { label: "Apple", value: "apple" },
     { items: [{ label: "Mango", value: "mango" }], label: "Tropical" },
@@ -25,7 +25,7 @@ test("SelectInput resolves flat and grouped labels without leaking wrapper props
     ["pear", "Pear"],
   ]) {
     const html = renderToStaticMarkup(
-      el(SelectInput, {
+      el(Select, {
         "aria-label": "Fruit",
         className: "w-56",
         data,
@@ -47,12 +47,12 @@ test("SelectInput resolves flat and grouped labels without leaking wrapper props
   }
 });
 
-test("SelectInput preserves empty placeholders, numeric values and multiple labels", () => {
-  const { SelectInput } = jiti("../registry/new-york/select.tsx");
-  assert.equal(typeof SelectInput, "function");
+test("Select preserves empty placeholders, numeric values and multiple labels", () => {
+  const { Select } = jiti("../registry/new-york/select.tsx");
+  assert.equal(typeof Select, "function");
   assert.match(
     renderToStaticMarkup(
-      el(SelectInput, {
+      el(Select, {
         "aria-label": "Fruit",
         data: [],
         placeholder: "Pick a fruit",
@@ -64,24 +64,21 @@ test("SelectInput preserves empty placeholders, numeric values and multiple labe
     { label: "Zero", value: 0 },
     { label: "One", value: 1 },
   ];
-  assert.match(
-    renderToStaticMarkup(el(SelectInput, { data, value: 0 })),
-    /Zero/
-  );
+  assert.match(renderToStaticMarkup(el(Select, { data, value: 0 })), /Zero/);
   const html = renderToStaticMarkup(
-    el(SelectInput, { data, multiple: true, value: [0, 1] })
+    el(Select, { data, multiple: true, value: [0, 1] })
   );
   assert.match(html, /Zero/);
   assert.match(html, /One/);
 });
 
-test("registry Select preserves labels, selected values, form names, and disabled semantics", () => {
-  const { Select, SelectTrigger, SelectValue } = jiti(
+test("registry SelectRoot preserves labels, selected values, form names, and disabled semantics", () => {
+  const { SelectRoot, SelectTrigger, SelectValue } = jiti(
     "../registry/new-york/select.tsx"
   );
   const html = renderToStaticMarkup(
     el(
-      Select,
+      SelectRoot,
       {
         defaultValue: "apple",
         disabled: true,
@@ -113,6 +110,6 @@ test("Select playground code escapes placeholders and preserves size, animation 
   assert.ok(code.includes('size="sm"'));
   assert.ok(code.includes("animated={false}"));
   assert.ok(code.includes(" disabled"));
-  assert.ok(code.includes("<SelectInput"));
+  assert.ok(code.includes("<Select"));
   assert.ok(code.includes("data={items}"));
 });
