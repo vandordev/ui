@@ -73,7 +73,7 @@ Requires React 19, Tailwind CSS 4, Base UI 1.8+, Motion 12.38+, and `cn`. Use sh
 Install Popover first. Portable stories are a separate optional item and do not reinstall or overwrite the component:
 
 ```bash
-pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/popover-stories.json
+npx shadcn@latest add https://vandor-ui.vercel.app/r/popover-stories.json
 ```
 
 Use your existing `@storybook/react` setup with matching Storybook package versions (types/composition checked with 10.6.1). Discover `**/*.stories.tsx` in your configured UI directory and load your global Tailwind/theme stylesheet in the preview. No extra addons or providers are required for Canvas and Controls; the `autodocs` tag uses your existing `@storybook/addon-docs` setup. Stories inherit your consumer theme. This repository has no Storybook server; Storybook UI appearance is not verified here.

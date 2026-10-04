@@ -22,8 +22,8 @@ Vandor UI's **Button** offers six variants, eight sizes, a subtle raised finish,
 ```bash
 git clone https://github.com/vandordev/ui.git
 cd ui
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 Open http://localhost:3000.
@@ -35,7 +35,7 @@ Components are installed as source files, not as an npm component package. Initi
 Install the Button:
 
 ```bash
-pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
+npx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
 ```
 
 ## Adding a Registry Component
@@ -43,8 +43,8 @@ pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/button.json
 1. Add the source file under `registry/new-york/`.
 2. Register the component, dependencies, and installation targets in `registry.json`.
 3. Add its MDX documentation under `content/docs/components/` and update the relevant `meta.json` navigation.
-4. Build the registry with `pnpm registry:build`.
-5. Verify with `pnpm check`, `pnpm build`, and `pnpm typecheck`.
+4. Build the registry with `npm run registry:build`.
+5. Verify with `npm run check`, `npm run build`, and `npm run typecheck`.
 
 `components/ui/` contains the website's UI primitives. `registry/new-york/` contains components intended for distribution.
 
@@ -65,15 +65,15 @@ styles/               Global styles and theme tokens
 
 ## Scripts
 
-| Command               | Purpose                                   |
-| --------------------- | ----------------------------------------- |
-| `pnpm dev`            | Start the development server              |
-| `pnpm registry:build` | Generate registry files in `public/r/`    |
-| `pnpm build`          | Build the registry and production website |
-| `pnpm start`          | Serve the production build                |
-| `pnpm typecheck`      | Check TypeScript types                    |
-| `pnpm check`          | Check lint and formatting                 |
-| `pnpm fix`            | Apply lint and formatting fixes           |
+| Command                  | Purpose                                   |
+| ------------------------ | ----------------------------------------- |
+| `npm run dev`            | Start the development server              |
+| `npm run registry:build` | Generate registry files in `public/r/`    |
+| `npm run build`          | Build the registry and production website |
+| `npm run start`          | Serve the production build                |
+| `npm run typecheck`      | Check TypeScript types                    |
+| `npm run check`          | Check lint and formatting                 |
+| `npm run fix`            | Apply lint and formatting fixes           |
 
 ## Deployment
 

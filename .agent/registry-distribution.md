@@ -80,7 +80,7 @@ artifact works in a consumer project.
 
 ## 5. Keep generated outputs reproducible
 
-- Generate `public/r/` using `pnpm registry:build`; do not patch generated component
+- Generate `public/r/` using `npm run registry:build`; do not patch generated component
   content manually. Compare the affected artifact contents and metadata with their
   manifest/source inputs.
 - When renaming or removing an item, inspect obsolete artifacts, dependency URLs,
@@ -109,7 +109,7 @@ artifact works in a consumer project.
 - Use relative public component imports for colocated stories. Verify stories-only
   CLI installation with a non-default UI alias/layout when introducing or changing
   packaging, and confirm an existing customized component remains unchanged.
-- Generate stories artifacts through `pnpm registry:build`. Check manifest/source
+- Generate stories artifacts through `npm run registry:build`. Check manifest/source
   parity, consumer compilation, and meaningful story composition as applicable.
   A Storybook server and Storybook UI verification are not required in this project;
   report that limitation without claiming visual verification.

@@ -38,4 +38,6 @@ Do not repeat the generated headings or installation/dependency/source data in t
 
 The `remarkComponentDocs` transformer runs before Fumadocs heading and Markdown processing. Generated headings appear in the table of contents. The processed Markdown includes dependency commands, prop values, default playground code, source, and credits, not just empty React component tags.
 
-After changing the registry, prop metadata, or source, verify with `pnpm build`. Check the page and `/llms.md/docs/components/<name>/content.md`; Copy Page uses this Markdown route. Also verify that ordinary documentation pages do not acquire component sections.
+After changing the registry, prop metadata, or source, verify with `npm run build`. Check the page and `/llms.md/docs/components/<name>/content.md`; Copy Page uses this Markdown route. Also verify that ordinary documentation pages do not acquire component sections.
+
+Write package-manager commands in Markdown/MDX using `npm` or `npx` as the canonical form. The MDX parser derives package-manager switcher tabs from this form; commands authored with other package managers do not produce the switcher.
