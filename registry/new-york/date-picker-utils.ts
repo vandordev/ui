@@ -22,11 +22,14 @@ export type DateShortcut =
   | "thisMonth"
   | "lastMonth";
 
-export function resolveDateShortcut(
+const asCalendarDay = (date: Date) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+export const resolveDateShortcut = (
   shortcut: DateShortcut,
   today: Date,
   weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 1
-): { from: Date; to: Date } {
+): { from: Date; to: Date } => {
   const current = new Date(
     today.getFullYear(),
     today.getMonth(),
@@ -43,8 +46,6 @@ export function resolveDateShortcut(
   }
 
   const weekStart = startOfWeek(current, { weekStartsOn });
-  const asCalendarDay = (date: Date) =>
-    new Date(date.getFullYear(), date.getMonth(), date.getDate());
   switch (shortcut) {
     case "thisWeek": {
       return {
@@ -77,19 +78,19 @@ export function resolveDateShortcut(
       throw new Error(`Unsupported date shortcut: ${exhaustive}`);
     }
   }
-}
+};
 
-export function toLocalDateValue(date: Date): string {
+export const toLocalDateValue = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
-}
+};
 
-export function isSelectableDateRange(
+export const isSelectableDateRange = (
   range: DateRange | undefined,
   disabledDates: readonly Date[] = []
-): boolean {
+): boolean => {
   if (
     !range?.from ||
     !range.to ||
@@ -104,19 +105,17 @@ export function isSelectableDateRange(
       (isSameDay(date, range.to as Date) ||
         isBefore(startOfDay(date), startOfDay(range.to as Date)))
   );
-}
+};
 
-export function isDateDisabled(
+export const isDateDisabled = (
   date: Date,
   disabledDates: readonly Date[] = []
-): boolean {
-  return disabledDates.some((disabled) => isSameDay(date, disabled));
-}
+): boolean => disabledDates.some((disabled) => isSameDay(date, disabled));
 
-export function rangeIncludesDisabledDate(
+export const rangeIncludesDisabledDate = (
   range: DateRange | undefined,
   disabledDates: readonly Date[] = []
-): boolean {
+): boolean => {
   if (!range?.from || !range.to) {
     return false;
   }
@@ -126,6 +125,6 @@ export function rangeIncludesDisabledDate(
         isAfter(date, range.from as Date)) &&
       (isSameDay(date, range.to as Date) || isBefore(date, range.to as Date))
   );
-}
+};
 
 export { addDays };

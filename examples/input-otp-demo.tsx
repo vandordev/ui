@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { InputOTP } from "@/registry/new-york/input-otp";
 
-export function InputOTPDemo() {
+export const InputOTPDemo = () => {
   const [code, setCode] = useState("");
   return (
     <div className="grid justify-items-center gap-2">
@@ -20,4 +20,4 @@ export function InputOTPDemo() {
       </span>
     </div>
   );
-}
+};

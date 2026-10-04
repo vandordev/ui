@@ -5,7 +5,7 @@ import type { DateRange } from "react-day-picker";
 
 import { DateRangePicker } from "@/registry/new-york/date-range-picker";
 
-export function DateRangePickerDemo() {
+export const DateRangePickerDemo = () => {
   const [range, setRange] = useState<DateRange>();
   return (
     <DateRangePicker
@@ -16,4 +16,4 @@ export function DateRangePickerDemo() {
       clearable
     />
   );
-}
+};

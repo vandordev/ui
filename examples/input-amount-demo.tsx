@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { InputAmount } from "@/registry/new-york/input-amount";
 
-export function InputAmountDemo() {
+export const InputAmountDemo = () => {
   const [amount, setAmount] = useState("1250000.50");
   return (
     <div className="grid max-w-sm gap-2">
@@ -22,4 +22,4 @@ export function InputAmountDemo() {
       </output>
     </div>
   );
-}
+};

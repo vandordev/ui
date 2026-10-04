@@ -342,6 +342,7 @@
       "type": "registry:ui",
       "title": "TextArea",
       "description": "A native multiline text field with an optional associated label.",
+      "registryDependencies": ["https://vandor-ui.vercel.app/r/input.json"],
       "dependencies": ["cn"],
       "files": [
         {
@@ -356,6 +357,7 @@
       "type": "registry:ui",
       "title": "Input Group",
       "description": "Composable input and textarea groups with aligned addons and actions.",
+      "registryDependencies": ["https://vandor-ui.vercel.app/r/input.json"],
       "dependencies": ["cn"],
       "files": [
         {
@@ -406,6 +408,7 @@
       "type": "registry:ui",
       "title": "Input Amount",
       "description": "A formatted decimal input that emits exact raw decimal strings.",
+      "registryDependencies": ["https://vandor-ui.vercel.app/r/input.json"],
       "dependencies": ["cn", "react-number-format"],
       "files": [
         {
@@ -425,7 +428,7 @@
         "https://vandor-ui.vercel.app/r/input-group.json",
         "https://vandor-ui.vercel.app/r/select.json"
       ],
-      "dependencies": ["cn", "libphonenumber-js"],
+      "dependencies": ["cn", "libphonenumber-js", "lucide-react"],
       "files": [
         {
           "path": "registry/new-york/input-phone.tsx",
@@ -439,6 +442,7 @@
       "type": "registry:ui",
       "title": "Input OTP",
       "description": "An accessible single-input one-time-code control with visual cells.",
+      "registryDependencies": ["https://vandor-ui.vercel.app/r/input.json"],
       "dependencies": ["cn"],
       "files": [
         {

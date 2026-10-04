@@ -21,11 +21,13 @@ import {
   <InputGroupAddon>
     <InputGroupText>https://</InputGroupText>
   </InputGroupAddon>
-  <InputGroupInput aria-label="Website" placeholder="example.com" />
+  <InputGroupInput label="Website" placeholder="example.com" />
 </InputGroup>;
 ```
 
 `InputGroupAddon` supports inline-start/end and block-start/end placement. Use `InputGroupButton` for an interactive action.
+
+`InputGroupInput` accepts the same label, icon, and native input props as `Input`. Labels default to floating inside the control without a background patch; use `labelStyle="static"` for a conventional label. Inline addons stay beside the flexible control; block addons occupy their own row.
 
 ## Examples
 

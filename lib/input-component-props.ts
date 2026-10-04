@@ -426,6 +426,18 @@ export const inputComponentProps: Record<
     ),
   },
   "input-group": {
+    label: p(
+      "string",
+      "undefined",
+      "InputGroupInput: visible associated label.",
+      text("Label", "Website")
+    ),
+    labelStyle: p(
+      '"floating" | "static"',
+      '"floating"',
+      "InputGroupInput: label presentation.",
+      select("Label style", "floating", ["floating", "static"])
+    ),
     align: p(
       '"inline-start" | "inline-end" | "block-start" | "block-end"',
       '"inline-start"',
@@ -547,6 +559,12 @@ export const inputComponentProps: Record<
     ),
   },
   "input-phone": {
+    labelStyle: p(
+      '"floating" | "static"',
+      '"floating"',
+      "InputPhone: label presentation for the number field.",
+      select("Label style", "floating", ["floating", "static"])
+    ),
     countrySelectLabel: p(
       "string",
       '"Country calling code"',
@@ -920,7 +938,7 @@ export const getInputPlaygroundCode = (
         'import { InputAmount } from "@/components/ui/input-amount";\nimport { useState } from "react";',
     },
     "input-group": {
-      code: `<InputGroup>\n  <InputGroupAddon align={${stringLiteral(String(values.align ?? "inline-start"))}}>\n    <InputGroupText>https://</InputGroupText>\n  </InputGroupAddon>\n  <InputGroupInput aria-label="Website" placeholder="example.com"${values.disabled ? " disabled" : ""} />\n</InputGroup>`,
+      code: `<InputGroup>\n  <InputGroupAddon align={${stringLiteral(String(values.align ?? "inline-start"))}}>\n    <InputGroupText>https://</InputGroupText>\n  </InputGroupAddon>\n  <InputGroupInput label={${stringLiteral(String(values.label ?? "Website"))}} labelStyle={${stringLiteral(String(values.labelStyle ?? "floating"))}} placeholder="example.com"${values.disabled ? " disabled" : ""} />\n</InputGroup>`,
       imports:
         'import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group";',
     },
@@ -935,7 +953,7 @@ export const getInputPlaygroundCode = (
         'import { InputPassword } from "@/components/ui/input-password";',
     },
     "input-phone": {
-      code: `const [phone, setPhone] = useState<string>();\n\n<InputPhone\n    label={${stringLiteral(String(values.label ?? "Phone number"))}}\n    value={phone}\n    onValueChange={setPhone}\n${propsBlock(values, ["defaultCountry", "locale", "disabled", "readOnly"])}\n/>\n\n<p>Normalized value (digits without +): {phone ?? "empty"}</p>`,
+      code: `const [phone, setPhone] = useState<string>();\n\n<InputPhone\n    label={${stringLiteral(String(values.label ?? "Phone number"))}}\n    value={phone}\n    onValueChange={setPhone}\n${propsBlock(values, ["defaultCountry", "locale", "disabled", "readOnly", "labelStyle"])}\n/>\n\n<p>Normalized value (digits without +): {phone ?? "empty"}</p>`,
       imports:
         'import { useState } from "react";\nimport { InputPhone } from "@/components/ui/input-phone";',
     },

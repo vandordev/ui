@@ -128,15 +128,15 @@ The playground must include:
 
 Choose useful controls, not every possible native prop. Examples:
 
-| Family | Meaningful controls/scenarios |
-| --- | --- |
-| Input/TextArea | Label, placeholder, label style where supported, disabled, read-only, invalid, adornments/rows |
-| Password/Search/Secret | Shared field states, clearability where supported, visibility/copy behavior |
-| Amount | Separators, prefix/suffix, decimal scale, fixed decimals, negative values |
-| Phone | Default country, locale, disabled/read-only, visible normalized-value feedback |
-| OTP | Length, alphabet, disabled/invalid, completion feedback |
-| Popover | Placement, alignment, open state, dismissal/composition examples |
-| Calendar/Date pickers | Selection mode where supported, locale, bounds/disabled dates, clearability, week start, range features |
+| Family                 | Meaningful controls/scenarios                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- |
+| Input/TextArea         | Label, placeholder, label style where supported, disabled, read-only, invalid, adornments/rows          |
+| Password/Search/Secret | Shared field states, clearability where supported, visibility/copy behavior                             |
+| Amount                 | Separators, prefix/suffix, decimal scale, fixed decimals, negative values                               |
+| Phone                  | Default country, locale, disabled/read-only, visible normalized-value feedback                          |
+| OTP                    | Length, alphabet, disabled/invalid, completion feedback                                                 |
+| Popover                | Placement, alignment, open state, dismissal/composition examples                                        |
+| Calendar/Date pickers  | Selection mode where supported, locale, bounds/disabled dates, clearability, week start, range features |
 
 Requirements:
 

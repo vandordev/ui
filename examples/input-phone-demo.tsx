@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { InputPhone } from "@/registry/new-york/input-phone";
 
-export function InputPhoneDemo() {
+export const InputPhoneDemo = () => {
   const [phone, setPhone] = useState<string>();
   return (
     <div className="grid max-w-sm gap-2">
@@ -19,4 +19,4 @@ export function InputPhoneDemo() {
       </output>
     </div>
   );
-}
+};

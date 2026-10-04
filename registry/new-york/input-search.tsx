@@ -56,7 +56,10 @@ export const InputSearch = React.forwardRef<HTMLInputElement, InputSearchProps>(
             }
             onChange?.(event);
           }}
-          className={cn("pr-10", className)}
+          className={cn(
+            "pr-10 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none",
+            className
+          )}
         />
         {clearable && current && !disabled && !readOnly ? (
           <Button

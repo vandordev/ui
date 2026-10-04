@@ -66,34 +66,81 @@ export interface DateRangePickerProps {
   className?: string;
 }
 
-export function DateRangePicker(props: DateRangePickerProps) {
+const getShownValue = (
+  committed: DateRange | undefined,
+  dateFormat: string,
+  locale: Locale | undefined,
+  placeholder: string
+) =>
+  committed?.from
+    ? `${format(committed.from, dateFormat, { locale })}${committed.to ? ` – ${format(committed.to, dateFormat, { locale })}` : ""}`
+    : placeholder;
+
+const getLabelAttributes = (id: string | undefined, label: string) => ({
+  "aria-label": id ? undefined : label,
+  "aria-labelledby": id ? `${id}-label` : undefined,
+});
+
+const getCurrentDate = () => new Date();
+
+const withRangePickerDefaults = ({
+  placeholder = "Select dates",
+  dateFormat = "PPP",
+  defaultOpen = false,
+  disabledDates = [],
+  features = [],
+  shortcuts = allShortcuts,
+  now = getCurrentDate,
+  weekStartsOn = 1,
+  clearable = false,
+  applyLabel = "Apply",
+  cancelLabel = "Cancel",
+  clearLabel = "Clear",
+  ...props
+}: DateRangePickerProps) => ({
+  ...props,
+  applyLabel,
+  cancelLabel,
+  clearLabel,
+  clearable,
+  dateFormat,
+  defaultOpen,
+  disabledDates,
+  features,
+  now,
+  placeholder,
+  shortcuts,
+  weekStartsOn,
+});
+
+export const DateRangePicker = (props: DateRangePickerProps) => {
   const {
     id,
     label,
-    placeholder = "Select dates",
+    placeholder,
     value,
     defaultValue,
     onValueChange,
     locale,
-    dateFormat = "PPP",
+    dateFormat,
     disabled,
     readOnly,
     open,
-    defaultOpen = false,
+    defaultOpen,
     onOpenChange,
     startMonth,
     endMonth,
-    disabledDates = [],
-    features = [],
-    shortcuts = allShortcuts,
-    now = () => new Date(),
-    weekStartsOn = 1,
-    clearable = false,
-    applyLabel = "Apply",
-    cancelLabel = "Cancel",
-    clearLabel = "Clear",
+    disabledDates,
+    features,
+    shortcuts,
+    now,
+    weekStartsOn,
+    clearable,
+    applyLabel,
+    cancelLabel,
+    clearLabel,
     className,
-  } = props;
+  } = withRangePickerDefaults(props);
   const controlled = Object.hasOwn(props, "value");
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const committed = controlled ? value : internalValue;
@@ -111,21 +158,21 @@ export function DateRangePicker(props: DateRangePickerProps) {
     return () => media.removeEventListener("change", update);
   }, []);
 
-  React.useEffect(() => {
+  const syncControlledDraft = React.useEffectEvent(() => {
     if (controlled) {
       setDraft(committed);
       setClearedDraft(false);
     }
-  }, [controlled, committed?.from?.getTime(), committed?.to?.getTime()]);
+  });
+  const fromTime = committed?.from?.getTime();
+  const toTime = committed?.to?.getTime();
+  React.useEffect(() => {
+    syncControlledDraft();
+  }, [controlled, fromTime, toTime]);
 
   const setOpen = (next: boolean) => {
-    if (next) {
-      setDraft(committed);
-      setClearedDraft(false);
-    } else {
-      setDraft(committed);
-      setClearedDraft(false);
-    }
+    setDraft(committed);
+    setClearedDraft(false);
     if (open === undefined) {
       setInternalOpen(next);
     }
@@ -145,9 +192,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
   }
   const canApply =
     !readOnly && (clearedDraft || isSelectableDateRange(draft, disabledDates));
-  const shownValue = committed?.from
-    ? `${format(committed.from, dateFormat, { locale })}${committed.to ? ` – ${format(committed.to, dateFormat, { locale })}` : ""}`
-    : placeholder;
+  const shownValue = getShownValue(committed, dateFormat, locale, placeholder);
 
   return (
     <div data-slot="date-range-picker" className="grid min-w-0 gap-1.5">
@@ -157,8 +202,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
       <Popover open={isOpen} onOpenChange={setOpen}>
         <PopoverTrigger
           disabled={disabled}
-          aria-labelledby={id ? `${id}-label` : undefined}
-          aria-label={id ? undefined : label}
+          {...getLabelAttributes(id, label)}
           className={cn(
             "inline-flex h-9 min-w-0 items-center justify-start gap-2 rounded-md border border-input bg-background px-3 text-sm font-normal shadow-xs outline-none hover:bg-accent focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30",
             className
@@ -258,4 +302,4 @@ export function DateRangePicker(props: DateRangePickerProps) {
       </Popover>
     </div>
   );
-}
+};

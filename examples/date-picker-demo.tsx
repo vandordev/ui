@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { DatePicker } from "@/registry/new-york/date-picker";
 
-export function DatePickerDemo() {
+export const DatePickerDemo = () => {
   const [date, setDate] = useState<Date>();
   return (
     <DatePicker
@@ -14,4 +14,4 @@ export function DatePickerDemo() {
       clearable
     />
   );
-}
+};

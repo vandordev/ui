@@ -5,6 +5,8 @@ import type { ComponentProps } from "react";
 import { NumericFormat } from "react-number-format";
 import type { NumericFormatProps } from "react-number-format";
 
+import { fieldSurfaceClassName } from "./input";
+
 export type InputAmountProps = Omit<
   NumericFormatProps<ComponentProps<"input">>,
   | "value"
@@ -33,7 +35,7 @@ export type InputAmountProps = Omit<
 const fieldClassName =
   "h-9 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive dark:bg-input/30 motion-reduce:transition-none";
 
-export function InputAmount({
+export const InputAmount = ({
   className,
   thousandSeparator = false,
   decimalSeparator = ".",
@@ -44,7 +46,7 @@ export function InputAmount({
   allowNegative = false,
   onValueChange,
   ...props
-}: InputAmountProps) {
+}: InputAmountProps) => {
   if (
     typeof thousandSeparator === "string" &&
     thousandSeparator === decimalSeparator
@@ -69,7 +71,7 @@ export function InputAmount({
           onValueChange?.(values.value);
         }
       }}
-      className={cn(fieldClassName, className)}
+      className={cn(fieldClassName, fieldSurfaceClassName, className)}
     />
   );
-}
+};

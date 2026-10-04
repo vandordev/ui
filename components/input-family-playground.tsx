@@ -34,45 +34,21 @@ import { TextArea } from "@/registry/new-york/textarea";
 
 type Values = Record<string, string | boolean | number>;
 
-export function InputFamilyPlayground({ component }: { component: string }) {
-  const initialValues = getInputPlaygroundDefaults(component);
-  return (
-    <ComponentPlayground
-      title={component}
-      definitions={inputComponentProps[component]}
-      initialValues={initialValues}
-      getCode={(values) => getInputPlaygroundCode(component, values)}
-      hint={getHint(component)}
-      renderPreview={(values) => (
-        <InputFamilyPreview component={component} values={values} />
-      )}
-    />
-  );
-}
-
-function InputFamilyPreview({
+const BasicInputPreview = ({
   component,
   values,
 }: {
   component: string;
   values: Values;
-}) {
-  const [phone, setPhone] = React.useState<string>();
+}) => {
   const [otp, setOtp] = React.useState("");
   const [amount, setAmount] = React.useState("1250000.50");
-  const [date, setDate] = React.useState<Date>();
-  const [range, setRange] = React.useState<DateRange>();
-  const [multiple, setMultiple] = React.useState<Date[]>([]);
-  const [open, setOpen] = React.useState(Boolean(values.defaultOpen));
-  React.useEffect(() => {
-    setOpen(Boolean(values.defaultOpen));
-  }, [values.defaultOpen]);
   const label = (fallback: string) => String(values.label ?? fallback);
   const disabled = Boolean(values.disabled);
   const readOnly = Boolean(values.readOnly);
 
   switch (component) {
-    case "input":
+    case "input": {
       return (
         <Input
           label={label("Full name")}
@@ -84,7 +60,8 @@ function InputFamilyPreview({
           className="w-72 max-w-full"
         />
       );
-    case "textarea":
+    }
+    case "textarea": {
       return (
         <TextArea
           label={label("Message")}
@@ -96,7 +73,8 @@ function InputFamilyPreview({
           className="max-w-full"
         />
       );
-    case "input-password":
+    }
+    case "input-password": {
       return (
         <InputPassword
           label={label("Password")}
@@ -108,7 +86,8 @@ function InputFamilyPreview({
           className="w-72 max-w-full"
         />
       );
-    case "input-search":
+    }
+    case "input-search": {
       return (
         <InputSearch
           label={label("Search")}
@@ -120,16 +99,15 @@ function InputFamilyPreview({
           className="w-72 max-w-full"
         />
       );
+    }
     case "input-amount": {
-      const separator = values.thousandSeparator;
+      const separators: Record<string, string | boolean> = {
+        comma: ",",
+        none: false,
+        period: ".",
+      };
       const thousandSeparator =
-        separator === "none"
-          ? false
-          : separator === "comma"
-            ? ","
-            : separator === "period"
-              ? "."
-              : " ";
+        separators[String(values.thousandSeparator)] ?? " ";
       return (
         <div className="grid w-72 max-w-full gap-2">
           <InputAmount
@@ -150,9 +128,9 @@ function InputFamilyPreview({
         </div>
       );
     }
-    case "input-group":
+    case "input-group": {
       return (
-        <InputGroup className="max-w-full">
+        <InputGroup className="w-80 max-w-full">
           <InputGroupAddon
             align={
               String(values.align) as
@@ -165,14 +143,16 @@ function InputFamilyPreview({
             <InputGroupText>https://</InputGroupText>
           </InputGroupAddon>
           <InputGroupInput
+            label={label("Website")}
+            labelStyle={values.labelStyle as "floating" | "static"}
             aria-label="Website"
             placeholder="example.com"
-            className="w-56"
             disabled={disabled}
           />
         </InputGroup>
       );
-    case "input-otp":
+    }
+    case "input-otp": {
       return (
         <div className="grid justify-items-center gap-2">
           <InputOTP
@@ -191,11 +171,50 @@ function InputFamilyPreview({
           </span>
         </div>
       );
-    case "input-phone":
+    }
+    case "input-secret": {
+      return (
+        <InputSecret
+          label={label("API secret")}
+          defaultValue="vnd_test_example_secret"
+          readOnly={readOnly}
+          disabled={disabled}
+          className="w-72 max-w-full"
+        />
+      );
+    }
+    default: {
+      return null;
+    }
+  }
+};
+
+const AdvancedInputPreview = ({
+  component,
+  values,
+}: {
+  component: string;
+  values: Values;
+}) => {
+  const [phone, setPhone] = React.useState<string>();
+  const [date, setDate] = React.useState<Date>();
+  const [range, setRange] = React.useState<DateRange>();
+  const [multiple, setMultiple] = React.useState<Date[]>([]);
+  const [open, setOpen] = React.useState(Boolean(values.defaultOpen));
+  React.useEffect(() => {
+    setOpen(Boolean(values.defaultOpen));
+  }, [values.defaultOpen]);
+  const label = (fallback: string) => String(values.label ?? fallback);
+  const disabled = Boolean(values.disabled);
+  const readOnly = Boolean(values.readOnly);
+
+  switch (component) {
+    case "input-phone": {
       return (
         <div className="grid w-80 max-w-full gap-2">
           <InputPhone
             label={label("Phone number")}
+            labelStyle={values.labelStyle as "floating" | "static"}
             defaultCountry={
               String(values.defaultCountry) as "ID" | "US" | "GB" | "SG"
             }
@@ -210,16 +229,7 @@ function InputFamilyPreview({
           </output>
         </div>
       );
-    case "input-secret":
-      return (
-        <InputSecret
-          label={label("API secret")}
-          defaultValue="vnd_test_example_secret"
-          readOnly={readOnly}
-          disabled={disabled}
-          className="w-72 max-w-full"
-        />
-      );
+    }
     case "calendar": {
       const mode = String(values.mode ?? "single");
       if (mode === "range") {
@@ -236,7 +246,7 @@ function InputFamilyPreview({
       }
       return <Calendar mode="single" selected={date} onSelect={setDate} />;
     }
-    case "date-picker":
+    case "date-picker": {
       return (
         <DatePicker
           label={label("Appointment date")}
@@ -249,14 +259,14 @@ function InputFamilyPreview({
           readOnly={readOnly}
         />
       );
+    }
     case "date-range-picker": {
       const feature = String(values.features ?? "shortcuts");
-      const features =
-        feature === "both"
-          ? ["twoMonths", "shortcuts"]
-          : feature === "none"
-            ? []
-            : [feature];
+      const featureSets: Record<string, string[]> = {
+        both: ["twoMonths", "shortcuts"],
+        none: [],
+      };
+      const features = featureSets[feature] ?? [feature];
       return (
         <DateRangePicker
           label={label("Reporting period")}
@@ -271,7 +281,7 @@ function InputFamilyPreview({
         />
       );
     }
-    case "popover":
+    case "popover": {
       return (
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger className="h-9 rounded-md border px-3 text-sm">
@@ -285,29 +295,64 @@ function InputFamilyPreview({
           </PopoverContent>
         </Popover>
       );
-    default:
+    }
+    default: {
       return (
         <span className="text-sm text-muted-foreground">
           No preview available.
         </span>
       );
+    }
   }
-}
+};
 
-function getHint(component: string) {
-  if (component === "input-amount")
+const getHint = (component: string) => {
+  if (component === "input-amount") {
     return "Edit the field to compare localized formatting with the raw decimal string emitted to your application.";
-  if (component === "input-phone")
+  }
+  if (component === "input-phone") {
     return "The displayed national draft is normalized to international digits without a leading plus sign.";
-  if (component === "input-otp")
+  }
+  if (component === "input-otp") {
     return "Paste is supported. Completion feedback appears when the configured number of characters is entered.";
-  if (component === "input-secret")
+  }
+  if (component === "input-secret") {
     return "This preview uses a fake value. Clipboard feedback is announced without repeating the secret.";
-  if (component === "date-range-picker")
+  }
+  if (component === "date-range-picker") {
     return "Choose dates as a draft, then Apply. Cancel, Escape, and outside dismissal discard changes.";
-  if (component === "calendar")
+  }
+  if (component === "calendar") {
     return "Selection mode changes the value shape. Keyboard arrows navigate dates; Page Up/Down changes months.";
-  return undefined;
-}
+  }
+};
+
+const advancedComponents = new Set([
+  "input-phone",
+  "calendar",
+  "date-picker",
+  "date-range-picker",
+  "popover",
+]);
+
+export const InputFamilyPlayground = ({ component }: { component: string }) => {
+  const initialValues = getInputPlaygroundDefaults(component);
+  return (
+    <ComponentPlayground
+      title={component}
+      definitions={inputComponentProps[component]}
+      initialValues={initialValues}
+      getCode={(values) => getInputPlaygroundCode(component, values)}
+      hint={getHint(component)}
+      renderPreview={(values) =>
+        advancedComponents.has(component) ? (
+          <AdvancedInputPreview component={component} values={values} />
+        ) : (
+          <BasicInputPreview component={component} values={values} />
+        )
+      }
+    />
+  );
+};
 
 export type { DateRange };

@@ -9,12 +9,12 @@ import type { InputProps } from "./input";
 
 export type InputPasswordProps = Omit<InputProps, "type" | "icon">;
 
-export function InputPassword({
+export const InputPassword = ({
   className,
   disabled,
   readOnly,
   ...props
-}: InputPasswordProps) {
+}: InputPasswordProps) => {
   const [visible, setVisible] = React.useState(false);
   return (
     <div data-slot="password-input" className="relative min-w-0">
@@ -39,4 +39,4 @@ export function InputPassword({
       </Button>
     </div>
   );
-}
+};

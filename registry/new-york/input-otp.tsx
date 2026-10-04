@@ -3,6 +3,8 @@
 import { cn } from "cn";
 import * as React from "react";
 
+import { fieldSurfaceClassName } from "./input";
+
 export type InputOTPProps = Omit<
   React.ComponentProps<"input">,
   "value" | "defaultValue" | "maxLength"
@@ -30,10 +32,12 @@ export const InputOTP = React.forwardRef<HTMLInputElement, InputOTPProps>(
     },
     forwardedRef
   ) {
-    const pattern = type === "numeric" ? /[^0-9]/g : /[^a-z0-9]/gi;
     const sanitize = React.useCallback(
-      (raw: string) => raw.replace(pattern, "").slice(0, length),
-      [length, pattern]
+      (raw: string) =>
+        raw
+          .replace(type === "numeric" ? /[^0-9]/g : /[^a-z0-9]/gi, "")
+          .slice(0, length),
+      [length, type]
     );
     const [internal, setInternal] = React.useState(() =>
       sanitize(defaultValue)
@@ -55,7 +59,10 @@ export const InputOTP = React.forwardRef<HTMLInputElement, InputOTPProps>(
       }
     }, [current, value]);
 
-    function update(raw: string, event: React.ChangeEvent<HTMLInputElement>) {
+    const update = (
+      raw: string,
+      event: React.ChangeEvent<HTMLInputElement>
+    ) => {
       const next = sanitize(raw);
       if (value === undefined) {
         setInternal(next);
@@ -68,21 +75,23 @@ export const InputOTP = React.forwardRef<HTMLInputElement, InputOTPProps>(
         }
       }
       onChange?.(event);
-    }
+    };
 
     return (
       <div
         data-slot="input-otp"
         data-focused={focused}
         className={cn("group relative inline-flex min-w-0 gap-2", className)}
-        onClick={() => inputRef.current?.focus()}
       >
         <div aria-hidden="true" className="flex gap-2">
           {Array.from({ length }, (_, index) => (
             <span
               key={index}
               data-filled={index < current.length}
-              className="flex size-11 items-center justify-center rounded-md border border-input bg-background text-lg text-foreground data-[filled=true]:border-ring group-data-[focused=true]:ring-[3px] group-data-[focused=true]:ring-ring/50"
+              className={cn(
+                "flex size-11 items-center justify-center rounded-md border border-input text-lg text-foreground data-[filled=true]:border-ring group-data-[focused=true]:ring-[3px] group-data-[focused=true]:ring-ring/50",
+                fieldSurfaceClassName
+              )}
             >
               {current[index] ?? ""}
             </span>

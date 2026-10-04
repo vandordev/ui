@@ -29,28 +29,26 @@ const calendarClassNames: Partial<ClassNames> = {
   weekdays: "flex",
 };
 
-export function Calendar({
+export const Calendar = ({
   className,
   classNames,
   components,
   showOutsideDays = true,
   ...props
-}: DayPickerProps) {
-  return (
-    <DayPicker
-      showOutsideDays={showOutsideDays}
-      className={cn("bg-background p-2", className)}
-      classNames={{ ...calendarClassNames, ...classNames }}
-      components={{
-        Chevron: ({ orientation, ...chevronProps }) =>
-          orientation === "left" ? (
-            <ChevronLeft aria-hidden="true" {...chevronProps} />
-          ) : (
-            <ChevronRight aria-hidden="true" {...chevronProps} />
-          ),
-        ...components,
-      }}
-      {...props}
-    />
-  );
-}
+}: DayPickerProps) => (
+  <DayPicker
+    showOutsideDays={showOutsideDays}
+    className={cn("bg-background p-2", className)}
+    classNames={{ ...calendarClassNames, ...classNames }}
+    components={{
+      Chevron: ({ orientation, ...chevronProps }) =>
+        orientation === "left" ? (
+          <ChevronLeft aria-hidden="true" {...chevronProps} />
+        ) : (
+          <ChevronRight aria-hidden="true" {...chevronProps} />
+        ),
+      ...components,
+    }}
+    {...props}
+  />
+);

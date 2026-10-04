@@ -8,22 +8,16 @@ import {
   parseIncompletePhoneNumber,
 } from "libphonenumber-js";
 import type { CountryCode } from "libphonenumber-js";
+import { ChevronDown } from "lucide-react";
 import * as React from "react";
 
-import { Input } from "./input";
 import type { InputProps } from "./input";
-import { InputGroup } from "./input-group";
+import { InputGroup, InputGroupInput } from "./input-group";
 import { Select } from "./select";
 
 export type InputPhoneProps = Omit<
   InputProps,
-  | "value"
-  | "defaultValue"
-  | "onChange"
-  | "type"
-  | "icon"
-  | "labelStyle"
-  | "name"
+  "value" | "defaultValue" | "onChange" | "type" | "icon" | "name"
 > & {
   value?: string;
   defaultValue?: string;
@@ -35,7 +29,7 @@ export type InputPhoneProps = Omit<
 
 const countries = getCountries();
 
-function parseDraft(draft: string, country: CountryCode) {
+const parseDraft = (draft: string, country: CountryCode) => {
   let compact = parseIncompletePhoneNumber(draft);
   if (country === "ID" && !compact.startsWith("+")) {
     compact = compact.replace(/^62/, "").replace(/^0+/, "");
@@ -59,16 +53,16 @@ function parseDraft(draft: string, country: CountryCode) {
     draft: formatted.slice(prefix.length).trimStart(),
     value: international.getNumberValue()?.slice(1),
   };
-}
+};
 
-function stateFromValue(value: string | undefined, country: CountryCode) {
+const stateFromValue = (value: string | undefined, country: CountryCode) => {
   const normalized =
     value && !value.startsWith("+") && !value.startsWith("0")
       ? `+${value}`
       : value;
   const parsed = parseDraft(normalized ?? "", country);
   return { ...parsed, controlledValue: value };
-}
+};
 
 export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
   function InputPhone(
@@ -80,6 +74,7 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
       locale = "en",
       countrySelectLabel = "Country calling code",
       label,
+      labelStyle = "floating",
       labelClassName,
       containerClassName,
       className,
@@ -133,7 +128,7 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
         );
     }, [locale]);
 
-    function update(draft: string, country: CountryCode) {
+    const update = (draft: string, country: CountryCode) => {
       const parsed = parseDraft(draft, country);
       const caretPosition = inputRef.current?.selectionStart;
       if (caretPosition !== null && caretPosition !== undefined) {
@@ -155,7 +150,7 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
       }
       setState({ ...parsed, controlledValue: value });
       onValueChange?.(parsed.value);
-    }
+    };
 
     const selectedOption = options.find(
       (option) => option.country === state.country
@@ -166,12 +161,7 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
         data-slot="phone-input"
         className={cn("grid min-w-0 gap-1.5", containerClassName)}
       >
-        {label ? (
-          <label htmlFor={inputId} className={labelClassName}>
-            {label}
-          </label>
-        ) : null}
-        <InputGroup>
+        <InputGroup className="flex-nowrap">
           <Select
             data={options.map((option) => ({
               label: option.label,
@@ -180,17 +170,29 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
             value={state.country}
             disabled={disabled || readOnly}
             aria-label={`${countrySelectLabel}: ${selectedOption?.label ?? state.country}`}
-            className="h-auto w-24 shrink-0 rounded-none border-0 bg-transparent px-2 shadow-none focus-visible:ring-0"
+            className="flex w-20 shrink-0 items-center justify-center gap-1 self-end rounded-l-md px-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed"
+            trigger={
+              <button
+                type="button"
+                className={label && labelStyle === "floating" ? "h-12" : "h-9"}
+              >
+                +{getCountryCallingCode(state.country)}
+                <ChevronDown aria-hidden="true" className="size-4" />
+              </button>
+            }
             onValueChange={(country) => {
               if (country) {
                 update(state.draft, country);
               }
             }}
           />
-          <Input
+          <InputGroupInput
             {...props}
             ref={inputRef}
             id={inputId}
+            label={label}
+            labelStyle={labelStyle}
+            labelClassName={labelClassName}
             type="tel"
             inputMode="tel"
             autoComplete={props.autoComplete ?? "tel-national"}
@@ -201,10 +203,7 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
             onChange={(event) =>
               update(event.currentTarget.value, state.country)
             }
-            className={cn(
-              "rounded-l-none border-0 bg-transparent shadow-none focus-visible:ring-0",
-              className
-            )}
+            className={cn("border-l border-input", className)}
           />
         </InputGroup>
       </div>

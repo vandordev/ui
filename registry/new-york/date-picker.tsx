@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import type { Locale } from "date-fns";
 import { CalendarDays } from "lucide-react";
 import * as React from "react";
-import type { DayPickerProps, Matcher } from "react-day-picker";
+import type { Matcher } from "react-day-picker";
 
 import { Button } from "./button";
 import { Calendar } from "./calendar";
@@ -35,7 +35,7 @@ export type DatePickerProps = CalendarOptions & {
   className?: string;
 };
 
-export function DatePicker(props: DatePickerProps) {
+export const DatePicker = (props: DatePickerProps) => {
   const {
     id,
     label,
@@ -65,7 +65,7 @@ export function DatePicker(props: DatePickerProps) {
     }
     onOpenChange?.(next);
   };
-  const selectDate = (date: Date | undefined) => {
+  const selectDate = (date?: Date) => {
     if (!controlled) {
       setInternal(date);
     }
@@ -114,7 +114,7 @@ export function DatePicker(props: DatePickerProps) {
               variant="ghost"
               className="mt-1 w-full"
               onClick={() => {
-                selectDate(undefined);
+                selectDate();
                 setOpen(false);
               }}
             >
@@ -125,4 +125,4 @@ export function DatePicker(props: DatePickerProps) {
       </Popover>
     </div>
   );
-}
+};

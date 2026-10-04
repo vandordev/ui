@@ -56,12 +56,12 @@ const mount = async (element) => {
   host = document.createElement("div");
   document.body.append(host);
   root = createRoot(host);
-  await React.act(async () => root.render(element));
+  await React.act(() => root.render(element));
 };
 
 afterEach(async () => {
   if (root) {
-    await React.act(async () => root.unmount());
+    await React.act(() => root.unmount());
     root = null;
     host.remove();
   }
@@ -90,6 +90,52 @@ test("Input floating label stays associated and elevated for a default value", a
   assert.equal(label.dataset.floating, "true");
 });
 
+test("InputGroupInput supports an associated floating label and controlled value updates", async () => {
+  await ready;
+  const { InputGroup, InputGroupInput } = jiti(
+    "../registry/new-york/input-group.tsx"
+  );
+  const render = (value) =>
+    React.createElement(
+      InputGroup,
+      null,
+      React.createElement(InputGroupInput, {
+        label: "Website",
+        onChange: (event) => event.currentTarget.value,
+        value,
+      })
+    );
+  await mount(render("example.com"));
+  const input = host.querySelector("input");
+  const label = host.querySelector("label");
+  assert.ok(label);
+  assert.equal(label.htmlFor, input.id);
+  assert.equal(label.dataset.floating, "true");
+  await React.act(() => root.render(render("")));
+  assert.equal(host.querySelector("label").dataset.floating, "false");
+});
+
+test("InputPhone forwards floating and static label presentation to its grouped field", async () => {
+  await ready;
+  const { InputPhone } = jiti("../registry/new-york/input-phone.tsx");
+  await mount(
+    React.createElement(InputPhone, {
+      defaultValue: "628123456789",
+      label: "Phone",
+    })
+  );
+  const input = host.querySelector('input[type="tel"]');
+  const label = host.querySelector("label");
+  assert.equal(label.htmlFor, input.id);
+  assert.equal(label.dataset.floating, "true");
+  await React.act(() =>
+    root.render(
+      React.createElement(InputPhone, { label: "Phone", labelStyle: "static" })
+    )
+  );
+  assert.equal(host.querySelector("label").dataset.floating, undefined);
+});
+
 test("InputOTP sanitizes values and announces completion only for changed user input", async () => {
   await ready;
   const { InputOTP } = jiti("../registry/new-york/input-otp.tsx");
@@ -104,7 +150,7 @@ test("InputOTP sanitizes values and announces completion only for changed user i
   );
   const input = document.querySelector('input[autocomplete="one-time-code"]');
   assert.ok(input);
-  await React.act(async () => {
+  await React.act(() => {
     Object.getOwnPropertyDescriptor(
       HTMLInputElement.prototype,
       "value"
@@ -114,7 +160,7 @@ test("InputOTP sanitizes values and announces completion only for changed user i
   assert.equal(input.value, "1234");
   assert.deepEqual(values, ["1234"]);
   assert.deepEqual(completed, ["1234"]);
-  await React.act(async () => {
+  await React.act(() => {
     input.dispatchEvent(new Event("change", { bubbles: true }));
   });
   assert.deepEqual(completed, ["1234"]);
@@ -140,7 +186,7 @@ test("InputAmount displays separators but emits exact decimal text without prop-
     HTMLInputElement.prototype,
     "value"
   ).set;
-  await React.act(async () => {
+  await React.act(() => {
     setter.call(input, "2.345,67");
     input.dispatchEvent(new Event("input", { bubbles: true }));
   });
@@ -163,10 +209,11 @@ test("InputSearch clear action emits an empty native change and restores input f
   const clear = document.querySelector('button[aria-label="Clear search"]');
   assert.ok(input);
   assert.ok(clear);
-  await React.act(async () => clear.click());
+  await React.act(() => clear.click());
   assert.equal(input.value, "");
   assert.equal(document.activeElement, input);
   assert.deepEqual(values, [""]);
+  assert.equal(host.querySelector("label").dataset.floating, "false");
 });
 
 test("InputPhone keeps a national draft and emits international digits without a plus sign", async () => {
@@ -186,7 +233,7 @@ test("InputPhone keeps a national draft and emits international digits without a
     HTMLInputElement.prototype,
     "value"
   ).set;
-  await React.act(async () => {
+  await React.act(() => {
     setter.call(input, "08123456789");
     input.dispatchEvent(new Event("input", { bubbles: true }));
   });
@@ -214,19 +261,76 @@ test("DateRangePicker applies a shortcut once and discards a cancelled draft", a
     (button) => button.textContent === "Last 7 days"
   );
   assert.ok(shortcut);
-  await React.act(async () => shortcut.click());
+  await React.act(() => shortcut.click());
   assert.deepEqual(changes, []);
   const apply = [...document.querySelectorAll("button")].find(
     (button) => button.textContent === "Apply"
   );
   assert.ok(apply);
   assert.equal(apply.disabled, false);
-  await React.act(async () => apply.click());
+  await React.act(() => apply.click());
   assert.equal(changes.length, 1);
   assert.deepEqual(changes[0], {
     from: new Date(2026, 8, 28),
     to: new Date(2026, 9, 4),
   });
+});
+
+test("DateRangePicker preserves a controlled draft when equivalent date values are rerendered", async () => {
+  await ready;
+  const { DateRangePicker } = jiti(
+    "../registry/new-york/date-range-picker.tsx"
+  );
+  const changes = [];
+  const render = () =>
+    React.createElement(DateRangePicker, {
+      defaultOpen: true,
+      features: ["shortcuts"],
+      label: "Range",
+      now: () => new Date(2026, 9, 4),
+      onValueChange: (range) => changes.push(range),
+      value: { from: new Date(2026, 0, 1), to: new Date(2026, 0, 3) },
+    });
+  await mount(render());
+  const shortcut = [...host.ownerDocument.querySelectorAll("button")].find(
+    (button) => button.textContent === "Last 7 days"
+  );
+  assert.ok(shortcut);
+  await React.act(() => shortcut.click());
+  await React.act(() => root.render(render()));
+  const apply = [...document.querySelectorAll("button")].find(
+    (button) => button.textContent === "Apply"
+  );
+  assert.ok(apply);
+  await React.act(() => apply.click());
+  assert.deepEqual(changes, [
+    { from: new Date(2026, 8, 28), to: new Date(2026, 9, 4) },
+  ]);
+});
+
+test("DateRangePicker synchronizes an externally changed controlled range before Apply", async () => {
+  await ready;
+  const { DateRangePicker } = jiti(
+    "../registry/new-york/date-range-picker.tsx"
+  );
+  const changes = [];
+  const render = (value) =>
+    React.createElement(DateRangePicker, {
+      defaultOpen: true,
+      label: "Range",
+      onValueChange: (range) => changes.push(range),
+      value,
+    });
+  await mount(render({ from: new Date(2026, 0, 1), to: new Date(2026, 0, 3) }));
+  const next = { from: new Date(2026, 1, 1), to: new Date(2026, 1, 3) };
+  await React.act(() => root.render(render(next)));
+  assert.deepEqual(changes, []);
+  const apply = [...document.querySelectorAll("button")].find(
+    (button) => button.textContent === "Apply"
+  );
+  assert.ok(apply);
+  await React.act(() => apply.click());
+  assert.deepEqual(changes, [next]);
 });
 
 test("date shortcuts cover complete Monday-based periods using local calendar days", async () => {
@@ -291,13 +395,13 @@ test("input family playground code follows configured values and safely serializ
 
   const code = playground.getInputPlaygroundCode("input", {
     ...defaults,
+    disabled: true,
     label: `O'Neil \\ family`,
     placeholder: `Say "hello"`,
-    disabled: true,
   });
 
   assert.match(code, /label=\{\\?"O'Neil/);
-  assert.match(code, /Say \\\"hello\\\"/);
+  assert.match(code, /Say \\"hello\\"/);
   assert.match(code, /disabled/);
   assert.match(code, /export function InputDemo/);
 });
@@ -321,8 +425,8 @@ test("input family playground offers a typed preview contract for every registry
     "popover",
   ];
   assert.deepEqual(
-    Object.keys(playground.inputComponentProps).sort(),
-    components.sort()
+    Object.keys(playground.inputComponentProps).toSorted(),
+    components.toSorted()
   );
   for (const component of components) {
     const definitions = playground.inputComponentProps[component];
@@ -348,16 +452,16 @@ test("internal input refs are also delivered to consumer refs", async () => {
       React.Fragment,
       null,
       React.createElement(InputSearch, {
-        ref: (node) => (received.search = node),
         "aria-label": "Search",
+        ref: (node) => (received.search = node),
       }),
       React.createElement(InputSecret, {
-        ref: (node) => (received.secret = node),
         "aria-label": "Secret",
+        ref: (node) => (received.secret = node),
       }),
       React.createElement(InputPhone, {
-        ref: (node) => (received.phone = node),
         "aria-label": "Phone",
+        ref: (node) => (received.phone = node),
       })
     )
   );
