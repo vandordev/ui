@@ -3,6 +3,33 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "dropdown",
+      "type": "registry:ui",
+      "title": "Dropdown",
+      "description": "A shadcn Base Nova action menu with elegant data and compound APIs, nested menus, and native Motion transitions.",
+      "dependencies": [
+        "@base-ui/react@^1.8.0",
+        "cn",
+        "lucide-react",
+        "motion@^12.38.0"
+      ],
+      "files": [
+        { "path": "registry/new-york/dropdown.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "dropdown-stories",
+      "type": "registry:item",
+      "title": "Dropdown Stories",
+      "description": "Optional portable Dropdown stories. Install Dropdown first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/dropdown.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "checkbox",
       "type": "registry:ui",
       "title": "Checkbox",

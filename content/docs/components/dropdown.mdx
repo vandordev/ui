@@ -1,0 +1,140 @@
+---
+title: Dropdown
+description: A shadcn-based action menu with a concise data API, advanced composition, and smooth Motion transitions.
+component: dropdown
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/dropdown-menu
+    contribution: Adapted Base Nova dropdown-menu composition and styling with a data API and native Motion animations.
+  - name: Base UI
+    url: https://base-ui.com/react/components/menu
+    contribution: Accessible menu primitives, keyboard navigation, positioning, and animation lifecycle.
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { DropdownDemo } from "@/examples/dropdown-demo";
+import { DropdownNestedDemo } from "@/examples/dropdown-nested-demo";
+import { DropdownSettingsDemo } from "@/examples/dropdown-settings-demo";
+import { DropdownIntegrationsDemo } from "@/examples/dropdown-integrations-demo";
+import { DropdownAsyncDemo } from "@/examples/dropdown-async-demo";
+
+## Usage
+
+```tsx
+"use client";
+
+import { Dropdown } from "@/components/ui/dropdown";
+
+export const Actions = () => (
+  <Dropdown
+    trigger={<button type="button">Actions</button>}
+    items={[
+      { id: "print", label: "Print", onSelect: () => window.print() },
+      { id: "divider", type: "separator" },
+      { id: "delete", label: "Delete", variant: "destructive", disabled: true },
+    ]}
+  />
+);
+```
+
+Use Dropdown for **actions**, not a form value selector. For selecting a value, use [Select](/docs/components/select). `trigger` is a single React element; Base UI merges trigger props and refs onto it without adding a nested button. Custom triggers must forward refs and native props. Use `triggerProps={{ nativeButton: false }}` for non-button elements; provide the appropriate semantics yourself.
+
+## Examples
+
+### Actions and shortcut hints
+
+The demo only updates its status; Delete does not remove data. `icon` accepts an SVG component such as a Lucide icon. `shortcut` displays a hint, but does not register a keyboard command.
+
+<ComponentPreview name="dropdown-demo" title="dropdown-demo.tsx">
+  <DropdownDemo />
+</ComponentPreview>
+
+### Groups, submenus, and controlled visibility
+
+Entries use stable `id` keys unique among siblings. Action entries have optional `type: "item"`; separators use `type: "separator"`; groups and submenus use `type: "group"` or `type: "submenu"` plus their own `items`. Group labels are optional. Nested entries preserve their order. An empty array renders an empty menu; provide a disabled informational action when useful.
+
+<ComponentPreview name="dropdown-nested-demo" title="dropdown-nested-demo.tsx">
+  <DropdownNestedDemo />
+</ComponentPreview>
+
+`open` with `onOpenChange(open, details)` is controlled; `defaultOpen` initializes uncontrolled visibility. `details.cancel()` rejects an interaction request. Externally changing `open` also works. `onOpenChangeComplete` fires after each completed transition; interrupted closing does not report a completed close. `disabled` disables the root and its trigger.
+
+### Compound settings and links
+
+Compose `DropdownRoot`, `DropdownTrigger`, and `DropdownContent` for custom content. Add groups/labels, items, links, checkbox/radio items, separators, and nested `DropdownSub` / `DropdownSubTrigger` / `DropdownSubContent` as needed. Put `DropdownLabel` inside a `DropdownGroup`. Compound parts inherit their corresponding [Base UI Menu API](https://base-ui.com/react/components/menu).
+
+<ComponentPreview
+  name="dropdown-settings-demo"
+  title="dropdown-settings-demo.tsx"
+>
+  <DropdownSettingsDemo />
+</ComponentPreview>
+
+Checkbox items use `checked` / `defaultChecked` and `onCheckedChange`; radio groups use `value` / `defaultValue` and `onValueChange`, with `value` on each radio item. Checkbox items stay open by default; radio items close by default. Set `closeOnClick={false}` to keep radio settings open. Use `DropdownLinkItem` for navigation rather than an action callback; it stays open by default, with `closeOnClick` available.
+
+### Router links and component-based overlays
+
+Pass a router element through `link`, for example `link: <Link href="/settings" />` with Next.js or `link: <Link to="/projects/$projectId" params={{ projectId }} />` with TanStack Router. Router-specific props are checked where that JSX is created; Dropdown has no router dependency. The element must render one anchor and forward its props and ref. The entry's label, icon, and shortcut supply the link contents. Compact links close by default; set `closeOnSelect: false` to retain the menu. Native link modifiers and router handlers stay on the anchor. Use `event.preventBaseUIHandler()` in a composed handler when you also want to cancel Base UI dismissal; `preventDefault()` alone can be used by routers to intercept native navigation.
+
+`renderOverlay` receives controlled `open`, `onOpenChange`, and `finalFocus` props. Return your own Dialog/Drawer wrapper; forward `finalFocus` into its `contentProps`. Install Dialog or Drawer separately when using them. Dropdown does not install either component or require an overlay provider.
+
+<ComponentPreview
+  name="dropdown-integrations-demo"
+  title="dropdown-integrations-demo.tsx"
+>
+  <DropdownIntegrationsDemo />
+</ComponentPreview>
+
+Overlays are rendered as siblings of the menu root, outside the popup subtree, including while closed. Keep hooks inside the returned component, not inside the render callback. Selection requests menu dismissal first; the overlay opens on the menu's completed-close callback, without a fixed timeout. A canceled close or interrupted reopen does not open the queued overlay. Controlled owners must accept the close request for the handoff to complete. Keep entry ids stable and do not remove the overlay entry while it is open. Overlay wrappers must honor the supplied controlled state, provide a title, and forward focus props.
+
+Each compact entry has only one intent: `onSelect`, `link`, or `renderOverlay`. Link entries do not accept `disabled` because Base UI LinkItem has no disabled contract; omit unavailable links or represent them as disabled action entries instead. Overlay entries always request closing and do not accept `closeOnSelect` or async callbacks.
+
+### Async actions and failure handling
+
+Returning a Promise from an action enables automatic pending state, a loading indicator, and `aria-busy`. Other actions, links, and submenu triggers cannot activate while that action is pending. `closeOnSelect: "success"` keeps the menu open until the callback resolves; rejection resets pending and invokes `onSelectError(error)` without automatically closing. Synchronous exceptions are also reported through `onSelectError`. Without an error handler, errors are logged to the console; Dropdown does not invent a toast or expose sensitive errors in the UI.
+
+<ComponentPreview name="dropdown-async-demo" title="dropdown-async-demo.tsx">
+  <DropdownAsyncDemo />
+</ComponentPreview>
+
+This example simulates a request and a failure. It does not invalidate a session or redirect. Escape and outside dismissal remain available while pending and do not cancel the operation. Reopening the menu retains the pending lock; successful completion of an older dismissed request does not close a newly opened menu. Removing the entire Dropdown does not abort application work, but its UI no longer updates or reports errors through its callback after unmount.
+
+For real Logout, await server-side session invalidation before clearing client state and redirecting. Use TanStack Query's `mutateAsync()`, not `mutate()`, to return a Promise. With `fetch()`, check `response.ok` and throw on HTTP failures. The following is an application-integration fragment; `logoutMutation`, `router`, and `toast` are supplied by your app:
+
+```tsx
+{
+  id: "logout",
+  label: "Logout",
+  variant: "destructive",
+  closeOnSelect: "success",
+  onSelect: async () => {
+    await logoutMutation.mutateAsync();
+    await router.navigate({ to: "/login" });
+  },
+  onSelectError: () => toast.error("Logout failed. Try again."),
+}
+```
+
+### Consumer setup and optional stories
+
+Requires React 19, Tailwind CSS 4 with shadcn semantic theme tokens, `@base-ui/react@^1.8.0`, `motion@^12.38.0`, `cn`, and `lucide-react`. No animation CSS or extra provider is required. The `new-york` source directory uses the project's shadcn **Base Nova** foundation, not Radix. Dropdown does not install Button or overwrite the website's internal dropdown-menu. Use your own styled trigger or install Button separately.
+
+The component follows your configured UI alias. Review the CLI overwrite prompt if `dropdown.tsx` already exists. For manual installation, install the generated Dependencies and copy the complete Source into your configured UI directory. Examples and playground adapters are website-only.
+
+Install Dropdown first, then optionally add stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/dropdown-stories.json
+```
+
+Use your existing React Storybook setup with matching `@storybook/react` package versions (checked with 10.6.1). Discover `**/*.stories.tsx` in your UI directory and load your global Tailwind/theme stylesheet in the preview. No extra addons/providers are required. The stories item installs no component, runtime dependencies, or Storybook configuration. This project has no Storybook server; Storybook UI is not verified here.
+
+## Behavior & Accessibility
+
+Base UI owns focus management, arrow-key navigation, Home/End, typeahead, Enter/Space activation, Escape dismissal, outside interaction, and collision-aware positioning. Disabled items remain keyboard-discoverable but cannot activate. Submenu Escape closes only that submenu by default. Main-menu dismissal restores focus according to the primitive's `finalFocus` policy. Supply a meaningful `aria-label` for icon-only triggers. Decorative icons are hidden from assistive technology. Long action labels wrap, and content scrolls within available space.
+
+Action `onSelect` receives the Base UI Item React click event; it is not a menu-wide value callback. Actions close immediately by default (`closeOnSelect: true`), including Promise-returning actions. Use `false` to disable automatic closing, or `"success"` to close only after success. Synchronous `preventDefault()` or `preventBaseUIHandler()` also cancels automatic action dismissal. Compound Item uses Base UI `onClick` and `closeOnClick` instead and does not implement the compact API's async orchestration. API calls, confirmation, session invalidation, redirect, and user-facing errors remain application responsibilities. Destructive styling is not a confirmation step.
+
+Motion React's native animations fade and scale Content in 180ms and out in 120ms. Base UI observes those animations to coordinate unmounting, focus return, and rapid reopening. Reduced-motion preferences or `animated={false}` skip transitions. The compact `animated` prop applies to submenus too; compound menus configure each Content separately. `keepMounted` is false by default; when enabled, Base UI keeps closed content hidden and non-interactive.
+
+Placement belongs to `contentProps` (or Content): `side`, `align`, `sideOffset`, `alignOffset`, `collisionPadding`, `collisionAvoidance`, and `anchor`. Root defaults to a modal menu. Reset restores playground configuration, selection, and visibility; generated code reproduces configured behavior, not the current selected action.

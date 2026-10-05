@@ -26,6 +26,11 @@ import {
   getDrawerDefaults,
 } from "@/lib/drawer-playground";
 import {
+  dropdownProps,
+  getDropdownCode,
+  getDropdownDefaults,
+} from "@/lib/dropdown-playground";
+import {
   emptyProps,
   getEmptyCode,
   getEmptyDefaults,
@@ -85,6 +90,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   drawer: {
     playground: { code: getDrawerCode(getDrawerDefaults()) },
     props: drawerProps,
+  },
+  dropdown: {
+    playground: { code: getDropdownCode(getDropdownDefaults()) },
+    props: dropdownProps,
   },
   empty: {
     playground: { code: getEmptyCode(getEmptyDefaults()) },
