@@ -196,6 +196,8 @@ header wrapper and X spacing remain owned by Dialog.
 Each Dialog has its own state. `useDialog()` chooses the nearest Dialog through portals;
 `useDialog(outerControl)` explicitly selects another. Escape dismisses the topmost dialog.
 The parent subtly scales back while a child is open; nested backdrops follow Base UI's behavior.
+Nested portals share the outermost Dialog's theme scope outside its animated panels, so parent
+scaling and body overflow do not clip or reposition a child dialog.
 
 ## Behavior & Accessibility
 

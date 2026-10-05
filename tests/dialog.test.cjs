@@ -588,6 +588,75 @@ test("Escape dismisses only the topmost nested modal and respects a cancellation
   ]);
 });
 
+test("nested dialog portals escape transformed and clipping parent panels while preserving theme scope", async () => {
+  await ready;
+  const { Dialog, DialogBody, useDialog } = load();
+  const el = React.createElement;
+  let innerControl;
+  const ChildContent = () => {
+    innerControl = useDialog();
+    return el("p", null, "Nested content");
+  };
+  await mount(
+    el(
+      "div",
+      { className: "dark", id: "dialog-theme-scope" },
+      el(
+        Dialog,
+        { defaultOpen: true, title: "Parent panel" },
+        el(
+          DialogBody,
+          null,
+          el(
+            Dialog,
+            {
+              title: "Child panel",
+              trigger: el(
+                "button",
+                { id: "open-child", type: "button" },
+                "Open child"
+              ),
+            },
+            el(DialogBody, null, el(ChildContent))
+          )
+        )
+      )
+    )
+  );
+  const parent = document.querySelector('[role="dialog"]');
+  const childTrigger = document.querySelector("#open-child");
+  assert.ok(
+    parent.contains(childTrigger),
+    "the trigger stays in its parent panel"
+  );
+  await React.act(async () => childTrigger.click());
+  const popups = [...document.querySelectorAll('[role="dialog"][data-open]')];
+  assert.equal(popups.length, 2);
+  const child = popups.find((popup) => popup !== parent);
+  const childViewport = child.closest('[data-slot="dialog-viewport"]');
+  assert.equal(
+    parent.contains(childViewport),
+    false,
+    "fixed child viewport must escape the scaled overflow-hidden parent"
+  );
+  assert.equal(parent.contains(child), false);
+  assert.equal(
+    child.closest("#dialog-theme-scope"),
+    document.querySelector("#dialog-theme-scope")
+  );
+  assert.equal(innerControl.isOpen, true);
+  await React.act(async () => innerControl.close());
+  await React.act(async () => {
+    await frames();
+    await finishAnimations();
+  });
+  assert.equal(
+    document.querySelectorAll('[role="dialog"][data-open]').length,
+    1
+  );
+  assert.equal(document.activeElement, childTrigger);
+});
+
 test("without Web Animations Dialog is visible immediately and closing completes without retained popup", async () => {
   await ready;
   const { Dialog } = load();
