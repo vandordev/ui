@@ -11,6 +11,11 @@ import {
   getButtonDefaults,
 } from "@/lib/button-playground";
 import {
+  dialogProps,
+  getDialogCode,
+  getDialogDefaults,
+} from "@/lib/dialog-playground";
+import {
   drawerProps,
   getDrawerCode,
   getDrawerDefaults,
@@ -58,6 +63,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
       code: getButtonCode(getButtonDefaults()),
     },
     props: buttonProps,
+  },
+  dialog: {
+    playground: { code: getDialogCode(getDialogDefaults()) },
+    props: dialogProps,
   },
   drawer: {
     playground: { code: getDrawerCode(getDrawerDefaults()) },

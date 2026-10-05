@@ -1,0 +1,229 @@
+---
+title: Dialog
+description: An accessible dialog with a production-friendly panel API and smooth Motion transitions.
+component: dialog
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/dialog
+    contribution: Adapted Base Nova Dialog source and semantic composition (MIT). Vandor adds the panel API, controllers, scroll layout, and Motion integration.
+  - name: Base UI
+    url: https://base-ui.com/react/components/dialog
+    contribution: Accessible dialog primitive, focus management, dismissal, and nested-dialog behavior.
+---
+
+import {
+  DialogDemo,
+  DialogFormDemo,
+  DialogExternalDemo,
+  DialogControlledDemo,
+  DialogNestedDemo,
+} from "@/examples/dialog-demo";
+
+## Usage
+
+```tsx
+import { Dialog, DialogBody } from "@/components/ui/dialog";
+
+export function ProjectDetails() {
+  return (
+    <Dialog
+      title="Project details"
+      description="Manage your project preferences."
+      trigger={<button type="button">View project</button>}
+    >
+      <DialogBody>Your project details</DialogBody>
+    </Dialog>
+  );
+}
+```
+
+Plain children are the default. The children render function is optional, not required.
+`Dialog` owns the associated trigger, portal, backdrop, header, panel, and built-in X.
+Only `Dialog`, `DialogBody`, `DialogFooter`, `useDialog`, and `useDialogControl` are public components/hooks.
+The upstream compound primitives remain internal.
+
+<ComponentPreview name="dialog-demo" title="dialog-demo.tsx">
+  <DialogDemo />
+</ComponentPreview>
+
+### Consumer setup
+
+Use React 19, Tailwind CSS 4, and an initialized shadcn theme. The registry uses Base UI 1.8+
+and Motion 12.38+. The historical `new-york` source directory does not mean this is a Radix
+component: its starting point is shadcn's **Base Nova** Dialog.
+
+The single distributed `dialog.tsx` uses `cn`, `lucide-react`, `@base-ui/react`, and `motion/react`.
+It does not install Button, Loading, website audio, or additional registry components.
+For manual installation, install the packages listed under Dependencies and copy the complete
+source into your configured UI directory. Keep the shadcn theme tokens for background,
+foreground, border, muted-foreground, accent, accent-foreground, and ring.
+Motion requires no animation stylesheet or provider. The module includes `"use client"`
+and can be imported from a Next.js Server Component; interactive examples belong in client components.
+Review the CLI overwrite prompt if your project already has `components/ui/dialog.tsx`.
+The Vandor API is intentionally different from shadcn's compound API.
+
+## Forms and stationary actions
+
+<ComponentPreview name="dialog-demo" title="dialog-demo.tsx">
+  <DialogFormDemo />
+</ComponentPreview>
+
+Wrap **both** `DialogBody` and `DialogFooter` in a native form with
+`className="flex min-h-0 flex-1 flex-col"`. Do not put the footer inside the body or nest forms.
+Body scrolling keeps the title, actions, and X visible. Any wrapper in the flex chain must retain
+the constrained height (`min-h-0`, `flex-1`, and `flex-col` where applicable).
+Content is deliberately not automatically wrapped in `DialogBody`.
+
+```tsx
+<Dialog title="Edit project" trigger={<button type="button">Edit</button>}>
+  {({ close }) => (
+    <form
+      className="flex min-h-0 flex-1 flex-col"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        const values = new FormData(event.currentTarget);
+        // Application-owned: handle errors and pending state here.
+        await saveProject(values);
+        close();
+      }}
+    >
+      <DialogBody>{/* Your labeled fields */}</DialogBody>
+      <DialogFooter>
+        <button type="button" onClick={close}>
+          Cancel
+        </button>
+        <button type="submit">Save</button>
+      </DialogFooter>
+    </form>
+  )}
+</Dialog>
+```
+
+This fragment assumes your application supplies `saveProject` and labeled fields.
+Submitting does **not** close the dialog automatically. Close only after saving succeeds;
+display failures and disable repeated submissions in your application. Cancel and dismissal
+do not save data. The runnable demo saves only local state.
+
+## Controllers and external openers
+
+<ComponentPreview name="dialog-demo" title="dialog-demo.tsx">
+  <DialogExternalDemo />
+</ComponentPreview>
+
+`useDialogControl()` creates a stable controller. Bind it to one mounted Dialog with `control`.
+Its read-only reactive `isOpen` reflects the **accepted** state; `open()` and `close()` request
+changes through Base UI and return void, not promises. `onOpenChangeComplete` runs after animation
+completion. Actions without a mounted Dialog are ignored rather than queued.
+Do not combine `control` with `open`, `defaultOpen`, or `handle`; types and runtime guards reject this.
+`onOpenChange` remains available to observe or cancel requests with `details.cancel()`.
+
+An external ordinary button is not an associated trigger. Set `contentProps.finalFocus` to
+its ref so focus has an explicit return target. Custom associated trigger components must
+forward their ref and native button props.
+
+For child components, call `useDialog()` at the top level:
+
+```tsx
+function DoneButton() {
+  const { close } = useDialog();
+  return (
+    <button type="button" onClick={close}>
+      Done
+    </button>
+  );
+}
+```
+
+This lets you keep ordinary children even when a deeply nested action needs the controller.
+Do not call hooks directly inside a children or header render callback; render a component instead.
+
+## Controlled state and dismissal guards
+
+Use `defaultOpen` for uncontrolled initial state, or `open` and `onOpenChange` for application-owned
+state. In controlled mode, `close()` requests closing; the dialog stays open until its parent
+updates `open`. Direct parent updates animate too.
+
+<ComponentPreview name="dialog-demo" title="dialog-demo.tsx">
+  <DialogControlledDemo />
+</ComponentPreview>
+
+`onOpenChange(nextOpen, details)` includes the Base UI reason, such as `escape-key`,
+`outside-press`, `close-press`, or `imperative-action`. Use `details.cancel()` to reject
+opening or closing without desynchronizing controllers. Set `disablePointerDismissal`
+to prevent outside presses; Escape remains available.
+
+## Sizes, persistence, and custom headers
+
+`contentProps.size` defaults to `"md"`: `sm` caps width at 24rem, `md` at 32rem,
+`lg` at 42rem, and `xl` at 56rem. Every size respects the available viewport.
+Use `contentProps.className` for application-specific layout overrides.
+
+`contentProps.showCloseButton` defaults to true. Localize the X with
+`contentProps.closeButtonLabel` (default `"Close dialog"`). When hiding it, provide another
+visible, keyboard-accessible close action. `initialFocus` and `finalFocus` retain the Base UI Popup API.
+
+Content normally unmounts after exit. `contentProps.keepMounted` preserves hidden content and form
+state across closure; it does not reset drafts. Reset values explicitly when changing the edited record.
+
+```tsx
+<Dialog
+  title="Project settings"
+  description="Update project details"
+  renderHeader={({ title, description }) => (
+    <>
+      {description}
+      <div className="flex items-center gap-2">
+        <span aria-hidden="true">✎</span>
+        {title}
+      </div>
+    </>
+  )}
+>
+  <DialogBody>Your settings form</DialogBody>
+</Dialog>
+```
+
+`renderHeader` receives ready-to-render semantic elements, not raw props. Include the provided
+title exactly once and description once when present (`null` when absent). The stationary
+header wrapper and X spacing remain owned by Dialog.
+
+## Nested dialogs
+
+<ComponentPreview name="dialog-demo" title="dialog-demo.tsx">
+  <DialogNestedDemo />
+</ComponentPreview>
+
+Each Dialog has its own state. `useDialog()` chooses the nearest Dialog through portals;
+`useDialog(outerControl)` explicitly selects another. Escape dismisses the topmost dialog.
+The parent subtly scales back while a child is open; nested backdrops follow Base UI's behavior.
+
+## Behavior & Accessibility
+
+- A meaningful title names the dialog; the optional description is associated automatically.
+- Modal dialogs trap focus, lock page scrolling, and render a backdrop by default.
+- `modal={false}` permits outside interaction and omits the backdrop. `modal="trap-focus"`
+  traps focus without locking page scroll or blocking outside pointer interaction; it also omits the backdrop.
+- Keyboard, Escape, focus targeting/return, dismissal cancellation, and nesting remain Base UI-owned.
+- Opening fades and scales the panel over 200ms; closing takes 150ms. Motion's native Web Animations
+  integrate with Base UI's animation lifecycle, including rapid reopening and controlled updates.
+- Reduced-motion preferences remove scaling and animated fades. Without Web Animations, state changes are immediate.
+- Root props inherit [Base UI Dialog Root](https://base-ui.com/react/components/dialog#root),
+  except children and state ownership follow the Vandor contract above. `contentProps` inherits
+  Popup props except children; Body and Footer forward native div props and refs.
+
+## Portable Storybook stories
+
+Installing Dialog does not install stories or Storybook packages. Install Dialog first, then optionally:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/dialog-stories.json
+```
+
+This separate item installs only `dialog.stories.tsx` beside the component using your configured UI
+alias/layout. It does not reinstall or overwrite your customized Dialog, or modify `.storybook/`.
+Use an existing React Storybook with `@storybook/react`; keep all Storybook package versions aligned.
+The stories are typechecked and composed against Storybook 10.6.1. No addons are required for rendering.
+Use your existing Controls setup to edit meaningful Playground args.
+Include `**/*.stories.tsx` in your story discovery pattern and import your Tailwind/shadcn global
+stylesheet in the preview. Theme decorators belong to the consumer. No Motion provider is required.
+Storybook UI is not verified here because this repository has no Storybook server.

@@ -3,6 +3,36 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "A shadcn-based Base UI Dialog with a production-friendly panel API, native Motion animations, accessible controls, and a scrollable body.",
+      "dependencies": [
+        "@base-ui/react@^1.8.0",
+        "cn",
+        "lucide-react",
+        "motion@^12.38.0"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/dialog.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "dialog-stories",
+      "type": "registry:item",
+      "title": "Dialog Stories",
+      "description": "Optional portable Dialog stories. Install Dialog first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/dialog.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "drawer",
       "type": "registry:ui",
       "title": "Drawer",

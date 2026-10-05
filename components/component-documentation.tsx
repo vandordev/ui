@@ -4,6 +4,7 @@ import { AccordionPlayground } from "@/components/accordion-playground";
 import { ButtonPlayground } from "@/components/button-playground";
 import { CodeCollapsibleWrapper } from "@/components/code-collapsible-wrapper";
 import { ComponentDependencies } from "@/components/component-dependencies";
+import { DialogPlayground } from "@/components/dialog-playground";
 import { DrawerPlayground } from "@/components/drawer-playground";
 import { InputFamilyPlayground } from "@/components/input-family-playground";
 import { LoadingPlayground } from "@/components/loading-playground";
@@ -20,6 +21,7 @@ const playgrounds: Record<string, () => ReactNode> = {
   "date-range-picker": () => (
     <InputFamilyPlayground component="date-range-picker" />
   ),
+  dialog: DialogPlayground,
   drawer: DrawerPlayground,
   input: () => <InputFamilyPlayground component="input" />,
   "input-amount": () => <InputFamilyPlayground component="input-amount" />,
