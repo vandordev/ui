@@ -495,6 +495,39 @@ test("rapid controlled reopening interrupts exit without a stale close completio
   assert.equal(completions.includes(false), false);
 });
 
+test("Dialog panel has a distinct scale and vertical transition with a faster exit than entrance", async () => {
+  await ready;
+  const { Dialog } = load();
+  const el = React.createElement;
+  const app = (open) => el(Dialog, { open, title: "Motion profile" });
+  await mount(app(true));
+  const popup = document.querySelector('[data-slot="dialog-popup"]');
+  const entrance = popup.getAnimations();
+  assert.ok(
+    entrance.length >= 3,
+    "opacity, scale, and translate animate natively"
+  );
+  assert.ok(
+    entrance.every((animation) => animation.effect.getTiming().duration === 320)
+  );
+  await React.act(async () => {
+    await frames();
+    await finishAnimations();
+  });
+  await React.act(async () => root.render(app(false)));
+  const exit = popup
+    .getAnimations()
+    .filter((animation) => animation.playState === "running");
+  assert.ok(
+    exit.every((animation) => animation.effect.getTiming().duration === 220)
+  );
+  const keyframes = exit.flatMap((animation) =>
+    animation.effect.getKeyframes()
+  );
+  assert.ok(keyframes.some((frame) => Number(frame.scale) === 0.94));
+  assert.ok(keyframes.some((frame) => frame.translate === "0 12px"));
+});
+
 test("Escape dismisses only the topmost nested modal and respects a cancellation guard", async () => {
   await ready;
   const { Dialog } = load();

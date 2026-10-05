@@ -204,9 +204,10 @@ The parent subtly scales back while a child is open; nested backdrops follow Bas
 - `modal={false}` permits outside interaction and omits the backdrop. `modal="trap-focus"`
   traps focus without locking page scroll or blocking outside pointer interaction; it also omits the backdrop.
 - Keyboard, Escape, focus targeting/return, dismissal cancellation, and nesting remain Base UI-owned.
-- Opening fades and scales the panel over 200ms; closing takes 150ms. Motion's native Web Animations
+- Opening fades, scales from 94%, and lifts the panel by 12px over 320ms; closing reverses the movement
+  over 220ms. The backdrop fades over 200ms. Motion's native Web Animations
   integrate with Base UI's animation lifecycle, including rapid reopening and controlled updates.
-- Reduced-motion preferences remove scaling and animated fades. Without Web Animations, state changes are immediate.
+- Reduced-motion preferences remove scaling, movement, and animated fades. Without Web Animations, state changes are immediate.
 - Root props inherit [Base UI Dialog Root](https://base-ui.com/react/components/dialog#root),
   except children and state ownership follow the Vandor contract above. `contentProps` inherits
   Popup props except children; Body and Footer forward native div props and refs.

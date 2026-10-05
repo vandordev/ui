@@ -158,7 +158,7 @@ const AnimatedElement = ({
   const reduceMotion = useReducedMotion();
   const nestedOpen = "nestedDialogOpen" in state && state.nestedDialogOpen;
   const openScale = nestedOpen ? 0.96 : 1;
-  const targetScale = state.open ? openScale : 0.98;
+  const targetScale = state.open ? openScale : 0.94;
   useLayoutEffect(() => {
     const element = scope.current;
     if (!element) {
@@ -166,19 +166,22 @@ const AnimatedElement = ({
     }
     const opacity = state.open ? 1 : 0;
     const scale = backdrop || reduceMotion ? 1 : targetScale;
+    const translate = state.open || reduceMotion ? "0 0px" : "0 12px";
     if (reduceMotion || typeof element.animate !== "function") {
       element.style.opacity = String(opacity);
       if (!backdrop) {
         element.style.scale = String(scale);
+        element.style.translate = translate;
       }
       return;
     }
+    const panelDuration = state.open ? 0.32 : 0.22;
     const animation = animate(
       [element],
-      backdrop ? { opacity } : { opacity, scale },
+      backdrop ? { opacity } : { opacity, scale, translate },
       {
-        duration: state.open ? 0.2 : 0.15,
-        ease: [0.22, 1, 0.36, 1],
+        duration: backdrop ? 0.2 : panelDuration,
+        ease: state.open ? [0.22, 1, 0.36, 1] : [0.4, 0, 1, 1],
       }
     );
     // WAAPI rejects finished when interrupted; rapid reopen/unmount is expected.
@@ -330,7 +333,7 @@ const Dialog = ({
                 data-size={size}
                 data-close-button={showCloseButton ? "" : undefined}
                 className={cn(
-                  "group/dialog-popup pointer-events-auto relative flex max-h-[calc(100dvh-2rem)] w-full min-h-0 scale-[0.98] flex-col overflow-hidden rounded-xl border border-border bg-background text-sm text-foreground opacity-0 shadow-xl outline-none sm:max-h-[calc(100dvh-3rem)] data-nested-dialog-open:brightness-95",
+                  "group/dialog-popup pointer-events-auto relative flex max-h-[calc(100dvh-2rem)] w-full min-h-0 translate-y-3 scale-[0.94] flex-col overflow-hidden rounded-xl border border-border bg-background text-sm text-foreground opacity-0 shadow-xl outline-none sm:max-h-[calc(100dvh-3rem)] data-nested-dialog-open:brightness-95",
                   {
                     "max-w-2xl": size === "lg",
                     "max-w-4xl": size === "xl",
