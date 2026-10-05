@@ -286,6 +286,13 @@ approval. If the server is unavailable, report the missing visual evidence.
 
 Choose fresh checks proportional to risk:
 
+- Follow the mandatory
+  [memory-safety rules](frontend-workflow.md#strict-memory-safety-for-verification)
+  for all test authoring and execution. Assert DOM/ref identity through booleans
+  with short messages, never through failure formatting of whole runtime objects.
+  Run focused tests with inherited heap limits, serial workers, and a process-tree
+  deadline; do not respond to OOM by increasing limits without user approval.
+
 - Typecheck public APIs and consumer usage. Include client-boundary and registry
   integration checks when relevant; a client playground alone is insufficient.
 - Add focused runtime tests for meaningful state transitions, normalization,

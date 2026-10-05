@@ -62,6 +62,67 @@ website's internal UI components.
 
 ## Library integration and staged checks
 
+### Strict memory safety for verification
+
+These rules are mandatory. Keeping the laptop responsive takes priority over
+finishing a verification command. A blocked check must be reported, not retried
+with unsafe resource settings.
+
+- Run Node tests with `NODE_OPTIONS="--max-old-space-size=512"` so Node child
+  processes inherit the heap limit, and use `--test-concurrency=1`. Start with one
+  affected file and a focused name pattern; expand only after that check is safe.
+  Do not run bare `node --test` or bare `pnpm test` without these safeguards.
+- Give every test/check invocation a finite wall-clock deadline and terminate its
+  owned process tree on timeout. For focused tests, default to 120 seconds with a
+  5-second forced-kill grace period. A shell/tool timeout alone is insufficient
+  unless it also terminates descendants. On Linux, an example is:
+
+  ```sh
+  NODE_OPTIONS="--max-old-space-size=512" timeout --signal=TERM --kill-after=5s 120s node --test --test-concurrency=1 --test-name-pattern='overlay survives' tests/dropdown.test.cjs
+  ```
+
+- A V8 heap limit is NOT a total-RAM limit: native allocations, buffers, and child
+  processes consume additional memory. For suspected runaway memory, use an
+  available OS-enforced process-tree memory limit (for example a configured
+  cgroup), with a default budget of 1 GiB for focused test reproduction. If such
+  isolation is unavailable, do not rerun a known memory-exhausting reproduction
+  unchanged; use read-only inspection or a bounded, reduced diagnostic instead,
+  and disclose the limitation. Never claim the heap flag guarantees a RAM cap.
+- Run tests, typechecks, registry builds, and production builds sequentially, not
+  in parallel with each other. Do not start multiple diagnostic test processes.
+  Account for existing servers and other workloads; do not stop user processes.
+- For other Node-based checks, set an explicit inherited heap budget (at most
+  2048 MiB by default), a finite deadline, and conservative worker concurrency
+  where supported. These are per-process budgets, not permission to consume all
+  available RAM. If a check needs a larger budget or additional parallel workers,
+  explain why and obtain explicit user approval first.
+- On OOM, abnormal memory growth, or timeout, stop the owned diagnostic process
+  tree and investigate the smallest failing case. Do not automatically retry,
+  increase heap limits, disable safeguards, generate heap snapshots/core dumps,
+  or launch another heavy check. Report the failure and available evidence.
+- Never pass DOM nodes, Happy DOM windows/documents, React fibers, synthetic
+  events, or similarly connected runtime objects directly to assertions that
+  format actual/expected values (`assert.equal`, `strictEqual`, `deepEqual`, etc.).
+  For identity, compare a boolean with a short explicit message:
+
+  ```js
+  assert.ok(
+    document.activeElement === triggerRef.current,
+    "Focus must return to the trigger"
+  );
+  assert.ok(document.querySelector('[role="menu"]') === null, "Menu must unmount");
+  ```
+
+- Assert small primitive snapshots for content/attributes/state instead. Do not
+  log, stringify, or deeply inspect entire DOM/React graphs on failure; diagnostics
+  must be bounded (for example tag name, ID, selected attributes, or truncated text).
+  Preserve the actual behavioral assertion; never hide a failure to avoid OOM.
+- Clean up mounted roots, timers, observers, animations, and DOM environments in
+  test teardown, including failure paths. Cleanup does not replace safe assertion
+  output or execution limits.
+
+### Integration and acceptance checks
+
 - Check public library exports and TypeScript declarations before implementing
   an integration. Confirm uncertain APIs with a minimal focused check; do not
   depend on undocumented internals merely because they exist at runtime.
