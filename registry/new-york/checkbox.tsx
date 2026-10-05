@@ -43,7 +43,7 @@ export const Checkbox = ({
   ...props
 }: CheckboxProps) => {
   const reducedMotion = useReducedMotion();
-  const duration = animated && !reducedMotion ? 0.18 : 0;
+  const shouldAnimate = animated && !reducedMotion;
 
   return (
     <CheckboxPrimitive.Root
@@ -61,18 +61,14 @@ export const Checkbox = ({
         data-slot="checkbox-indicator"
         render={(indicatorProps, state) => {
           const visible = state.checked || state.indeterminate;
+          const strokeDuration = visible ? 0.22 : 0.14;
           return (
             <span
               {...indicatorProps}
               aria-hidden="true"
               className="grid place-content-center text-current"
             >
-              <motion.span
-                className="grid place-content-center"
-                initial={false}
-                animate={{ opacity: visible ? 1 : 0, scale: visible ? 1 : 0.8 }}
-                transition={{ duration, ease: [0.22, 1, 0.36, 1] }}
-              >
+              <span className="grid place-content-center">
                 <svg
                   aria-hidden="true"
                   className="size-3.5"
@@ -89,12 +85,28 @@ export const Checkbox = ({
                       d: state.indeterminate
                         ? "M5 12 L12 12 L19 12"
                         : "M5 12 L10 17 L19 7",
+                      opacity: visible ? 1 : 0,
                       pathLength: visible ? 1 : 0,
                     }}
-                    transition={{ duration, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{
+                      d: {
+                        duration: shouldAnimate ? 0.18 : 0,
+                        ease: [0.22, 1, 0.36, 1],
+                      },
+                      // Keep the stroke visible during withdrawal. Hide the
+                      // round-cap dot only after the path has drawn back to zero.
+                      opacity: {
+                        delay: shouldAnimate && !visible ? 0.14 : 0,
+                        duration: 0,
+                      },
+                      pathLength: {
+                        duration: shouldAnimate ? strokeDuration : 0,
+                        ease: "linear",
+                      },
+                    }}
                   />
                 </svg>
-              </motion.span>
+              </span>
             </span>
           );
         }}

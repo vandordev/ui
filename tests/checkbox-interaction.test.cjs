@@ -87,7 +87,10 @@ test("Checkbox toggles with clicks and Space, submits native values, and forward
   );
   const form = host.querySelector("form");
   const control = host.querySelector('[role="checkbox"]');
-  assert.equal(ref.current, control);
+  assert.ok(
+    ref.current === control,
+    "Consumer ref must target the checkbox root"
+  );
   assert.equal(inputRef.current.type, "checkbox");
   assert.equal(new dom.FormData(form).get("updates"), "weekly");
   await React.act(async () => control.click());
@@ -105,7 +108,10 @@ test("Checkbox toggles with clicks and Space, submits native values, and forward
   assert.deepEqual(changes, [false, true]);
   assert.ok(clicks >= 1);
   await React.act(async () => ref.current.focus());
-  assert.equal(document.activeElement, control);
+  assert.ok(
+    document.activeElement === control,
+    "Consumer ref must focus the checkbox"
+  );
 });
 
 test("Checkbox controlled form reset restores the public state and submitted value", async () => {

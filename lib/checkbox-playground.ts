@@ -11,7 +11,7 @@ export const checkboxProps = {
     },
     defaultValue: "true",
     description:
-      "Enables indicator fade, scale, stroke drawing and morphing. Reduced motion makes these immediate.",
+      "Draws and withdraws the check stroke, with mixed-state morphing. Reduced motion makes these immediate.",
     type: "boolean",
   },
   "aria-invalid": {

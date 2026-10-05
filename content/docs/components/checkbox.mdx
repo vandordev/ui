@@ -5,7 +5,7 @@ component: checkbox
 credits:
   - name: shadcn/ui
     url: https://ui.shadcn.com/docs/components/base/checkbox
-    contribution: Adapted Base Nova Checkbox foundation. Vandor UI adds Motion indicator fade, scale, stroke drawing, mixed-state morphing, and reduced-motion support.
+    contribution: Adapted Base Nova Checkbox foundation. Vandor UI adds Motion stroke drawing and withdrawal, mixed-state morphing, and reduced-motion support.
 ---
 
 import { CheckboxDemo } from "@/examples/checkbox-demo";
@@ -71,7 +71,7 @@ Set `name` and `value` to include a checked checkbox in `FormData`. The default 
 - Base UI preserves checkbox keyboard behavior: Tab focuses and Space toggles. Enter is not the toggle key.
 - The default visible root is a span with checkbox semantics plus a hidden native input. Use an enclosing label or Base UI Field for naming. For a sibling `htmlFor` label, use `render={<button />}` and `nativeButton` as described in the [Base UI documentation](https://base-ui.com/react/components/checkbox).
 - `ref` targets the visible root; `inputRef` targets the native input. Base UI root props, event handlers, state-aware `className`/`style`, and composition are forwarded. Children are reserved for the built-in indicator.
-- Indicator opacity, scale, stroke length, and check-to-line morph use interruptible 180 ms ease-out transitions. There is no bounce or delayed state update. Reduced-motion preferences make indicator transitions immediate and disable CSS color transitions. `animated={false}` disables indicator motion explicitly; color transitions remain unless reduced motion is preferred.
+- The check mark draws along its stroke, from the short arm into the long arm, over 220 ms at a steady pace. Unchecking draws it back over 140 ms, hiding it only after withdrawal finishes. Mixed-state morphing uses a short 180 ms ease-out transition. There is no scale, bounce, fade-in, or delayed state update. Reduced-motion preferences make indicator transitions immediate and disable CSS color transitions. `animated={false}` disables indicator motion explicitly; color transitions remain unless reduced motion is preferred.
 - Light and dark styles inherit your shadcn tokens. A custom `className` merges with defaults. Do not remove accessible focus treatment without a replacement.
 
 ## Storybook Stories (Optional)
