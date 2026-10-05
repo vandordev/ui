@@ -12,6 +12,7 @@
     "drawer",
     "dropdown",
     "empty",
+    "error-state",
     "input",
     "input-amount",
     "input-group",

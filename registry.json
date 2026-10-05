@@ -3,6 +3,33 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "error-state",
+      "type": "registry:ui",
+      "title": "Error State",
+      "description": "A composable error fallback with centered and inline layouts, recovery actions, and opt-in support details.",
+      "dependencies": ["cn", "lucide-react"],
+      "registryDependencies": ["https://vandor-ui.vercel.app/r/accordion.json"],
+      "files": [
+        { "path": "registry/new-york/error-state.tsx", "type": "registry:ui" },
+        {
+          "path": "registry/new-york/error-state-details.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "error-state-stories",
+      "type": "registry:item",
+      "title": "Error State Stories",
+      "description": "Optional portable Error State stories. Install Error State first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/error-state.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "dropdown",
       "type": "registry:ui",
       "title": "Dropdown",
@@ -144,6 +171,18 @@
       ]
     },
     {
+      "name": "accordion-stories",
+      "type": "registry:item",
+      "title": "Accordion Stories",
+      "description": "Optional portable Accordion stories. Install Accordion first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/accordion.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "accordion",
       "type": "registry:ui",
       "title": "Accordion",
@@ -152,8 +191,7 @@
       "files": [
         {
           "path": "registry/new-york/accordion.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/accordion.tsx"
+          "type": "registry:ui"
         }
       ]
     },

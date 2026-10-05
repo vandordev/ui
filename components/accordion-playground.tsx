@@ -6,6 +6,7 @@ import {
   accordionProps,
   getAccordionCode,
   getAccordionDefaults,
+  getAccordionIconProps,
 } from "@/lib/accordion-playground";
 import {
   Accordion,
@@ -31,7 +32,9 @@ export const AccordionPlayground = () => (
       >
         {accordionItems.map((item) => (
           <AccordionItem key={item.value} value={item.value}>
-            <AccordionTrigger>{item.question}</AccordionTrigger>
+            <AccordionTrigger {...getAccordionIconProps(values.iconStyle)}>
+              {item.question}
+            </AccordionTrigger>
             <AccordionContent>{item.answer}</AccordionContent>
           </AccordionItem>
         ))}

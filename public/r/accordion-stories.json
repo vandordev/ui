@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "accordion-stories",
+  "title": "Accordion Stories",
+  "description": "Optional portable Accordion stories. Install Accordion first; no component or Storybook configuration is overwritten.",
+  "files": [
+    {
+      "path": "registry/new-york/accordion.stories.tsx",
+      "content": "import type { Meta, StoryObj } from \"@storybook/react\";\nimport { ChevronDownIcon, MinusIcon, PlusIcon } from \"lucide-react\";\n\nimport {\n  Accordion,\n  AccordionContent,\n  AccordionItem,\n  AccordionTrigger,\n} from \"./accordion\";\n\ninterface Args {\n  disabled: boolean;\n  multiple: boolean;\n  iconStyle: \"chevron\" | \"plus-minus\" | \"plus-rotate\" | \"none\";\n}\n\nconst meta = {\n  argTypes: {\n    disabled: { control: \"boolean\" },\n    iconStyle: {\n      control: \"select\",\n      options: [\"chevron\", \"plus-minus\", \"plus-rotate\", \"none\"],\n    },\n    multiple: { control: \"boolean\" },\n  },\n  args: { disabled: false, iconStyle: \"chevron\", multiple: false },\n  parameters: { layout: \"centered\" },\n  render: ({ disabled, iconStyle, multiple }) => (\n    <Accordion\n      disabled={disabled}\n      multiple={multiple}\n      className=\"w-80 max-w-full\"\n      defaultValue={[\"details\"]}\n    >\n      {[\n        {\n          content: \"Reference: DEMO-1042\",\n          title: \"Technical details\",\n          value: \"details\",\n        },\n        {\n          content: \"Check your connection and try again.\",\n          title: \"Recovery options\",\n          value: \"recovery\",\n        },\n      ].map(({ value, title, content }) => (\n        <AccordionItem value={value} key={value}>\n          <AccordionTrigger\n            icon={\n              {\n                chevron: <ChevronDownIcon />,\n                none: null,\n                \"plus-minus\": <PlusIcon />,\n                \"plus-rotate\": <PlusIcon />,\n              }[iconStyle]\n            }\n            expandedIcon={\n              iconStyle === \"plus-minus\" ? <MinusIcon /> : undefined\n            }\n            iconRotation={iconStyle === \"plus-rotate\" ? 45 : 180}\n          >\n            {title}\n          </AccordionTrigger>\n          <AccordionContent>{content}</AccordionContent>\n        </AccordionItem>\n      ))}\n    </Accordion>\n  ),\n  title: \"Vandor UI/Accordion\",\n} satisfies Meta<Args>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\nexport const Playground: Story = {};\nexport const PlusMinus: Story = { args: { iconStyle: \"plus-minus\" } };\nexport const RotatingPlus: Story = { args: { iconStyle: \"plus-rotate\" } };\nexport const WithoutIcon: Story = { args: { iconStyle: \"none\" } };\nexport const Disabled: Story = { args: { disabled: true } };\nexport const Multiple: Story = { args: { multiple: true } };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:item"
+}

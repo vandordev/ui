@@ -1,0 +1,118 @@
+---
+title: Error State
+description: Composable failure feedback with centered and inline layouts, recovery actions, and opt-in support details.
+component: error-state
+credits:
+  - name: shadcn/ui Empty
+    url: https://ui.shadcn.com/docs/components/base/empty
+    contribution: Composition and visual vocabulary reference; Error State is an independent implementation, not an adapted upstream error component.
+  - name: react-error-boundary
+    url: https://github.com/bvaughn/react-error-boundary
+    contribution: Optional MIT-licensed dependency used only by the rendering-error integration example.
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { ErrorStateDemo } from "@/examples/error-state-demo";
+import { ErrorStateInlineDemo } from "@/examples/error-state-inline-demo";
+import { ErrorStateBoundaryDemo } from "@/examples/error-state-boundary-demo";
+
+## Usage
+
+```tsx
+import {
+  ErrorState,
+  ErrorStateContent,
+  ErrorStateHeader,
+  ErrorStateTitle,
+  ErrorStateDescription,
+} from "@/components/ui/error-state";
+
+<ErrorState>
+  <ErrorStateContent>
+    <ErrorStateHeader>
+      <ErrorStateTitle>Unable to load projects</ErrorStateTitle>
+      <ErrorStateDescription>
+        Check your connection and try again.
+      </ErrorStateDescription>
+    </ErrorStateHeader>
+  </ErrorStateContent>
+</ErrorState>;
+```
+
+Put optional `ErrorStateMedia` before `ErrorStateContent`. Inside Content, use Header for Title and Description, Actions for buttons or links, and Details for safe support information. All parts are optional and accept native attributes and React 19 refs. The root selects layout; it does not fetch data, catch errors, or retry operations.
+
+## Examples
+
+### Recovery action
+
+Replace only the content that failed, keeping navigation and other working sections available. This demo switches to a successful preview when you select Try again, without making a network request. In your application, connect the action to a refetch or another recovery operation. Keep retry unavailable while that operation is pending and announce the outcome.
+
+<ComponentPreview name="error-state-demo" title="error-state-demo.tsx">
+  <ErrorStateDemo />
+</ComponentPreview>
+
+Install [Button](/docs/components/button) separately for examples or generated playground code using it. Icons use the declared `lucide-react` dependency; Error State does not require Button.
+
+### Inline failure and support reference
+
+Use `variant="inline"` for a localized failure beside content that still works. Set `border="dashed"` for a subtle dashed outline, `border="solid"` for a solid outline, or leave the default `border="none"`. Border style and layout are independent. Do not offer retry for missing permissions or a missing page unless retry can actually fix the problem; offer an appropriate navigation or access-request action instead.
+
+<ComponentPreview
+  name="error-state-inline-demo"
+  title="error-state-inline-demo.tsx"
+>
+  <ErrorStateInlineDemo />
+</ComponentPreview>
+
+Details now uses [Accordion](/docs/components/accordion) with a Plus/Minus crossfade and animated panel expansion. It is closed by default. Its default summary is “Technical details”; pass a localized `summary` when needed. Replace its `icon` and `expandedIcon` with decorative React nodes, or pass `icon={null}` to hide the indicator. Use `defaultOpen` for an initially open uncontrolled disclosure, or `open` with `onOpenChange` for controlled state. `disabled` prevents interaction.
+
+This replaces the initial native `details` implementation: migrate native `onToggle` to `onOpenChange`, and move detail-element refs/attributes to the new div-based Accordion root. No native `details` or `summary` elements are rendered.
+
+Only provide a safe support reference or explicitly sanitized content. Closed content may remain mounted while an animation completes and consumer code always contains any supplied information: the disclosure is **not a privacy or redaction boundary**. Never put secrets, raw server messages, or production stack traces inside it.
+
+### Rendering errors with an optional boundary
+
+Install the optional package only if your application needs a component-level React boundary:
+
+```bash
+pnpm add react-error-boundary
+```
+
+The integration below was checked with `react-error-boundary` 6.1.6. Simulate render error causes the child to throw during render; Try again resets both the boundary and the state that caused the failure. It intentionally does not show the exception message. React development tooling may log the simulated error even though the fallback handles it.
+
+<ComponentPreview
+  name="error-state-boundary-demo"
+  title="error-state-boundary-demo.tsx"
+>
+  <ErrorStateBoundaryDemo />
+</ComponentPreview>
+
+For production reporting, connect the boundary's `onError` to your error reporting service. Report privately rather than exposing raw errors to the user. Resetting a boundary retries rendering; it does not automatically retry a failed request or repair its cause.
+
+Boundaries catch descendant rendering errors, not ordinary event-handler exceptions, SSR errors, or arbitrary rejected promises. Handle request errors explicitly and render Error State from your application's error state. Use the library's supported hooks when deliberately forwarding a caught async error to a boundary. Next.js applications can also use this UI in their framework-provided route error fallback; Error State imports no Next.js APIs.
+
+### Consumer setup and optional stories
+
+Error State requires React 19 and Tailwind CSS 4. The CLI installs `cn`, `lucide-react`, and the Accordion registry dependency (which declares `@base-ui/react`, `motion`, `cn`, and `lucide-react`). Load your global Tailwind stylesheet with shadcn semantic tokens including `foreground`, `muted`, `muted-foreground`, `background`, `border`, `destructive`, and `ring`. No provider or extra animation CSS is needed. The visual root remains server-compatible; Details is a separate client module. State, event handlers, and boundary integrations belong in a client module in React Server Component applications.
+
+The registry installs `error-state.tsx` and `error-state-details.tsx`, plus Accordion, into the UI alias configured in `components.json`. Installing it can update an existing Accordion, so review the CLI overwrite prompt before replacing local customizations. It does not install Empty, Button, or an error boundary. Use CLI installation: copying the displayed Source alone is insufficient because Details is a separate supporting file. Examples and playground adapters are website-only, not distributed source.
+
+Install Error State first, then optionally install its portable stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/error-state-stories.json
+```
+
+Use your existing `@storybook/react` setup with matching Storybook package versions (types and composition checked with 10.6.1). Discover `**/*.stories.tsx` in your UI directory and load your global theme stylesheet in the preview. Stories use native action buttons, inherit the consumer theme, and use the component's declared icon dependency without extra addons or providers. The stories-only installation does not reinstall the component or modify Storybook configuration. This project has no Storybook server; Storybook UI appearance is not verified here.
+
+## Behavior & Accessibility
+
+Error State is presentational. Keep loading, failed requests, missing permissions, missing pages, and genuinely empty results distinct. Content and actions are caller-owned; no automatic announcements, focus changes, hardcoded icon, or built-in retry callback are added.
+
+The root and layout parts render `div` elements. Title is visual text, not an automatic heading. For a named region, set `role="region"` and `aria-labelledby` on the root and a matching `id` on Title; add `role="heading"` and an appropriate `aria-level` to Title when the page hierarchy requires it. Hide decorative icons using `aria-hidden="true"`. Use native buttons for actions and links for navigation; do not rely on red alone to communicate the error.
+
+Choose application-level announcements according to urgency, usually a polite live region for async feedback. Do not make every static fallback an assertive alert. When content containing focus is replaced, manage focus from the application and return it to an appropriate destination after recovery.
+
+Details inherits Accordion's button/heading/panel semantics and keyboard interaction. It supports controlled `open`/`onOpenChange` and uncontrolled `defaultOpen`. Opening animates the panel and Plus/Minus indicators together; closing content becomes inert and hidden from assistive technology immediately. Reduced-motion preferences make transitions immediate. Long text wraps and the support content is keyboard-scrollable.
+
+Playground title and description are composed children. Icon, retry, and details toggles are demo controls, not ErrorState props. The playground retry is intentionally inert; the runnable examples demonstrate recovery. Reset restores configuration and remounts the preview, closing the disclosure.

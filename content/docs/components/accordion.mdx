@@ -9,6 +9,7 @@ credits:
 ---
 
 import { AccordionDemo } from "@/examples/accordion-demo";
+import { AccordionIconsDemo } from "@/examples/accordion-icons-demo";
 
 ## Usage
 
@@ -64,12 +65,42 @@ Use `value` and `onValueChange` for controlled state. Both `value` and `defaultV
 
 Set `keepMounted` on `AccordionContent` to preserve its DOM when closed. Base UI hides closed panels from interaction.
 
+### Custom Indicators
+
+Set `icon` on `AccordionTrigger` to any decorative React node. A single icon rotates by `iconRotation` degrees when expanded (default `180`). Set `iconRotation={45}` to turn a Plus into a close mark, or `0` to keep it still. The animation wrapper owns Motion behavior, so your icon component does not need Motion props or ref forwarding.
+
+Supply `expandedIcon` for a different open-state indicator. Both indicators crossfade with a subtle scale transition; rotation is ignored in this mode. Pass `icon={null}` to hide the indicator entirely. Indicator content is decorative and hidden from assistive technology; keep the trigger text descriptive and never put interactive elements inside an icon.
+
+<ComponentPreview name="accordion-icons-demo" title="accordion-icons-demo.tsx">
+  <AccordionIconsDemo />
+</ComponentPreview>
+
+```tsx
+<AccordionTrigger icon={<PlusIcon />} expandedIcon={<MinusIcon />}>
+  Technical details
+</AccordionTrigger>
+```
+
+Import the example icons from `lucide-react`. These customizations work with the same controlled state, keyboard activation, disabled behavior, and reduced-motion support as the default Chevron.
+
+### Consumer Setup and Optional Stories
+
+Requires React 19, Tailwind CSS 4 with shadcn theme tokens, `@base-ui/react`, `cn`, `lucide-react`, and `motion`. The CLI follows your configured UI alias; review overwrite prompts before replacing a customized Accordion. The component has its own client boundary and may be imported by a Server Component; interactive callbacks must originate in a client module.
+
+Install Accordion first, then optionally install portable stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/accordion-stories.json
+```
+
+Use your existing `@storybook/react` setup with matching Storybook versions (types and composition checked with 10.6.1), discover `**/*.stories.tsx` in your configured UI directory, and load your global Tailwind/theme stylesheet. The stories use the component's declared icon dependency, need no additional addons or providers, and do not overwrite the component or Storybook configuration. This project has no Storybook server; Storybook UI verification is not performed.
+
 ## Accessibility & Transitions
 
 - Triggers are native buttons inside level-three headings, with expanded state and panel relationships managed by Base UI.
 - Tab moves between triggers. Enter or Space toggles the focused item.
 - Visible focus rings and disabled states use the existing theme tokens.
-- Panel height, content opacity, and chevron rotation animate together with `motion/react` over `240ms`, using an ease-out curve without bounce or delayed content. Initially expanded panels render open without a first-paint collapse.
+- Panel height, content opacity, and indicator rotation or crossfade animate together with `motion/react` over `240ms`, using an ease-out curve without bounce or delayed content. Initially expanded panels render open without a first-paint collapse.
 - Closing content remains mounted until the animation finishes, but becomes inert and hidden from assistive technology immediately. Rapid toggles reverse from the current animated position.
 - Reduced-motion preferences make transitions immediate. Triggers do not scale.
 - `className` on `AccordionContent` styles the inner content wrapper, following the shadcn composition.

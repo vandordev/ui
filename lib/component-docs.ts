@@ -36,6 +36,11 @@ import {
   getEmptyDefaults,
 } from "@/lib/empty-playground";
 import {
+  errorStateProps,
+  getErrorStateCode,
+  getErrorStateDefaults,
+} from "@/lib/error-state-playground";
+import {
   inputComponentProps,
   inputPlaygroundCode,
 } from "@/lib/input-component-props";
@@ -98,6 +103,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   empty: {
     playground: { code: getEmptyCode(getEmptyDefaults()) },
     props: emptyProps,
+  },
+  "error-state": {
+    playground: { code: getErrorStateCode(getErrorStateDefaults()) },
+    props: errorStateProps,
   },
   loading: {
     playground: { code: getLoadingCode(getLoadingDefaults()) },

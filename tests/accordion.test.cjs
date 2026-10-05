@@ -4,6 +4,12 @@ const React = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
 const { createJiti } = require("jiti");
 const registry = require("../registry.json");
+const { readFileSync } = require("node:fs");
+const { composeStories } = require("@storybook/react");
+const ts = require("typescript");
+const vm = require("node:vm");
+const icons = require("lucide-react");
+const jsxRuntime = require("react/jsx-runtime");
 
 const jiti = createJiti(__filename, {
   alias: { "@": process.cwd() },
@@ -11,6 +17,110 @@ const jiti = createJiti(__filename, {
   jsx: { runtime: "automatic" },
 });
 const el = React.createElement;
+
+test("Accordion icon controls reproduce the preview and portable stories wire their args", () => {
+  const { getAccordionCode, getAccordionDefaults, getAccordionIconProps } =
+    jiti("../lib/accordion-playground.ts");
+  const component = jiti("../registry/new-york/accordion.tsx");
+  const stories = composeStories(
+    jiti("../registry/new-york/accordion.stories.tsx")
+  );
+  for (const iconStyle of ["chevron", "plus-minus", "plus-rotate", "none"]) {
+    const props = getAccordionIconProps(iconStyle);
+    const code = getAccordionCode({ ...getAccordionDefaults(), iconStyle });
+    const compiled = ts.transpileModule(code, {
+      compilerOptions: {
+        jsx: ts.JsxEmit.ReactJSX,
+        module: ts.ModuleKind.CommonJS,
+      },
+      reportDiagnostics: true,
+    });
+    assert.equal(compiled.diagnostics.length, 0);
+    const exports = {};
+    vm.runInNewContext(compiled.outputText, {
+      exports,
+      require: (name) =>
+        ({
+          "@/components/ui/accordion": component,
+          "lucide-react": icons,
+          "react/jsx-runtime": jsxRuntime,
+        })[name],
+    });
+    const generated = renderToStaticMarkup(el(exports.AccordionDemo));
+    const story = renderToStaticMarkup(el(stories.Playground, { iconStyle }));
+    if (iconStyle === "none") {
+      assert.equal(props.icon, null);
+      assert.doesNotMatch(generated, /accordion-trigger-icon/);
+      assert.doesNotMatch(story, /accordion-trigger-icon/);
+    } else {
+      const iconName = iconStyle === "chevron" ? "chevron-down" : "plus";
+      assert.match(generated, new RegExp(`lucide-${iconName}`));
+      assert.match(story, new RegExp(`lucide-${iconName}`));
+      if (iconStyle === "plus-minus") {
+        assert.ok(props.expandedIcon);
+        assert.match(generated, /lucide-minus/);
+        assert.match(story, /lucide-minus/);
+      }
+      if (iconStyle === "plus-rotate") {
+        assert.equal(props.iconRotation, 45);
+        assert.match(generated, /rotate\(45deg\)/);
+        assert.match(story, /rotate\(45deg\)/);
+      }
+    }
+  }
+  for (const name of ["accordion", "accordion-stories"]) {
+    const artifact = JSON.parse(readFileSync(`public/r/${name}.json`, "utf-8"));
+    const item = registry.items.find((entry) => entry.name === name);
+    assert.deepEqual(artifact.dependencies ?? [], item.dependencies ?? []);
+    assert.deepEqual(artifact.registryDependencies ?? [], []);
+    for (const file of artifact.files) {
+      assert.equal(file.content, readFileSync(file.path, "utf-8"));
+      assert.equal(file.target, undefined);
+    }
+  }
+});
+
+test("Accordion custom icons preserve default rotation, allow swapping, and can be hidden", () => {
+  const { Accordion, AccordionItem, AccordionTrigger } = jiti(
+    "../registry/new-york/accordion.tsx"
+  );
+  const render = (triggerProps, open = false) =>
+    renderToStaticMarkup(
+      el(
+        Accordion,
+        { defaultValue: open ? ["custom"] : [] },
+        el(
+          AccordionItem,
+          { value: "custom" },
+          el(AccordionTrigger, triggerProps, "Details")
+        )
+      )
+    );
+  const custom = render(
+    { icon: el("svg", { "data-custom-icon": true }), iconRotation: 90 },
+    true
+  );
+  assert.match(custom, /data-custom-icon="true"/);
+  assert.match(custom, /rotate\(90deg\)/);
+  assert.doesNotMatch(
+    render({ icon: null }),
+    /data-slot="accordion-trigger-icon"/
+  );
+  const swapped = render(
+    {
+      expandedIcon: el("svg", { "data-open-icon": true }),
+      icon: el("svg", { "data-closed-icon": true }),
+    },
+    true
+  );
+  assert.match(swapped, /data-open-icon="true"/);
+  assert.match(swapped, /data-closed-icon="true"/);
+  assert.match(
+    swapped,
+    /data-slot="accordion-trigger-icon"[^>]*aria-hidden="true"|aria-hidden="true"[^>]*data-slot="accordion-trigger-icon"/
+  );
+  assert.doesNotMatch(swapped, /rotate\(180deg\)/);
+});
 
 test("Accordion registry declares Motion and initially open panels do not collapse on first paint", () => {
   assert.ok(

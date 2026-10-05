@@ -1,5 +1,10 @@
+import { MinusIcon, PlusIcon } from "lucide-react";
+import { createElement } from "react";
+import type { ComponentProps } from "react";
+
 import type { PropDefinition } from "@/lib/playground";
 import { getPlaygroundDefaults } from "@/lib/playground";
+import type { AccordionTrigger } from "@/registry/new-york/accordion";
 
 export const accordionItems = [
   {
@@ -38,6 +43,40 @@ export const accordionProps = {
     description: "Accordion or AccordionItem: prevents interaction.",
     type: "boolean",
   },
+  expandedIcon: {
+    defaultValue: "Not set",
+    description:
+      "AccordionTrigger: optional expanded indicator. When provided, the two icons crossfade and gently scale instead of rotating.",
+    type: "ReactNode",
+  },
+  icon: {
+    defaultValue: "ChevronDownIcon",
+    description:
+      "AccordionTrigger: decorative indicator React node. Pass null to hide it; custom icon components do not need Motion props or refs.",
+    type: "ReactNode",
+  },
+  iconRotation: {
+    defaultValue: "180",
+    description:
+      "AccordionTrigger: expanded rotation in degrees for a single icon. Ignored when expandedIcon is supplied. Use 45 to turn Plus into a close mark, or 0 for no rotation.",
+    type: "number",
+  },
+  iconStyle: {
+    control: {
+      initialValue: "chevron" as
+        | "chevron"
+        | "plus-minus"
+        | "plus-rotate"
+        | "none",
+      kind: "select",
+      label: "Icon style",
+      options: ["chevron", "plus-minus", "plus-rotate", "none"],
+    },
+    defaultValue: '"chevron" (demo)',
+    description:
+      "Demo composition: default chevron, Plus/Minus crossfade, Plus rotation, or no indicator. Configures AccordionTrigger props.",
+    type: "string (demo only)",
+  },
   keepMounted: {
     defaultValue: "false",
     description: "AccordionContent: keeps closed panels in the DOM.",
@@ -68,8 +107,34 @@ export const accordionProps = {
 
 export const getAccordionDefaults = () => getPlaygroundDefaults(accordionProps);
 export type AccordionPlaygroundValues = ReturnType<typeof getAccordionDefaults>;
+export const getAccordionIconProps = (
+  style: AccordionPlaygroundValues["iconStyle"]
+): ComponentProps<typeof AccordionTrigger> => {
+  if (style === "plus-minus") {
+    return {
+      expandedIcon: createElement(MinusIcon),
+      icon: createElement(PlusIcon),
+    };
+  }
+  if (style === "plus-rotate") {
+    return { icon: createElement(PlusIcon), iconRotation: 45 };
+  }
+  if (style === "none") {
+    return { icon: null };
+  }
+  return {};
+};
 
-export const getAccordionCode = (values: AccordionPlaygroundValues) => `import {
+const iconCode = {
+  chevron: "",
+  none: " icon={null}",
+  "plus-minus": " icon={<PlusIcon />} expandedIcon={<MinusIcon />}",
+  "plus-rotate": " icon={<PlusIcon />} iconRotation={45}",
+};
+
+export const getAccordionCode = (
+  values: AccordionPlaygroundValues
+) => `${values.iconStyle.startsWith("plus") ? `import { PlusIcon${values.iconStyle === "plus-minus" ? ", MinusIcon" : ""} } from "lucide-react";\n` : ""}import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 
@@ -79,7 +144,7 @@ export const AccordionDemo = () => (
   <Accordion defaultValue={["accessible"]}${values.multiple ? " multiple" : ""}${values.disabled ? " disabled" : ""}>
     {items.map((item) => (
       <AccordionItem key={item.value} value={item.value}>
-        <AccordionTrigger>{item.question}</AccordionTrigger>
+        <AccordionTrigger${iconCode[values.iconStyle]}>{item.question}</AccordionTrigger>
         <AccordionContent>{item.answer}</AccordionContent>
       </AccordionItem>
     ))}

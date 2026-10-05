@@ -7,7 +7,7 @@ import { cn } from "cn";
 import { ChevronDownIcon } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 const panelContext = createContext({
   hiddenUntilFound: false,
@@ -33,7 +33,6 @@ const PanelElement = ({
     state: { ...state },
   });
 const MotionPanelElement = motion.create(PanelElement);
-const MotionChevron = motion.create(ChevronDownIcon);
 
 const TriggerElement = ({
   nativeProps,
@@ -132,12 +131,21 @@ const AccordionItem = ({
   />
 );
 
+type AccordionTriggerProps = AccordionPrimitive.Trigger.Props & {
+  icon?: ReactNode;
+  expandedIcon?: ReactNode;
+  iconRotation?: number;
+};
+
 const AccordionTrigger = ({
   className,
   children,
   render,
+  icon = <ChevronDownIcon />,
+  expandedIcon,
+  iconRotation = 180,
   ...props
-}: AccordionPrimitive.Trigger.Props) => {
+}: AccordionTriggerProps) => {
   const reduceMotion = useReducedMotion();
   return (
     <AccordionPrimitive.Header className="flex">
@@ -155,17 +163,57 @@ const AccordionTrigger = ({
             render={render}
           >
             {children}
-            <MotionChevron
-              aria-hidden="true"
-              data-slot="accordion-trigger-icon"
-              className="pointer-events-none mt-0.5 text-muted-foreground"
-              initial={false}
-              animate={{ rotate: state.open ? 180 : 0 }}
-              transition={{
-                ...transition,
-                duration: reduceMotion ? 0 : transition.duration,
-              }}
-            />
+            {icon !== null && icon !== false && (
+              <motion.span
+                aria-hidden="true"
+                data-slot="accordion-trigger-icon"
+                className="pointer-events-none relative mt-0.5 inline-grid size-4 shrink-0 place-items-center text-muted-foreground"
+                initial={false}
+                animate={{
+                  rotate:
+                    state.open && expandedIcon === undefined ? iconRotation : 0,
+                }}
+                transition={{
+                  ...transition,
+                  duration: reduceMotion ? 0 : transition.duration,
+                }}
+              >
+                {expandedIcon === undefined ? (
+                  icon
+                ) : (
+                  <>
+                    <motion.span
+                      className="col-start-1 row-start-1 inline-flex"
+                      initial={false}
+                      animate={{
+                        opacity: state.open ? 0 : 1,
+                        scale: state.open ? 0.85 : 1,
+                      }}
+                      transition={{
+                        ...transition,
+                        duration: reduceMotion ? 0 : transition.duration,
+                      }}
+                    >
+                      {icon}
+                    </motion.span>
+                    <motion.span
+                      className="col-start-1 row-start-1 inline-flex"
+                      initial={false}
+                      animate={{
+                        opacity: state.open ? 1 : 0,
+                        scale: state.open ? 1 : 0.85,
+                      }}
+                      transition={{
+                        ...transition,
+                        duration: reduceMotion ? 0 : transition.duration,
+                      }}
+                    >
+                      {expandedIcon}
+                    </motion.span>
+                  </>
+                )}
+              </motion.span>
+            )}
           </TriggerElement>
         )}
       />
@@ -212,3 +260,4 @@ const AccordionContent = ({
 };
 
 export { Accordion, AccordionContent, AccordionItem, AccordionTrigger };
+export type { AccordionTriggerProps };
