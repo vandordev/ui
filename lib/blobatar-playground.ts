@@ -125,7 +125,30 @@ export const blobatarProps = {
   },
 } satisfies Record<string, PropDefinition>;
 
-export const getBlobatarDefaults = () => getPlaygroundDefaults(blobatarProps);
+// Composition is a documentation scenario, not a prop of the registry component.
+export const blobatarPlaygroundProps = {
+  composition: {
+    control: {
+      initialValue: "standalone" as
+        | "standalone"
+        | "popover"
+        | "dropdown"
+        | "dialog"
+        | "drawer",
+      kind: "select",
+      label: "Composition",
+      options: ["standalone", "popover", "dropdown", "dialog", "drawer"],
+    },
+    defaultValue: '"standalone"',
+    description:
+      "Preview scenario only. Overlay components are installed separately.",
+    type: "Playground scenario",
+  },
+  ...blobatarProps,
+} satisfies Record<string, PropDefinition>;
+
+export const getBlobatarDefaults = () =>
+  getPlaygroundDefaults(blobatarPlaygroundProps);
 export type BlobatarPlaygroundValues = ReturnType<typeof getBlobatarDefaults>;
 const expressions = { happy, idle, thinking, wink };
 
@@ -162,5 +185,31 @@ export const getBlobatarCode = (values: BlobatarPlaygroundValues) => {
         ]),
     ...(expression === "idle" ? [] : [`expression: ${expression}`]),
   ];
-  return `"use client";\n\nimport { Blobatar } from "@/components/ui/blobatar";${expression === "idle" ? "" : `\nimport { ${expression} } from "blobatar/expression";`}${animate !== "off" || expression === "thinking" || values.followPointer ? '\nimport "blobatar/motion.css";' : ""}${values.followPointer ? '\nimport "blobatar/gaze.css";' : ""}\n\nexport function Demo() {\n  return (\n    <Blobatar\n      name={${JSON.stringify(values.name)}}\n      alt={${JSON.stringify(values.name)}}\n      size={${values.size}}${values.followPointer ? `\n      followPointer\n      pointerTravel={${values.pointerTravel}}` : ""}${values.src ? `\n      src={${JSON.stringify(values.src)}}` : ""}${options.length ? `\n      blobatar={{ ${options.join(", ")} }}` : ""}\n    />\n  );\n}`;
+  const avatar = `<Blobatar\n      name={${JSON.stringify(values.name)}}\n      alt={${values.composition === "standalone" ? JSON.stringify(values.name) : '""'}}\n      size={${values.size}}${values.followPointer ? `\n      followPointer\n      pointerTravel={${values.pointerTravel}}` : ""}${values.src ? `\n      src={${JSON.stringify(values.src)}}` : ""}${options.length ? `\n      blobatar={{ ${options.join(", ")} }}` : ""}\n    />`;
+  const imports = `"use client";\n\nimport { Blobatar } from "@/components/ui/blobatar";${expression === "idle" ? "" : `\nimport { ${expression} } from "blobatar/expression";`}${animate !== "off" || expression === "thinking" || values.followPointer ? '\nimport "blobatar/motion.css";' : ""}${values.followPointer ? '\nimport "blobatar/gaze.css";' : ""}`;
+  const name = JSON.stringify(values.name);
+  const profile = `<p className="break-words font-medium">{${name}}</p>\n      <p className="text-sm text-muted-foreground">Product designer</p>\n      <p className="mt-3 text-sm text-muted-foreground">Building thoughtful interfaces with Vandor UI.</p>`;
+  const labels = {
+    dialog: "profile dialog",
+    drawer: "profile drawer",
+    dropdown: "account menu",
+    popover: "profile",
+  };
+  const { composition } = values;
+  if (composition === "standalone") {
+    return `${imports}\n\nexport function Demo() {\n  return (\n    ${avatar}\n  );\n}`;
+  }
+  const button = `<button type="button" aria-label={${JSON.stringify(`Open ${labels[composition]} for ${values.name}`)}} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">${avatar}</button>`;
+  if (composition === "popover") {
+    return `${imports}\nimport { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";\n\nexport function Demo() {\n  return (\n    <Popover>\n      <PopoverTrigger render={${button}} />\n      <PopoverContent className="w-64 max-w-[calc(100vw-2rem)]">${profile}</PopoverContent>\n    </Popover>\n  );\n}`;
+  }
+  if (composition === "dropdown") {
+    return `${imports}\nimport { useState } from "react";\nimport { Dropdown } from "@/components/ui/dropdown";\n\nexport function Demo() {\n  const [status, setStatus] = useState("Available");\n  return (\n    <div className="flex flex-col items-center gap-3">\n      <Dropdown\n        trigger={${button}}\n        items={[{ id: "status", type: "group", label: "Set status", items: [\n          { id: "available", label: "Available", onSelect: () => setStatus("Available") },\n          { id: "busy", label: "Busy", onSelect: () => setStatus("Busy") },\n          { id: "away", label: "Away", onSelect: () => setStatus("Away") },\n        ] }]}\n      />\n      <p role="status" className="text-sm text-muted-foreground">{status}</p>\n    </div>\n  );\n}`;
+  }
+  const overlay = composition === "dialog" ? "Dialog" : "Drawer";
+  const description =
+    composition === "dialog"
+      ? "A closer look at this team member."
+      : "Keep this team member's details close by.";
+  return `${imports}\nimport { ${overlay}, ${overlay}Body } from "@/components/ui/${composition}";\n\nexport function Demo() {\n  return (\n    <${overlay} title="Profile details" description=${JSON.stringify(description)} trigger={${button}}>\n      <${overlay}Body${composition === "drawer" ? ' className="pt-5"' : ""}>${profile}</${overlay}Body>\n    </${overlay}>\n  );\n}`;
 };

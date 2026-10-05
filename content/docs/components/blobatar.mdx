@@ -12,6 +12,10 @@ import { BlobatarDemo } from "@/examples/blobatar-demo";
 import { BlobatarPhotoDemo } from "@/examples/blobatar-photo-demo";
 import { BlobatarMotionDemo } from "@/examples/blobatar-motion-demo";
 import { BlobatarPointerDemo } from "@/examples/blobatar-pointer-demo";
+import { BlobatarPopoverDemo } from "@/examples/blobatar-popover-demo";
+import { BlobatarDropdownDemo } from "@/examples/blobatar-dropdown-demo";
+import { BlobatarDialogDemo } from "@/examples/blobatar-dialog-demo";
+import { BlobatarDrawerDemo } from "@/examples/blobatar-drawer-demo";
 
 ## Usage
 
@@ -30,6 +34,58 @@ The `name` can be a username, ID, email, or team name. Generation runs locally, 
 </ComponentPreview>
 
 Installation adds only this wrapper and its declared packages. It uses Base UI Avatar directly; it does not install or overwrite a separate Avatar component. Requires React 19, Tailwind CSS 4, and Base UI 1.8+. The generated face has no site-specific theme token requirements.
+
+## Overlay Compositions
+
+Choose **Composition** in the playground to try the avatar as a Popover, Dropdown, Dialog, or Drawer trigger. Appearance, photos, expressions, and pointer tracking still apply; copied code includes the selected overlay. Composition is a playground setting, not a Blobatar prop.
+
+Install only the overlay you need alongside Blobatar, for example:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/blobatar.json https://vandor-ui.vercel.app/r/popover.json
+```
+
+Replace `popover.json` with `dropdown.json`, `dialog.json`, or `drawer.json` for the other examples. Blobatar itself does not depend on these overlays.
+
+### With Popover
+
+Click the avatar for a compact profile summary. Escape or an outside click dismisses it.
+
+<ComponentPreview
+  name="blobatar-popover-demo"
+  title="blobatar-popover-demo.tsx"
+>
+  <BlobatarPopoverDemo size={64} />
+</ComponentPreview>
+
+### With Dropdown
+
+Open the account menu and choose a status. The selection updates the text below the avatar; use arrow keys to navigate the menu.
+
+<ComponentPreview
+  name="blobatar-dropdown-demo"
+  title="blobatar-dropdown-demo.tsx"
+>
+  <BlobatarDropdownDemo size={64} />
+</ComponentPreview>
+
+### With Dialog
+
+Use a dialog for focused profile details. Focus stays inside until it closes, then returns to the avatar button.
+
+<ComponentPreview name="blobatar-dialog-demo" title="blobatar-dialog-demo.tsx">
+  <BlobatarDialogDemo size={64} />
+</ComponentPreview>
+
+### With Drawer
+
+A drawer keeps the profile in a side panel. Use its close button, Escape, or swipe toward the right edge on touch.
+
+<ComponentPreview name="blobatar-drawer-demo" title="blobatar-drawer-demo.tsx">
+  <BlobatarDrawerDemo size={64} />
+</ComponentPreview>
+
+Each trigger is a real button with an accessible name and a visible keyboard focus ring. The avatar inside is decorative (`alt=""`) so its label is not repeated. Triggers keep a minimum 44px hit area even for small avatars.
 
 ## Profile Photos
 

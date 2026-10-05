@@ -13,6 +13,12 @@ const ready = (async () => {
     "document",
     "navigator",
     "HTMLElement",
+    "HTMLButtonElement",
+    "HTMLInputElement",
+    "NodeFilter",
+    "MouseEvent",
+    "KeyboardEvent",
+    "CustomEvent",
     "HTMLImageElement",
     "SVGElement",
     "SVGSVGElement",
@@ -269,6 +275,10 @@ test("Blobatar playground serializes every control into runnable code matching t
     alias: {
       "@": process.cwd(),
       "@/components/ui/blobatar": `${process.cwd()}/registry/new-york/blobatar.tsx`,
+      "@/components/ui/dialog": `${process.cwd()}/registry/new-york/dialog.tsx`,
+      "@/components/ui/drawer": `${process.cwd()}/registry/new-york/drawer.tsx`,
+      "@/components/ui/dropdown": `${process.cwd()}/registry/new-york/dropdown.tsx`,
+      "@/components/ui/popover": `${process.cwd()}/registry/new-york/popover.tsx`,
     },
     fsCache: false,
     jsx: { runtime: "automatic" },
@@ -294,6 +304,14 @@ test("Blobatar playground serializes every control into runnable code matching t
     { followPointer: true },
     { followPointer: true, pointerTravel: 4 },
     {
+      composition: "popover",
+      followPointer: true,
+      name: 'A "quoted" name\n日本語',
+    },
+    { composition: "dropdown", size: 24, src: "/photo.png" },
+    { "blobatar.expression": "happy", composition: "dialog" },
+    { "blobatar.animate": "hover", composition: "drawer" },
+    {
       "blobatar.animate": "always",
       "blobatar.background": "circle",
       "blobatar.expression": "thinking",
@@ -310,11 +328,111 @@ test("Blobatar playground serializes every control into runnable code matching t
       { filename: `${process.cwd()}/blobatar-generated.tsx` }
     );
     const generated = renderToStaticMarkup(React.createElement(Demo));
+    const exports = {
+      dialog: "BlobatarDialogDemo",
+      drawer: "BlobatarDrawerDemo",
+      dropdown: "BlobatarDropdownDemo",
+      popover: "BlobatarPopoverDemo",
+    };
+    const Preview =
+      values.composition === "standalone"
+        ? Blobatar
+        : jiti(`../examples/blobatar-${values.composition}-demo.tsx`)[
+            exports[values.composition]
+          ];
     const preview = renderToStaticMarkup(
-      React.createElement(Blobatar, getBlobatarPreviewProps(values))
+      React.createElement(Preview, getBlobatarPreviewProps(values))
     );
     assert.equal(generated, preview);
   }
   assert.equal(defaults.name, "vandor");
   assert.equal(getBlobatarDefaults()["blobatar.animate"], "off");
+});
+
+test("Blobatar composition code renders named avatar buttons rather than inert spans", async () => {
+  await ready;
+  const jiti = createJiti(__filename, {
+    alias: Object.fromEntries([
+      ...["blobatar", "popover", "dropdown", "dialog", "drawer"].map((name) => [
+        `@/components/ui/${name}`,
+        `${process.cwd()}/registry/new-york/${name}.tsx`,
+      ]),
+      ["@", process.cwd()],
+    ]),
+    fsCache: false,
+    jsx: { runtime: "automatic" },
+  });
+  const { getBlobatarDefaults, getBlobatarCode } = jiti(
+    "../lib/blobatar-playground.ts"
+  );
+  const { renderToStaticMarkup } = require("react-dom/server");
+  for (const composition of ["popover", "dropdown", "dialog", "drawer"]) {
+    const code = getBlobatarCode({
+      ...getBlobatarDefaults(),
+      composition,
+      name: 'A "quoted" name',
+    });
+    const { Demo } = jiti.evalModule(code, {
+      filename: `${process.cwd()}/blobatar-composition-generated.tsx`,
+    });
+    const markup = renderToStaticMarkup(React.createElement(Demo));
+    assert.match(markup, /<button[^>]*aria-label="Open/);
+    assert.match(markup, /data-slot="blobatar"/);
+    assert.doesNotMatch(markup, /composition=/);
+  }
+});
+
+test("Blobatar dropdown selection updates status and profile examples open their overlays", async () => {
+  await ready;
+  const jiti = createJiti(__filename, {
+    alias: { "@": process.cwd() },
+    fsCache: false,
+    jsx: { runtime: "automatic" },
+  });
+  host = document.createElement("div");
+  document.body.append(host);
+  root = createRoot(host);
+  const mountedRoot = root;
+  const { createElement } = React;
+  for (const [name, exportName, role] of [
+    ["popover", "BlobatarPopoverDemo", "dialog"],
+    ["dropdown", "BlobatarDropdownDemo", "menu"],
+    ["dialog", "BlobatarDialogDemo", "dialog"],
+    ["drawer", "BlobatarDrawerDemo", "dialog"],
+  ]) {
+    const Example = jiti(`../examples/blobatar-${name}-demo.tsx`)[exportName];
+    await React.act(async () =>
+      mountedRoot.render(
+        createElement(Example, { name: "Test member", size: 24 })
+      )
+    );
+    const trigger = host.querySelector("button");
+    assert.match(trigger.getAttribute("aria-label"), /Test member/);
+    assert.equal(trigger.querySelector("img").getAttribute("alt"), "");
+    await React.act(async () => {
+      trigger.click();
+      await wait(80);
+    });
+    assert.ok(
+      document.querySelector(`[role="${role}"]`) !== null,
+      `${name} opens from avatar button`
+    );
+    if (name === "dropdown") {
+      const busy = [...document.querySelectorAll('[role="menuitem"]')].find(
+        (item) => item.textContent === "Busy"
+      );
+      assert.ok(Boolean(busy), "Account menu offers a Busy status");
+      await React.act(async () => {
+        busy.click();
+        await wait(80);
+      });
+      assert.equal(host.querySelector('[role="status"]').textContent, "Busy");
+    } else {
+      assert.match(
+        document.querySelector(`[role="${role}"]`).textContent,
+        /Test member/
+      );
+    }
+    await React.act(async () => mountedRoot.render(null));
+  }
 });
