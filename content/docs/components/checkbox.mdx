@@ -1,0 +1,87 @@
+---
+title: Checkbox
+description: A shadcn-based Checkbox with fluid indicator transitions, mixed state, and accessible form semantics.
+component: checkbox
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/checkbox
+    contribution: Adapted Base Nova Checkbox foundation. Vandor UI adds Motion indicator fade, scale, stroke drawing, mixed-state morphing, and reduced-motion support.
+---
+
+import { CheckboxDemo } from "@/examples/checkbox-demo";
+import { CheckboxStates } from "@/examples/checkbox-states";
+import { CheckboxGroup } from "@/examples/checkbox-group";
+import { CheckboxForm } from "@/examples/checkbox-form";
+
+## Usage
+
+```tsx
+"use client";
+
+import { Checkbox } from "@/components/ui/checkbox";
+
+export function Demo() {
+  return (
+    <label className="flex items-center gap-3 text-sm">
+      <Checkbox defaultChecked />
+      Enable notifications
+    </label>
+  );
+}
+```
+
+Use your configured UI alias if it differs. Requires React 19, Tailwind CSS 4 with shadcn theme tokens (`input`, `primary`, `primary-foreground`, `ring`, and `destructive`), Base UI 1.8+, and Motion 12.38+. No website-specific CSS, providers, or icon package is needed. The upstream MIT notice is included in the source. For manual installation, install the packages listed above and copy the complete Source into your configured UI directory, preserving the notice.
+
+## Examples
+
+### Basic
+
+Wrap the control and text in a label to make the whole row clickable. `defaultChecked` sets the initial uncontrolled state; changing it does not update an existing checkbox. The playground remounts the control when this configuration changes.
+
+<ComponentPreview name="checkbox-demo" title="checkbox-demo.tsx">
+  <CheckboxDemo />
+</ComponentPreview>
+
+### States and validation
+
+Disabled controls cannot change and are omitted from submission. Read-only controls retain focusability and their submitted value. Connect errors or helper text through `aria-describedby`; `aria-invalid` exposes invalid semantics and styling but does not implement validation itself.
+
+<ComponentPreview name="checkbox-states" title="checkbox-states.tsx">
+  <CheckboxStates />
+</ComponentPreview>
+
+### Controlled selection and indeterminate state
+
+Use `checked` with `onCheckedChange` for controlled state. The callback receives a boolean and Base UI event details immediately, before any animation finishes. `details.cancel()` rejects an update. `indeterminate` is independent of `checked`: a mixed state displays a line and announces `aria-checked="mixed"`. Manage both values yourself, as in this select-all example.
+
+<ComponentPreview name="checkbox-group" title="checkbox-group.tsx">
+  <CheckboxGroup />
+</ComponentPreview>
+
+### Native form submission and reset
+
+Set `name` and `value` to include a checked checkbox in `FormData`. The default checked value is `"on"`; unchecked inputs are omitted unless `uncheckedValue` is provided. Base UI does not synchronize uncontrolled visual state with native form reset. When reset is needed, use controlled state and restore it in the form's `onReset`, as shown here. Use `required` for native constraint validation; use `form` to associate an external control with a form.
+
+<ComponentPreview name="checkbox-form" title="checkbox-form.tsx">
+  <CheckboxForm />
+</ComponentPreview>
+
+## Behavior & Accessibility
+
+- Base UI preserves checkbox keyboard behavior: Tab focuses and Space toggles. Enter is not the toggle key.
+- The default visible root is a span with checkbox semantics plus a hidden native input. Use an enclosing label or Base UI Field for naming. For a sibling `htmlFor` label, use `render={<button />}` and `nativeButton` as described in the [Base UI documentation](https://base-ui.com/react/components/checkbox).
+- `ref` targets the visible root; `inputRef` targets the native input. Base UI root props, event handlers, state-aware `className`/`style`, and composition are forwarded. Children are reserved for the built-in indicator.
+- Indicator opacity, scale, stroke length, and check-to-line morph use interruptible 180 ms ease-out transitions. There is no bounce or delayed state update. Reduced-motion preferences make indicator transitions immediate and disable CSS color transitions. `animated={false}` disables indicator motion explicitly; color transitions remain unless reduced motion is preferred.
+- Light and dark styles inherit your shadcn tokens. A custom `className` merges with defaults. Do not remove accessible focus treatment without a replacement.
+
+## Storybook Stories (Optional)
+
+Install Checkbox first, then add portable stories to your existing React Storybook:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/checkbox-stories.json
+```
+
+This installs only `checkbox.stories.tsx` beside Checkbox in your configured UI directory, without reinstalling Checkbox, adding packages, or editing `.storybook/`. Review overwrite prompts for existing stories. Supply `@storybook/react` matching your installed Storybook version and React; stories are typechecked and composed against Storybook React 10.6.1. No extra example dependencies are required.
+
+Include `../components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)` in your existing `.storybook/main.ts` stories patterns, adjusting for your UI directory. Import your application's Tailwind/global stylesheet in `.storybook/preview.ts`; include the UI/stories directory in Tailwind source scanning. Stories inherit your theme and decorators. Apply your dark-theme selector inside the preview iframe, not only to the Storybook manager. The `autodocs` tag needs your existing `@storybook/addon-docs` configuration; Canvas and Controls do not.

@@ -1,0 +1,77 @@
+---
+title: Empty
+description: A composable shadcn-based empty state for missing data and first-use guidance.
+component: empty
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/empty
+    contribution: Adapted Base Nova Empty composition and styling, with the website-specific font class removed and Description props aligned with its rendered div.
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { EmptyDemo } from "@/examples/empty-demo";
+import { EmptyOutlineDemo } from "@/examples/empty-outline-demo";
+
+## Usage
+
+```tsx
+import {
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
+
+<Empty>
+  <EmptyHeader>
+    <EmptyTitle>No projects yet</EmptyTitle>
+    <EmptyDescription>
+      Create your first project to get started.
+    </EmptyDescription>
+  </EmptyHeader>
+</Empty>;
+```
+
+Use `EmptyHeader` to group optional `EmptyMedia`, `EmptyTitle`, and `EmptyDescription`. Put links, buttons, or inputs inside `EmptyContent`. Empty does not fetch data or decide when it is shown: render it after loading completes and there are no results.
+
+## Examples
+
+### First-use guidance
+
+Explain what is missing and how to get started. The icon is decorative; the text carries the meaning.
+
+<ComponentPreview name="empty-demo" title="empty-demo.tsx">
+  <EmptyDemo />
+</ComponentPreview>
+
+### Outline and next step
+
+Add `className="border"` to enable the existing dashed border style. The link below opens the component list. Replace it with a destination or a real application action appropriate to your empty state.
+
+<ComponentPreview name="empty-outline-demo" title="empty-outline-demo.tsx">
+  <EmptyOutlineDemo />
+</ComponentPreview>
+
+`EmptyMedia` defaults to a transparent container for arbitrary media. Use `variant="icon"` for a muted icon tile, or the default variant for an image or avatar. Media and actions are optional. Install [Button](/docs/components/button) separately if composing a Vandor Button; Empty does not install it automatically. Examples using icons also need `lucide-react`.
+
+### Consumer setup and optional stories
+
+Requires React 19, Tailwind CSS 4, `class-variance-authority`, and `cn`. Load your global Tailwind stylesheet with shadcn semantic tokens (`muted`, `foreground`, `muted-foreground`, `primary`, `border`, and `ring` for example links). No Base UI runtime, provider, animation CSS, or client directive is required for Empty itself. The `new-york` source directory name does not change its Base Nova styling foundation.
+
+The component and stories follow the UI alias configured in `components.json` (normally `components/ui`). Review the CLI overwrite prompt before replacing an existing Empty. For manual setup, install the declared dependencies and copy the Source into your UI directory; the examples and playground are not distributed with the component.
+
+Install Empty first, then optionally install its portable stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/empty-stories.json
+```
+
+Use your existing `@storybook/react` setup with matching Storybook package versions (types and composition checked with 10.6.1). Discover `**/*.stories.tsx` in your UI directory and load your global Tailwind/theme stylesheet in the preview. No extra addons or providers are required for Canvas and Controls. Stories inherit the consumer theme and add no Storybook configuration or component dependencies. This project has no Storybook server; Storybook UI appearance is not verified here.
+
+## Behavior & Accessibility
+
+Empty is a static layout, without state, callbacks, loading indicators, or animation. All six parts render `div` elements and forward native div attributes and React 19 refs. `EmptyTitle` is visual text, not an automatic semantic heading. For a named region, give Empty `role="region"` and `aria-labelledby` pointing to the title's `id`; add an appropriate heading role and `aria-level` to the title only when the page hierarchy calls for it.
+
+Hide decorative icons with `aria-hidden="true"`, provide meaningful alternative text for informative images, and use native links or buttons for actions. Empty does not automatically announce async results or move focus. If results change dynamically, choose an application-level live region based on the interaction rather than making every empty state an alert. Keep loading, failed requests, and genuinely empty results distinct.
+
+The playground's title and description are children of the corresponding parts. Outline, media visibility, and action visibility are demo composition controls, not extra component props. Generated code and Reset use the same settings as the preview.

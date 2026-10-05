@@ -11,6 +11,11 @@ import {
   getButtonDefaults,
 } from "@/lib/button-playground";
 import {
+  checkboxProps,
+  getCheckboxCode,
+  getCheckboxDefaults,
+} from "@/lib/checkbox-playground";
+import {
   dialogProps,
   getDialogCode,
   getDialogDefaults,
@@ -20,6 +25,11 @@ import {
   getDrawerCode,
   getDrawerDefaults,
 } from "@/lib/drawer-playground";
+import {
+  emptyProps,
+  getEmptyCode,
+  getEmptyDefaults,
+} from "@/lib/empty-playground";
 import {
   inputComponentProps,
   inputPlaygroundCode,
@@ -64,6 +74,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
     },
     props: buttonProps,
   },
+  checkbox: {
+    playground: { code: getCheckboxCode(getCheckboxDefaults()) },
+    props: checkboxProps,
+  },
   dialog: {
     playground: { code: getDialogCode(getDialogDefaults()) },
     props: dialogProps,
@@ -71,6 +85,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   drawer: {
     playground: { code: getDrawerCode(getDrawerDefaults()) },
     props: drawerProps,
+  },
+  empty: {
+    playground: { code: getEmptyCode(getEmptyDefaults()) },
+    props: emptyProps,
   },
   loading: {
     playground: { code: getLoadingCode(getLoadingDefaults()) },

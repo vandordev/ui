@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "checkbox-stories",
+  "title": "Checkbox Stories",
+  "description": "Optional portable Checkbox stories. Install Checkbox first; no component or Storybook configuration is overwritten.",
+  "files": [
+    {
+      "path": "registry/new-york/checkbox.stories.tsx",
+      "content": "import type { Meta, StoryObj } from \"@storybook/react\";\nimport { useState } from \"react\";\n\nimport { Checkbox } from \"./checkbox\";\n\nconst meta = {\n  argTypes: {\n    animated: { control: \"boolean\" },\n    \"aria-invalid\": { control: \"boolean\" },\n    \"aria-label\": { control: \"text\" },\n    checked: { control: false },\n    defaultChecked: { control: \"boolean\" },\n    disabled: { control: \"boolean\" },\n    indeterminate: { control: \"boolean\" },\n    inputRef: { control: false },\n    onCheckedChange: { control: false },\n    readOnly: { control: \"boolean\" },\n    render: { control: false },\n  },\n  args: {\n    animated: true,\n    \"aria-label\": \"Enable notifications\",\n    defaultChecked: false,\n    disabled: false,\n    indeterminate: false,\n    readOnly: false,\n  },\n  component: Checkbox,\n  parameters: { layout: \"centered\" },\n  render: (args) => (\n    <label className=\"flex items-center gap-3 text-sm\">\n      <Checkbox key={String(args.defaultChecked)} {...args} />\n      <span>{args[\"aria-label\"]}</span>\n    </label>\n  ),\n  tags: [\"autodocs\"],\n  title: \"Vandor UI/Checkbox\",\n} satisfies Meta<typeof Checkbox>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\nexport const Playground: Story = {};\nexport const Checked: Story = { args: { defaultChecked: true } };\nexport const Indeterminate: Story = { args: { indeterminate: true } };\nexport const Disabled: Story = {\n  args: { defaultChecked: true, disabled: true },\n};\nexport const ReadOnly: Story = {\n  args: { defaultChecked: true, readOnly: true },\n};\nexport const Invalid: Story = { args: { \"aria-invalid\": true } };\nexport const WithoutMotion: Story = { args: { animated: false } };\n\nconst ControlledExample = (args: React.ComponentProps<typeof Checkbox>) => {\n  const [checked, setChecked] = useState(false);\n  return (\n    <label className=\"flex items-center gap-3 text-sm\">\n      <Checkbox {...args} checked={checked} onCheckedChange={setChecked} />\n      <span>{checked ? \"Notifications enabled\" : \"Enable notifications\"}</span>\n    </label>\n  );\n};\nexport const Controlled: Story = {\n  argTypes: {\n    \"aria-label\": { control: false },\n    defaultChecked: { control: false },\n  },\n  render: (args) => <ControlledExample {...args} aria-label={undefined} />,\n};\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:item"
+}
