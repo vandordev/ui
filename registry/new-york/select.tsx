@@ -148,7 +148,7 @@ const SelectContent = ({
   const reduceMotion = useReducedMotion();
   const unmount = useContext(SelectActionsContext);
   return (
-    <SelectPrimitive.Portal>
+    <SelectPrimitive.Portal style={{ position: "absolute" }}>
       <SelectPrimitive.Positioner
         side={side}
         sideOffset={sideOffset}

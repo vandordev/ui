@@ -657,6 +657,74 @@ test("nested dialog portals escape transformed and clipping parent panels while 
   assert.equal(document.activeElement, childTrigger);
 });
 
+const inFlowElements = (parent) =>
+  [...parent.children].flatMap((child) => {
+    const style = getComputedStyle(child);
+    if (style.display === "contents") {
+      return inFlowElements(child);
+    }
+    if (
+      style.display === "none" ||
+      style.position === "absolute" ||
+      style.position === "fixed"
+    ) {
+      return [];
+    }
+    return [`${child.tagName}:${child.id}`];
+  });
+
+test("opening and closing Dialog do not add normal-flow items to the trigger's flex layout", async () => {
+  await ready;
+  const { Dialog, DialogBody } = load();
+  const el = React.createElement;
+  await mount(
+    el(
+      "div",
+      {
+        id: "trigger-layout",
+        style: { display: "flex", flexDirection: "column", gap: "12px" },
+      },
+      el(
+        Dialog,
+        {
+          title: "Edit project",
+          trigger: el(
+            "button",
+            { id: "layout-trigger", type: "button" },
+            "Edit project"
+          ),
+        },
+        el(DialogBody, null, "Project form")
+      ),
+      el("output", { id: "saved-name" }, "Current name: Vandor UI")
+    )
+  );
+  const layout = document.querySelector("#trigger-layout");
+  const expected = ["BUTTON:layout-trigger", "OUTPUT:saved-name"];
+  assert.deepEqual(inFlowElements(layout), expected);
+  await React.act(async () =>
+    document.querySelector("#layout-trigger").click()
+  );
+  assert.deepEqual(
+    inFlowElements(layout),
+    expected,
+    "the portal must not add a flex item and extra gap when opening"
+  );
+  await React.act(async () =>
+    document.querySelector('[data-slot="dialog-close-button"]').click()
+  );
+  assert.deepEqual(
+    inFlowElements(layout),
+    expected,
+    "exit animation must not shift the trigger either"
+  );
+  await React.act(async () => {
+    await frames();
+    await finishAnimations();
+  });
+  assert.deepEqual(inFlowElements(layout), expected);
+});
+
 test("without Web Animations Dialog is visible immediately and closing completes without retained popup", async () => {
   await ready;
   const { Dialog } = load();

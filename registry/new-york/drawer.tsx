@@ -5,6 +5,7 @@ import { cn } from "cn";
 import { XIcon } from "lucide-react";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -160,6 +161,20 @@ const DrawerRoot = ({
     );
   }
   const [container, setContainer] = useState<HTMLElement | null>(null);
+  const setHost = useCallback((node: HTMLSpanElement | null) => {
+    // Shared with Dialog: choose the outermost theme host, outside animated panels.
+    let host: HTMLElement | null = node;
+    let ancestor = node?.parentElement?.closest<HTMLElement>(
+      "[data-vandor-overlay-host]"
+    );
+    while (ancestor) {
+      host = ancestor;
+      ancestor = ancestor.parentElement?.closest<HTMLElement>(
+        "[data-vandor-overlay-host]"
+      );
+    }
+    setContainer(host);
+  }, []);
   const hasSnapPoints =
     snapPoints !== undefined && snapPoints !== null && snapPoints.length > 0;
   const value = useMemo(
@@ -176,8 +191,12 @@ const DrawerRoot = ({
 
   return (
     <DrawerContext.Provider value={value}>
-      {/* Keep portals inside the caller's theme scope, including nested drawers. */}
-      <span ref={setContainer} style={{ display: "contents" }}>
+      {/* Keep nested Dialog/Drawer portals in the outer caller's theme scope. */}
+      <span
+        ref={setHost}
+        data-vandor-overlay-host=""
+        style={{ display: "contents" }}
+      >
         <DrawerPrimitive.Root
           handle={selected[drawerControlKey].handle}
           onOpenChange={(nextOpen, details) => {
@@ -213,7 +232,11 @@ const DrawerTrigger = ({
 );
 
 const DrawerPortal = (props: DrawerPrimitive.Portal.Props) => (
-  <DrawerPrimitive.Portal data-slot="drawer-portal" {...props} />
+  <DrawerPrimitive.Portal
+    data-slot="drawer-portal"
+    style={{ position: "absolute" }}
+    {...props}
+  />
 );
 
 const DrawerClose = ({ className, ...props }: DrawerPrimitive.Close.Props) => (

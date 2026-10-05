@@ -31,6 +31,7 @@ import { XIcon } from "lucide-react";
 import { useAnimateMini, useReducedMotion } from "motion/react";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -92,11 +93,6 @@ const useDialogControl = (): DialogControl => {
   return useSubscription(control);
 };
 const DialogContext = createContext<DialogControl | null>(null);
-// Nested portals share the outermost theme host, never an animated popup.
-// null means the host has not mounted yet; undefined means no ancestor Dialog.
-const DialogPortalContainerContext = createContext<
-  HTMLElement | null | undefined
->(undefined);
 const useDialog = (control?: DialogControl): DialogControl => {
   const context = useContext(DialogContext);
   const selected = control ?? context;
@@ -264,10 +260,24 @@ const Dialog = ({
       "Dialog control cannot be combined with open, defaultOpen, or handle"
     );
   }
-  const [container, setContainer] = useState<HTMLElement | null>(null);
-  const parentPortalContainer = useContext(DialogPortalContainerContext);
-  const portalContainer =
-    parentPortalContainer === undefined ? container : parentPortalContainer;
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
+    null
+  );
+  const setContainer = useCallback((node: HTMLSpanElement | null) => {
+    // Dialog and Drawer share the outermost theme host without an install-time
+    // dependency on each other. Never portal into a transformed parent panel.
+    let host: HTMLElement | null = node;
+    let ancestor = node?.parentElement?.closest<HTMLElement>(
+      "[data-vandor-overlay-host]"
+    );
+    while (ancestor) {
+      host = ancestor;
+      ancestor = ancestor.parentElement?.closest<HTMLElement>(
+        "[data-vandor-overlay-host]"
+      );
+    }
+    setPortalContainer(host);
+  }, []);
   const {
     size = "md",
     showCloseButton = true,
@@ -298,100 +308,105 @@ const Dialog = ({
   };
   return (
     <DialogContext.Provider value={selected}>
-      <DialogPortalContainerContext.Provider value={portalContainer}>
-        <span ref={setContainer} style={{ display: "contents" }}>
-          <Primitive.Root
-            {...props}
-            handle={selected[controlKey].handle}
-            modal={modal}
-            onOpenChange={(nextOpen, details) => {
-              try {
-                onOpenChange?.(nextOpen, details);
-              } finally {
-                queueMicrotask(selected[controlKey].notify);
-              }
-            }}
+      <span
+        ref={setContainer}
+        data-vandor-overlay-host=""
+        style={{ display: "contents" }}
+      >
+        <Primitive.Root
+          {...props}
+          handle={selected[controlKey].handle}
+          modal={modal}
+          onOpenChange={(nextOpen, details) => {
+            try {
+              onOpenChange?.(nextOpen, details);
+            } finally {
+              queueMicrotask(selected[controlKey].notify);
+            }
+          }}
+        >
+          {trigger && (
+            <Primitive.Trigger
+              data-slot="dialog-trigger"
+              className="cursor-pointer disabled:cursor-not-allowed data-disabled:cursor-not-allowed"
+              render={trigger}
+            />
+          )}
+          <Primitive.Portal
+            container={portalContainer}
+            keepMounted={keepMounted}
+            // The theme host uses display: contents. A static portal wrapper
+            // would become an extra flex/grid item and introduce caller gaps.
+            style={{ position: "absolute" }}
           >
-            {trigger && (
-              <Primitive.Trigger
-                data-slot="dialog-trigger"
-                className="cursor-pointer disabled:cursor-not-allowed data-disabled:cursor-not-allowed"
-                render={trigger}
+            {modal === true && (
+              <Primitive.Backdrop
+                data-slot="dialog-overlay"
+                className="fixed inset-0 z-50 min-h-dvh bg-black/55 opacity-0 data-ending-style:pointer-events-none supports-[-webkit-touch-callout:none]:absolute"
+                render={(nativeProps, state) => (
+                  <AnimatedElement
+                    nativeProps={nativeProps}
+                    state={state}
+                    backdrop
+                  />
+                )}
               />
             )}
-            <Primitive.Portal
-              container={portalContainer}
-              keepMounted={keepMounted}
+            <Primitive.Viewport
+              data-slot="dialog-viewport"
+              className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
             >
-              {modal === true && (
-                <Primitive.Backdrop
-                  data-slot="dialog-overlay"
-                  className="fixed inset-0 z-50 min-h-dvh bg-black/55 opacity-0 data-ending-style:pointer-events-none supports-[-webkit-touch-callout:none]:absolute"
-                  render={(nativeProps, state) => (
-                    <AnimatedElement
-                      nativeProps={nativeProps}
-                      state={state}
-                      backdrop
-                    />
-                  )}
-                />
-              )}
-              <Primitive.Viewport
-                data-slot="dialog-viewport"
-                className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+              <Primitive.Popup
+                data-slot="dialog-popup"
+                data-size={size}
+                data-close-button={showCloseButton ? "" : undefined}
+                className={cn(
+                  "group/dialog-popup pointer-events-auto relative flex max-h-[calc(100dvh-2rem)] w-full min-h-0 translate-y-3 scale-[0.94] flex-col overflow-hidden rounded-xl border border-border bg-background text-sm text-foreground opacity-0 shadow-xl outline-none sm:max-h-[calc(100dvh-3rem)] data-nested-dialog-open:brightness-95",
+                  {
+                    "max-w-2xl": size === "lg",
+                    "max-w-4xl": size === "xl",
+                    "max-w-lg": size === "md",
+                    "max-w-sm": size === "sm",
+                  },
+                  className
+                )}
+                {...popupProps}
+                render={(nativeProps, state) => (
+                  <AnimatedElement
+                    nativeProps={nativeProps}
+                    state={state}
+                    render={render}
+                  />
+                )}
               >
-                <Primitive.Popup
-                  data-slot="dialog-popup"
-                  data-size={size}
-                  data-close-button={showCloseButton ? "" : undefined}
-                  className={cn(
-                    "group/dialog-popup pointer-events-auto relative flex max-h-[calc(100dvh-2rem)] w-full min-h-0 translate-y-3 scale-[0.94] flex-col overflow-hidden rounded-xl border border-border bg-background text-sm text-foreground opacity-0 shadow-xl outline-none sm:max-h-[calc(100dvh-3rem)] data-nested-dialog-open:brightness-95",
-                    {
-                      "max-w-2xl": size === "lg",
-                      "max-w-4xl": size === "xl",
-                      "max-w-lg": size === "md",
-                      "max-w-sm": size === "sm",
-                    },
-                    className
-                  )}
-                  {...popupProps}
-                  render={(nativeProps, state) => (
-                    <AnimatedElement
-                      nativeProps={nativeProps}
-                      state={state}
-                      render={render}
-                    />
-                  )}
+                <div
+                  data-slot="dialog-header"
+                  className="flex shrink-0 flex-col gap-2 p-4 pb-0 group-data-close-button/dialog-popup:pr-14"
                 >
-                  <div
-                    data-slot="dialog-header"
-                    className="flex shrink-0 flex-col gap-2 p-4 pb-0 group-data-close-button/dialog-popup:pr-14"
-                  >
-                    {renderHeader ? (
-                      renderHeader(elements)
-                    ) : (
-                      <>
-                        {elements.title}
-                        {elements.description}
-                      </>
-                    )}
-                  </div>
-                  <DialogChildren>{children}</DialogChildren>
-                  {showCloseButton && (
-                    <Primitive.Close
-                      data-slot="dialog-close-button"
-                      aria-label={closeButtonLabel}
-                      className="absolute top-3 right-3 inline-flex size-8 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none"
-                    >
-                      <XIcon aria-hidden="true" className="size-4" />
-                    </Primitive.Close>
+                  {renderHeader ? (
+                    renderHeader(elements)
+                  ) : (
+                    <>
+                      {elements.title}
+                      {elements.description}
+                    </>
                   )}
-                </Primitive.Popup>
-              </Primitive.Viewport>
-            </Primitive.Portal>
-          </Primitive.Root>
-        </span>
-      </DialogPortalContainerContext.Provider>
+                </div>
+                <DialogChildren>{children}</DialogChildren>
+                {showCloseButton && (
+                  <Primitive.Close
+                    data-slot="dialog-close-button"
+                    aria-label={closeButtonLabel}
+                    className="absolute top-3 right-3 inline-flex size-8 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none"
+                  >
+                    <XIcon aria-hidden="true" className="size-4" />
+                  </Primitive.Close>
+                )}
+              </Primitive.Popup>
+            </Primitive.Viewport>
+          </Primitive.Portal>
+        </Primitive.Root>
+      </span>
     </DialogContext.Provider>
   );
 };

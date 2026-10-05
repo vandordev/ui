@@ -131,7 +131,7 @@ export const PopoverContent = ({
   render,
   ...props
 }: PopoverContentProps) => (
-  <Primitive.Portal>
+  <Primitive.Portal style={{ position: "absolute" }}>
     <Primitive.Positioner
       align={align}
       side={side}

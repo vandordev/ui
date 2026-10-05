@@ -37,7 +37,7 @@ export function ProjectSettings() {
 }
 ```
 
-The registry installs editable source into your project. Use your configured UI alias if it differs from `@/components/ui`.
+The registry installs editable source in your configured UI directory, rather than a fixed `components/ui` target. Use your configured UI alias if it differs from `@/components/ui`. When updating an older installation with a custom alias, check for an existing copy at the old target and move your customizations deliberately; the CLI does not remove that copy. Review overwrite prompts before replacing customized source.
 
 ## Examples
 
@@ -47,7 +47,9 @@ The registry installs editable source into your project. Use your configured UI 
 
 ## Panel API
 
-`Drawer` owns the trigger, portal, optional backdrop, swipeable panel, header, and built-in X. Only the optional trigger occupies space in the page; the panel renders through a portal. The public API has one panel composition, not a separate root/content composition.
+`Drawer` owns the trigger, portal, optional backdrop, swipeable panel, header, and built-in X. Only the optional trigger occupies space in the page; the panel and its portal wrapper stay out of normal flow, including with `contentProps.keepMounted`. The public API has one panel composition, not a separate root/content composition.
+
+Nested Drawers and Dialogs share the outermost panel's theme host, outside its transformed panel. Child panels avoid parent clipping and retain the outer theme; their triggers remain inside their parent. Update both components when using mixed nesting with older installed source.
 
 | Prop               | Purpose                                                                                                                                           |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -483,3 +485,13 @@ For forms reused outside drawers, pass `onSuccess={close}` through Drawer's rend
 - Keep long content inside DrawerBody. The portal stays in the caller's theme scope, preserving inherited tokens and nested panels.
 
 See the [Base UI Drawer API](https://base-ui.com/react/components/drawer) for underlying behavior and root props.
+
+## Portable Storybook stories
+
+Install Drawer first, then optionally install its colocated stories without overwriting the component:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/drawer-stories.json
+```
+
+The item installs only `drawer.stories.tsx` in your configured UI directory. It does not install Storybook packages or modify `.storybook/`. Stories are typechecked and composed with Storybook 10.6.1; use matching Storybook package versions in your consumer. Discover `**/*.stories.tsx` and import your Tailwind/shadcn global CSS and theme in the preview. No additional runtime dependency is required. Scenarios include directions, snap points, long content, persistent content, non-modal, controlled state, and nesting. Storybook UI was not verified because this repository has no Storybook server.

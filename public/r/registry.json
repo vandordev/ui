@@ -41,8 +41,31 @@
       "files": [
         {
           "path": "registry/new-york/drawer.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/drawer.tsx"
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "drawer-stories",
+      "type": "registry:item",
+      "title": "Drawer Stories",
+      "description": "Optional portable Drawer stories. Install Drawer first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/drawer.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "select-stories",
+      "type": "registry:item",
+      "title": "Select Stories",
+      "description": "Optional portable Select stories. Install Select first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/select.stories.tsx",
+          "type": "registry:ui"
         }
       ]
     },
@@ -69,8 +92,7 @@
       "files": [
         {
           "path": "registry/new-york/select.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/select.tsx"
+          "type": "registry:ui"
         }
       ]
     },

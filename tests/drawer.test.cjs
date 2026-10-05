@@ -13,7 +13,7 @@ const jiti = createJiti(__filename, {
 });
 const el = React.createElement;
 
-test("Drawer registry item declares the Base UI dependency and install target", () => {
+test("Drawer registry item declares Base UI and follows the consumer UI directory", () => {
   const item = registry.items.find((entry) => entry.name === "drawer");
   assert.ok(item);
   assert.ok(item.dependencies.includes("@base-ui/react"));
@@ -21,7 +21,7 @@ test("Drawer registry item declares the Base UI dependency and install target", 
     item.files.some(
       (file) =>
         file.path === "registry/new-york/drawer.tsx" &&
-        file.target === "components/ui/drawer.tsx"
+        file.target === undefined
     )
   );
 });

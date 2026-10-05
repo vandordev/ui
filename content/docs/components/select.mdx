@@ -108,7 +108,7 @@ export function Demo() {
 }
 ```
 
-Use your project's configured UI alias if it differs from `@/components/ui`. Pass `items` to map stored values to readable labels.
+Use your project's configured UI alias if it differs from `@/components/ui`. The registry now installs in that configured UI directory rather than a fixed `components/ui` target. When updating older source with a custom alias, check for a copy at the old target and move customizations deliberately; the CLI does not remove it. Review overwrite prompts before replacing customized source. Pass `items` to map stored values to readable labels.
 
 ## Examples
 
@@ -168,6 +168,8 @@ Use `value` and `onValueChange` on `Select` for controlled selection, or `defaul
 
 ## Motion & Accessibility
 
+The popup and portal wrapper stay out of normal flow, including when `body` uses flex/grid. Opening the menu does not add a layout item beside your app.
+
 The trigger uses a subtle vertical gradient, a pointer cursor, and press feedback matching Button: it scales to `0.96` and darkens by 10% while pressed, with a `120ms` ease-out transition. Disabled triggers show a not-allowed cursor and do not scale or darken. Reduced-motion preferences disable scaling and transitions while retaining instant color feedback. Options use a pointer cursor; disabled options show a not-allowed cursor and remain unselectable.
 
 The option menu fades and scales from `0.96` to `1` over `180ms` with an ease-out curve. Closing reverses the effect over `120ms`, keeping the popup mounted until Motion finishes. Options remain immediately interactive, without staggered delays.
@@ -178,6 +180,16 @@ The option menu fades and scales from `0.96` to `1` over `180ms` with an ease-ou
 - Base UI preserves Arrow-key navigation, typeahead, Enter/Space selection, Escape dismissal, and focus restoration.
 - Long lists scroll within the available viewport height, with scroll-arrow affordances.
 - Give every control an accessible name using a visible label or `aria-label` on `SelectTrigger`.
+
+## Portable Storybook stories
+
+Install Select first, then optionally install its colocated stories without overwriting the component:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/select-stories.json
+```
+
+The item installs only `select.stories.tsx` in your configured UI directory. It does not install Storybook packages or modify `.storybook/`. Stories are typechecked and composed with Storybook 10.6.1; use matching Storybook package versions in your consumer. Discover `**/*.stories.tsx` and import your Tailwind/shadcn global CSS and theme in the preview. No additional runtime dependency is required. Scenarios include sizes, disabled options, groups, multiple selection, invalid and controlled states, and disabled motion. Storybook UI was not verified because this repository has no Storybook server.
 
 ## Migration
 
