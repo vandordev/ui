@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "accordion",
+    "blobatar",
     "button",
     "calendar",
     "checkbox",

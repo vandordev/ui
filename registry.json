@@ -3,6 +3,33 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "blobatar",
+      "type": "registry:ui",
+      "title": "Blobatar",
+      "description": "A deterministic local avatar with optional profile photo fallback and opt-in Blobatar motion.",
+      "dependencies": [
+        "@base-ui/react@^1.8.0",
+        "blobatar@^2.7.0",
+        "@blobatar/react@^2.7.0",
+        "cn"
+      ],
+      "files": [
+        { "path": "registry/new-york/blobatar.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "blobatar-stories",
+      "type": "registry:item",
+      "title": "Blobatar Stories",
+      "description": "Optional portable Blobatar stories. Install Blobatar first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/blobatar.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "error-state",
       "type": "registry:ui",
       "title": "Error State",

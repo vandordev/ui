@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "blobatar",
+  "title": "Blobatar",
+  "description": "A deterministic local avatar with optional profile photo fallback and opt-in Blobatar motion.",
+  "dependencies": [
+    "@base-ui/react@^1.8.0",
+    "blobatar@^2.7.0",
+    "@blobatar/react@^2.7.0",
+    "cn"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/blobatar.tsx",
+      "content": "\"use client\";\n\nimport { Avatar } from \"@base-ui/react/avatar\";\nimport { Blobatar as GeneratedBlobatar } from \"@blobatar/react\";\nimport { useGaze } from \"@blobatar/react/gaze\";\nimport type { BlobatarOptions } from \"blobatar\";\nimport { cn } from \"cn\";\nimport type * as React from \"react\";\n\nexport type BlobatarAppearance = Omit<\n  BlobatarOptions,\n  \"size\" | \"title\" | \"animate\"\n> & {\n  animate?: false | \"hover\" | \"always\";\n};\n\nexport type BlobatarProps = Omit<React.ComponentProps<\"span\">, \"children\"> & {\n  /** Stable identity used to generate the fallback locally. */\n  name: string;\n  /** Optional profile photo. Loading and failed photos show the fallback. */\n  src?: string;\n  /** Accessible label for both photo and fallback. Empty means decorative. */\n  alt?: string;\n  /** Width and height in pixels. Explicit style can override them. */\n  size?: number;\n  /** Follow a fine pointer. Requires motion.css and gaze.css; forces inline SVG. */\n  followPointer?: boolean;\n  /** Eye excursion in SVG viewBox units, not screen pixels. */\n  pointerTravel?: number;\n  /** Generator options. Motion requires blobatar/motion.css. */\n  blobatar?: BlobatarAppearance;\n};\n\nexport const Blobatar = ({\n  name,\n  src,\n  alt = \"\",\n  size = 40,\n  followPointer = false,\n  pointerTravel = 3,\n  blobatar,\n  className,\n  style,\n  ...props\n}: BlobatarProps) => {\n  const { ref: gazeRef } = useGaze({\n    lookAt: followPointer ? \"pointer\" : null,\n    travel: pointerTravel,\n  });\n  return (\n    <Avatar.Root\n      data-slot=\"blobatar\"\n      className={cn(\"relative inline-flex shrink-0 align-middle\", className)}\n      style={{ height: size, width: size, ...style }}\n      {...props}\n    >\n      {src ? (\n        <Avatar.Image\n          data-slot=\"blobatar-image\"\n          src={src}\n          alt={alt}\n          keepMounted\n          className=\"absolute inset-0 size-full rounded-full object-cover data-[loading]:invisible data-[error]:invisible\"\n        />\n      ) : null}\n      <Avatar.Fallback data-slot=\"blobatar-fallback\" className=\"flex size-full\">\n        <GeneratedBlobatar\n          background=\"circle\"\n          {...blobatar}\n          animate={followPointer ? \"always\" : blobatar?.animate || undefined}\n          ref={followPointer ? gazeRef : undefined}\n          name={name}\n          title={alt || undefined}\n          className=\"size-full\"\n        />\n      </Avatar.Fallback>\n    </Avatar.Root>\n  );\n};\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

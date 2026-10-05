@@ -6,6 +6,11 @@ import {
   getAccordionDefaults,
 } from "@/lib/accordion-playground";
 import {
+  blobatarProps,
+  getBlobatarCode,
+  getBlobatarDefaults,
+} from "@/lib/blobatar-playground";
+import {
   buttonProps,
   getButtonCode,
   getButtonDefaults,
@@ -77,6 +82,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   accordion: {
     playground: { code: getAccordionCode(getAccordionDefaults()) },
     props: accordionProps,
+  },
+  blobatar: {
+    playground: { code: getBlobatarCode(getBlobatarDefaults()) },
+    props: blobatarProps,
   },
   button: {
     playground: {

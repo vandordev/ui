@@ -1,0 +1,115 @@
+---
+title: Blobatar
+description: Locally generated geometric avatars with profile photo fallback and opt-in motion.
+component: blobatar
+credits:
+  - name: Blobatar by Alain
+    url: https://github.com/Alain00/blobatar
+    contribution: MIT-licensed generator and React adapter used as dependencies. Vandor UI adds a Base UI photo/fallback composition, sizing, playground, and portable stories.
+---
+
+import { BlobatarDemo } from "@/examples/blobatar-demo";
+import { BlobatarPhotoDemo } from "@/examples/blobatar-photo-demo";
+import { BlobatarMotionDemo } from "@/examples/blobatar-motion-demo";
+import { BlobatarPointerDemo } from "@/examples/blobatar-pointer-demo";
+
+## Usage
+
+```tsx
+import { Blobatar } from "@/components/ui/blobatar";
+
+export function Demo() {
+  return <Blobatar name="vandor" alt="Vandor" size={48} />;
+}
+```
+
+The `name` can be a username, ID, email, or team name. Generation runs locally, with no call to blobatar.dev. Prefer a stable public ID when names could expose personal information in rendered markup. Names are NFC-normalized, trimmed, and lowercased unless you pass `blobatar={{ normalize: false }}`.
+
+<ComponentPreview name="blobatar-demo" title="blobatar-demo.tsx">
+  <BlobatarDemo />
+</ComponentPreview>
+
+Installation adds only this wrapper and its declared packages. It uses Base UI Avatar directly; it does not install or overwrite a separate Avatar component. Requires React 19, Tailwind CSS 4, and Base UI 1.8+. The generated face has no site-specific theme token requirements.
+
+## Profile Photos
+
+Pass `src` when a profile photo exists. The generated fallback is visible while the photo loads and after a load error. Once loaded, the round photo replaces the fallback. Changing `src` lets Base UI resolve the new image; removing it restores the fallback.
+
+<ComponentPreview name="blobatar-photo-demo" title="blobatar-photo-demo.tsx">
+  <BlobatarPhotoDemo />
+</ComponentPreview>
+
+## Motion and Expressions
+
+Animation is off by default. Static faces use a single `<img>` with a local SVG data URI. `animate: "hover"` or `"always"` switches the fallback to inline SVG. Import the package stylesheet once in your application's global entry or the animated component:
+
+```tsx
+import "blobatar/motion.css";
+import { happy } from "blobatar/expression";
+import { Blobatar } from "@/components/ui/blobatar";
+
+<Blobatar name="vandor" blobatar={{ animate: "hover", expression: happy }} />;
+```
+
+Expressions are imported **values**, not strings. The upstream roster includes idle, happy, sad, mad, surprised, wink, sleepy, smug, unsure, scared, love, shy, sick, and thinking. Poses remain until changed. A pose works without `animate`; morphing between poses requires inline SVG. Thinking's eye cycle also requires `blobatar/motion.css`.
+
+<ComponentPreview name="blobatar-motion-demo" title="blobatar-motion-demo.tsx">
+  <BlobatarMotionDemo />
+</ComponentPreview>
+
+Prefer static faces for long lists and hover motion for small grids. Reserve always-on motion for a single prominent avatar. Upstream motion becomes static under `prefers-reduced-motion` and hover motion does not activate on touch.
+
+## Following the Mouse
+
+Enable `followPointer` for eyes that follow your mouse anywhere on the page. This uses the official `useGaze` hook, automatically switches the fallback to inline SVG with always-on motion, and requires both stylesheets:
+
+```tsx
+import "blobatar/motion.css";
+import "blobatar/gaze.css";
+import { Blobatar } from "@/components/ui/blobatar";
+
+<Blobatar name="vandor" size={128} followPointer pointerTravel={3} />;
+```
+
+<ComponentPreview
+  name="blobatar-pointer-demo"
+  title="blobatar-pointer-demo.tsx"
+>
+  <BlobatarPointerDemo />
+</ComponentPreview>
+
+`pointerTravel` defaults to 3, measured in SVG viewBox units (the face is 100 units wide), not screen pixels. The playground offers 1–4. It is easier to see at 96–128px than at list-avatar sizes. `followPointer` takes precedence over `blobatar.animate`, including `false`. Disabling it restores the configured animation mode.
+
+Tracking attaches only for a fine pointer with hover support and without reduced motion. It stops on unmount, while a loaded photo replaces the fallback, and when those media preferences change. Photos do not track the pointer. Importing this wrapper includes the upstream gaze driver, but no pointer tracking listeners attach unless `followPointer` is enabled. The public `ref` still targets the outer span.
+
+## Appearance
+
+Pass generator options through `blobatar`. The fallback defaults to a full-frame `"circle"` backdrop, matching the photo's occupied area. The upstream body sits inside its SVG viewBox with intentional breathing room; this is not CSS padding. The backdrop fills that room without cropping the body or its motion. Set `background: false` for the original transparent silhouette. `background` also accepts `"square"` and `"squircle"`. Hue, tone, traits, palette, normalize, and contrast are forwarded to the official renderer:
+
+```tsx
+<Blobatar name="vandor" blobatar={{ hue: 220, background: "squircle" }} />
+```
+
+The outer `size` controls both photo and fallback. Override dimensions through `style`; `className` merges on the outer span. Photo styling is fixed to a circle; fallback backdrop configuration does not change the photo. Body shapes are generated from the name, not the backdrop.
+
+Identical names produce identical faces within a package major version. Registry dependencies stay on major 2; upgrading to a new major may change the name-to-face mapping. Custom palette colors bypass upstream's eye/body contrast guarantee. See the [upstream API](https://blobatar.dev/llms.txt) for traits and palette configuration.
+
+## Behavior and Accessibility
+
+`alt` defaults to an empty string, making the face decorative when a name is already written beside it. Pass `alt="Person's name"` for a standalone avatar. The label is used for both the photo's alternative text and the generated SVG title. Expressions are decorative: announce loading or presence separately in real text, not through facial poses.
+
+Native span attributes, event handlers, style, and the public `ref` target the outer span. There is no internal click behavior or keyboard control. For an actionable avatar, wrap it in an accessible button or link rather than adding an unlabeled click handler. Children and Base UI's render-composition API are not exposed.
+
+The local SVG data URI requires your Content Security Policy to allow `data:` in `img-src`. Photo URLs need their own allowed origins. Animation CSS is an explicit consumer setup step; copying Source alone will not enable motion.
+
+## Portable Storybook Stories
+
+Install Blobatar first, then optionally install stories without replacing your customized component:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/blobatar-stories.json
+```
+
+The stories import the colocated `./blobatar` component. They do not install Storybook packages or change `.storybook/`. Supply your existing matching Storybook React packages (types checked against `@storybook/react` 10.6.1), React 19, Tailwind CSS 4, and your consumer theme. Include `**/*.stories.tsx` under your UI directory in the Storybook stories glob. Import `blobatar/motion.css` in `.storybook/preview.ts` to enable the motion stories, plus `blobatar/gaze.css` for PointerTracking. No optional addons are required.
+
+Ordinary Blobatar installation includes neither stories nor Storybook dependencies. Storybook UI is not verified here because this project has no Storybook server.

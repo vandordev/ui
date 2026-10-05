@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { AccordionPlayground } from "@/components/accordion-playground";
+import { BlobatarPlayground } from "@/components/blobatar-playground";
 import { ButtonPlayground } from "@/components/button-playground";
 import { CheckboxPlayground } from "@/components/checkbox-playground";
 import { CodeCollapsibleWrapper } from "@/components/code-collapsible-wrapper";
@@ -19,6 +20,7 @@ import { componentDocDefinitions } from "@/lib/component-docs";
 
 const playgrounds: Record<string, () => ReactNode> = {
   accordion: AccordionPlayground,
+  blobatar: BlobatarPlayground,
   button: ButtonPlayground,
   calendar: () => <InputFamilyPlayground component="calendar" />,
   checkbox: CheckboxPlayground,
