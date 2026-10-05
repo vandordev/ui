@@ -131,7 +131,9 @@ export const PopoverContent = ({
   render,
   ...props
 }: PopoverContentProps) => (
-  <Primitive.Portal style={{ position: "absolute" }}>
+  // Keep the portal out of flex/grid flow without inheriting the static
+  // position at the end of its container (which can scroll autofocus there).
+  <Primitive.Portal style={{ left: 0, position: "absolute", top: 0 }}>
     <Primitive.Positioner
       align={align}
       side={side}

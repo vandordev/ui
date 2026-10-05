@@ -148,7 +148,9 @@ const SelectContent = ({
   const reduceMotion = useReducedMotion();
   const unmount = useContext(SelectActionsContext);
   return (
-    <SelectPrimitive.Portal style={{ position: "absolute" }}>
+    // Explicit insets avoid an end-of-container static position while keeping
+    // the portal out of flex/grid flow.
+    <SelectPrimitive.Portal style={{ left: 0, position: "absolute", top: 0 }}>
       <SelectPrimitive.Positioner
         side={side}
         sideOffset={sideOffset}

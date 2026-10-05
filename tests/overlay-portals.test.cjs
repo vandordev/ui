@@ -54,6 +54,7 @@ const ready = (async () => {
       "select",
       "date-picker",
       "date-range-picker",
+      "input-phone",
     ].map((name) => jiti(`../registry/new-york/${name}.tsx`))
   );
 })();
@@ -169,9 +170,15 @@ for (const name of ["Dialog", "Drawer"]) {
   }
 }
 
-for (const name of ["Popover", "Select", "DatePicker", "DateRangePicker"]) {
+for (const name of [
+  "Popover",
+  "Select",
+  "DatePicker",
+  "DateRangePicker",
+  "InputPhone",
+]) {
   for (const layout of ["flex", "grid"]) {
-    test(`${name} adds no normal-flow item to a ${layout} body`, async () => {
+    test(`${name} uses an explicit portal origin outside a ${layout} body's normal flow`, async () => {
       await ready;
       const el = React.createElement;
       document.body.style.display = layout;
@@ -192,13 +199,33 @@ for (const name of ["Popover", "Select", "DatePicker", "DateRangePicker"]) {
           "aria-label": "Choice",
           data: [{ label: "One", value: "one" }],
         });
+      } else if (name === "InputPhone") {
+        element = el(components.InputPhone, {
+          defaultCountry: "ID",
+          label: "Phone",
+        });
       } else {
         element = el(components[name], { label: "Date", motion: false });
       }
       await mount(element);
       assertFlow(document.body, [host]);
       await React.act(async () => host.querySelector("button").click());
-      assert.ok(document.querySelector("[data-base-ui-portal]"));
+      const portal = document.querySelector("[data-base-ui-portal]");
+      assert.ok(portal);
+      // DOM-only guard for the browser-reproduced scroll regression: an
+      // absolute portal with auto insets inherits its end-of-document static
+      // position. Happy DOM cannot prove viewport placement or scroll stability.
+      const portalStyle = getComputedStyle(portal);
+      assert.equal(
+        portalStyle.top,
+        "0px",
+        "portal must not use its static Y position"
+      );
+      assert.equal(
+        portalStyle.left,
+        "0px",
+        "portal must not use its static X position"
+      );
       assertFlow(document.body, [host]);
       await React.act(async () =>
         document.activeElement.dispatchEvent(
