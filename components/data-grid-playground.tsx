@@ -164,7 +164,7 @@ function PreviewSurface<C extends typeof usersGrid | typeof cursorUsersGrid>({
           stickyHeader={config.stickyHeader}
         />
       </DataGridViewport>
-      <DataGridPagination />
+      <DataGridPagination showPageNumbers={config.showPageNumbers} />
     </DataGrid>
   );
 }

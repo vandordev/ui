@@ -53,6 +53,7 @@ interface Args {
   filterMode: "immediate" | "apply";
   selectionMode: "none" | "explicit" | "allMatching";
   stickyHeader: boolean;
+  showPageNumbers: boolean;
   scenario: "ready" | "empty" | "error" | "inactive" | "loading";
   pagination: "page" | "cursor";
   controlled: boolean;
@@ -138,7 +139,7 @@ function StoryGrid(args: Args) {
           stickyHeader={args.stickyHeader}
         />
       </DataGridViewport>
-      <DataGridPagination />
+      <DataGridPagination showPageNumbers={args.showPageNumbers} />
     </DataGrid>
   );
 }
@@ -195,7 +196,7 @@ function CursorGrid(args: Args) {
           stickyHeader={args.stickyHeader}
         />
       </DataGridViewport>
-      <DataGridPagination />
+      <DataGridPagination showPageNumbers={args.showPageNumbers} />
     </DataGrid>
   );
 }
@@ -229,6 +230,7 @@ const meta = {
       options: ["none", "explicit", "allMatching"],
     },
     stickyHeader: { control: "boolean" },
+    showPageNumbers: { control: "boolean" },
     variant: {
       control: "select",
       options: ["default", "striped", "bordered", "plain"],
@@ -242,6 +244,7 @@ const meta = {
     scenario: "ready",
     selectionMode: "none",
     stickyHeader: false,
+    showPageNumbers: true,
     variant: "default",
   },
   component: Example,
@@ -258,12 +261,17 @@ export const Plain: Story = { args: { variant: "plain" } };
 export const ApplyFilters: Story = { args: { filterMode: "apply" } };
 export const AllMatching: Story = { args: { selectionMode: "allMatching" } };
 export const StickyHeader: Story = { args: { stickyHeader: true } };
+export const IconPagination: Story = { args: { showPageNumbers: false } };
 export const Empty: Story = { args: { scenario: "empty" } };
 export const Error: Story = { args: { scenario: "error" } };
 export const Inactive: Story = { args: { scenario: "inactive" } };
 export const Loading: Story = { args: { scenario: "loading" } };
 export const Cursor: Story = {
-  argTypes: { controlled: { control: false }, scenario: { control: false } },
+  argTypes: {
+    controlled: { control: false },
+    scenario: { control: false },
+    showPageNumbers: { control: false },
+  },
   args: { pagination: "cursor" },
 };
 export const Controlled: Story = { args: { controlled: true } };

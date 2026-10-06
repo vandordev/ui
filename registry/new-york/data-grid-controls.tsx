@@ -1,6 +1,12 @@
 "use client";
 
 import { cn } from "cn";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 import { useId } from "react";
 import type { ComponentProps, ReactNode } from "react";
 
@@ -8,6 +14,7 @@ import { Button } from "./button";
 import { useDataGridContext } from "./data-grid-context";
 import type { DataGridSurface } from "./data-grid-context";
 import type { DataGridContract, DataGridFilterInput } from "./data-grid-schema";
+import { getDataGridPageLinks } from "./data-grid-state";
 import {
   DropdownRoot,
   DropdownTrigger,
@@ -182,12 +189,47 @@ export function DataGridColumnVisibility() {
   );
 }
 
-export function DataGridPagination({
-  pageSizes = [25, 50, 100],
-  className,
-  ...props
-}: ComponentProps<"div"> & { pageSizes?: readonly number[] }) {
+const DataGridPageLinks = ({
+  links,
+  index,
+}: {
+  links: (number | "ellipsis")[];
+  index: number;
+}) => {
   const { grid, labels } = useDataGridContext();
+  return links.map((link, position) => {
+    if (link === "ellipsis") {
+      return (
+        <span
+          key={`gap-${position}`}
+          aria-hidden="true"
+          className="flex size-8 items-center justify-center text-muted-foreground"
+        >
+          …
+        </span>
+      );
+    }
+    return (
+      <Button
+        key={link}
+        type="button"
+        size="icon-sm"
+        variant={link === index ? "default" : "outline"}
+        data-page={link}
+        aria-label={labels.page(link)}
+        aria-current={link === index ? "page" : undefined}
+        disabled={!grid.presentation.currentData}
+        onClick={() => grid.table.setPageIndex(link - 1)}
+        className="min-w-8 w-auto px-2 tabular-nums"
+      >
+        {link}
+      </Button>
+    );
+  });
+};
+
+const usePaginationPresentation = (showPageNumbers: boolean) => {
+  const { grid } = useDataGridContext();
   const { pagination } = grid.request;
   const { data } = grid.query;
   const page = "pageIndex" in pagination;
@@ -204,6 +246,26 @@ export function DataGridPagination({
       ? 0
       : Math.min(from === 0 ? 0 : from + pagination.pageSize - 1, count);
   const index = page ? pagination.pageIndex + 1 : grid.cursorHistory.index + 1;
+  const numbered = page && showPageNumbers;
+  const links =
+    numbered && count !== undefined
+      ? getDataGridPageLinks(index, grid.pageCount ?? 1)
+      : [];
+  return { count, from, index, links, numbered, page, pagination, to };
+};
+
+export function DataGridPagination({
+  pageSizes = [25, 50, 100],
+  showPageNumbers = true,
+  className,
+  ...props
+}: ComponentProps<"div"> & {
+  pageSizes?: readonly number[];
+  showPageNumbers?: boolean;
+}) {
+  const { grid, labels } = useDataGridContext();
+  const { count, from, index, links, numbered, page, pagination, to } =
+    usePaginationPresentation(showPageNumbers);
   return (
     <div
       {...props}
@@ -230,54 +292,58 @@ export function DataGridPagination({
           }}
           size="sm"
         />
-        {page && (
+        {page && !numbered && (
           <Button
             type="button"
-            size="sm"
+            size="icon-sm"
             variant="outline"
             disabled={!grid.canPreviousPage}
             onClick={() => grid.table.setPageIndex(0)}
             aria-label={labels.first}
           >
-            {labels.first}
+            <ChevronsLeft aria-hidden="true" />
           </Button>
         )}
         <Button
           type="button"
-          size="sm"
+          size="icon-sm"
           variant="outline"
           disabled={!grid.canPreviousPage}
           onClick={() => grid.previousPage()}
           aria-label={labels.previous}
         >
-          {labels.previous}
+          <ChevronLeft aria-hidden="true" />
         </Button>
-        <span className="tabular-nums">
-          {labels.page(
-            index,
-            page && count !== undefined ? grid.pageCount : undefined
-          )}
-        </span>
+        {links.length > 0 ? (
+          <DataGridPageLinks links={links} index={index} />
+        ) : (
+          <span className="tabular-nums">
+            {labels.page(
+              index,
+              page && count !== undefined ? grid.pageCount : undefined
+            )}
+          </span>
+        )}
         <Button
           type="button"
-          size="sm"
+          size="icon-sm"
           variant="outline"
           disabled={!grid.canNextPage}
           onClick={() => grid.nextPage()}
           aria-label={labels.next}
         >
-          {labels.next}
+          <ChevronRight aria-hidden="true" />
         </Button>
-        {page && (
+        {page && !numbered && (
           <Button
             type="button"
-            size="sm"
+            size="icon-sm"
             variant="outline"
             disabled={!grid.canNextPage}
             onClick={() => grid.table.setPageIndex((grid.pageCount ?? 1) - 1)}
             aria-label={labels.last}
           >
-            {labels.last}
+            <ChevronsRight aria-hidden="true" />
           </Button>
         )}
       </div>

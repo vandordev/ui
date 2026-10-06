@@ -47,8 +47,8 @@ const listUsers = procedure
 const grid = useDataGrid({
   contract: usersGrid,
   columns,
-  getRowId: row => row.id,
-  queryOptions: input => trpc.users.list.queryOptions(input),
+  getRowId: (row) => row.id,
+  queryOptions: (input) => trpc.users.list.queryOptions(input),
 });
 ```
 
@@ -62,7 +62,12 @@ Draft bindings infer `z.input`, while `request` and query factories use normaliz
 
 ## Cursor pagination
 
-<ComponentPreview name="data-grid-cursor-demo" title="data-grid-cursor-demo.tsx">
+Page pagination shows Previous/Next icons and numbered links by default, for example `‹ 1 2 3 … 8 ›`. First and last numbers remain reachable; the active number uses `aria-current="page"`. Set `<DataGridPagination showPageNumbers={false} />` for icon-only First/Previous/Next/Last controls with a page indicator instead. Icons retain localized accessible names. While totals are unavailable or placeholder rows belong to another request, numbered links are not inferred from stale metadata.
+
+<ComponentPreview
+  name="data-grid-cursor-demo"
+  title="data-grid-cursor-demo.tsx"
+>
   <DataGridCursorDemo />
 </ComponentPreview>
 
@@ -70,7 +75,10 @@ Next uses current successful response metadata. Previous uses successfully visit
 
 ## Filters and Apply
 
-<ComponentPreview name="data-grid-filters-demo" title="data-grid-filters-demo.tsx">
+<ComponentPreview
+  name="data-grid-filters-demo"
+  title="data-grid-filters-demo.tsx"
+>
   <DataGridFiltersDemo />
 </ComponentPreview>
 
@@ -80,7 +88,10 @@ Immediate mode validates each changed field, with Search debounced 300 ms by def
 
 ## Remote selection
 
-<ComponentPreview name="data-grid-selection-demo" title="data-grid-selection-demo.tsx">
+<ComponentPreview
+  name="data-grid-selection-demo"
+  title="data-grid-selection-demo.tsx"
+>
   <DataGridSelectionDemo />
 </ComponentPreview>
 
@@ -90,7 +101,10 @@ Validate descriptors with `createDataGridSelectionSchema({ filters, id })`. UI I
 
 ## Controlled state
 
-<ComponentPreview name="data-grid-controlled-demo" title="data-grid-controlled-demo.tsx">
+<ComponentPreview
+  name="data-grid-controlled-demo"
+  title="data-grid-controlled-demo.tsx"
+>
   <DataGridControlledDemo />
 </ComponentPreview>
 
@@ -100,7 +114,10 @@ URL/router adapters remain application-owned. Remount with a scope key when tena
 
 ## Rendering and columns
 
-<ComponentPreview name="data-grid-rendering-demo" title="data-grid-rendering-demo.tsx">
+<ComponentPreview
+  name="data-grid-rendering-demo"
+  title="data-grid-rendering-demo.tsx"
+>
   <DataGridRenderingDemo />
 </ComponentPreview>
 

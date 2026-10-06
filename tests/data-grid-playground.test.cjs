@@ -18,6 +18,15 @@ test("every playground config changes the actual adapter and runnable generated 
     const ts = require("typescript");
     const cases = [
       [
+        "showPageNumbers",
+        false,
+        () =>
+          assert.ok(
+            Boolean(f.button("Last page")),
+            "Unnumbered preview shows last icon"
+          ),
+      ],
+      [
         "variant",
         "bordered",
         () =>
@@ -91,9 +100,11 @@ test("every playground config changes the actual adapter and runnable generated 
             ? `pagination: ${JSON.stringify(value)}`
             : field === "scenario"
               ? "enabled: false"
-              : field === "stickyHeader"
-                ? "stickyHeader={true}"
-                : `${field}${field === "variant" || field === "density" ? "=" : ": "}${JSON.stringify(value)}`
+              : field === "showPageNumbers"
+                ? "showPageNumbers={false}"
+                : field === "stickyHeader"
+                  ? "stickyHeader={true}"
+                  : `${field}${field === "variant" || field === "density" ? "=" : ": "}${JSON.stringify(value)}`
         )
       );
       const result = ts.transpileModule(source, {
@@ -209,12 +220,18 @@ test("actual playground Reset remounts selection, preferences and cursor history
       async () => new Promise((resolve) => setTimeout(resolve, 160))
     );
     await f.settle();
-    assert.ok(Boolean(f.button("Last page")), "Default page contract restored");
+    assert.ok(
+      Boolean(f.host.querySelector('[data-page="4"]')),
+      "Default numbered page contract restored"
+    );
     assert.equal(
       f.host.querySelectorAll('input[aria-label="Select this page"]').length,
       0
     );
-    assert.ok(f.host.textContent.includes("Page 1 of 4"));
+    assert.equal(
+      f.host.querySelector('[aria-current="page"]').textContent,
+      "1"
+    );
     assert.equal(
       f.host.querySelectorAll('th button[aria-label="Sort Name ascending"]')
         .length,

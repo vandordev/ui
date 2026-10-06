@@ -24,6 +24,7 @@ test("portable composed stories wire controls and real Query feedback", async ()
       "Empty",
       "Cursor",
       "Controlled",
+      "IconPagination",
     ]) {
       await f.mount({ children: () => f.React.createElement(stories[name]) });
       await f.React.act(
@@ -63,6 +64,17 @@ test("portable composed stories wire controls and real Query feedback", async ()
         );
         await f.settle();
         assert.ok(f.host.textContent.includes("Example user 26"));
+      }
+      if (name === "IconPagination") {
+        const last = f.host.querySelector('[aria-label="Last page"]');
+        assert.ok(Boolean(last), "Unnumbered story exposes last icon");
+        assert.equal(last.textContent, "");
+        await f.click(last);
+        await f.React.act(
+          async () => new Promise((resolve) => setTimeout(resolve, 120))
+        );
+        await f.settle();
+        assert.ok(f.host.textContent.includes("Example user 51"));
       }
     }
   } finally {

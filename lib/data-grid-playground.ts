@@ -77,6 +77,17 @@ export const dataGridProps = {
       "DataGridPagination: sizes must fit contract limits. Cursor mode does not show total/first/last controls.",
     type: "readonly number[]",
   },
+  showPageNumbers: {
+    control: {
+      initialValue: true as boolean,
+      kind: "boolean",
+      label: "Page numbers",
+    },
+    defaultValue: "true",
+    description:
+      "DataGridPagination: page links with ellipses instead of First/Last. Set false for four icon controls. Cursor mode always uses Previous/Next only.",
+    type: "boolean",
+  },
   pagination: {
     control: {
       initialValue: "page" as "page" | "cursor",
@@ -244,7 +255,7 @@ function Users() {
     <DataGridViewport className="max-h-80">
       <DataGridTable grid={grid} aria-label="Users" stickyHeader={${values.stickyHeader}} />
     </DataGridViewport>
-    <DataGridPagination />
+    <DataGridPagination showPageNumbers={${values.showPageNumbers}} />
   </DataGrid>;
 }
 export default function UsersDemo() {

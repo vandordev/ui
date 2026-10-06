@@ -1,5 +1,14 @@
 # DataGrid execution evidence
 
+## Pagination follow-up after checkpoint `1bd860b`
+
+- User chose direct inline implementation on current clean `main`: icon-only navigation; numbered page links replace First/Last, while unnumbered mode retains all four icon actions. No automatic commit requested for this follow-up.
+- `DataGridPagination.showPageNumbers` defaults true. Page endpoints/current neighbors use a bounded ellipsis window, even with MAX_SAFE_INTEGER totals. Active link uses `aria-current="page"`; icons retain localized accessible labels. Cursor mode never fabricates page links/First/Last. Placeholder/unknown totals do not supply stale links; zero rows yield one disabled-navigation page.
+- Playground metadata/adapter/generated code expose Page numbers; portable stories include IconPagination and disable the inapplicable cursor control. Docs and generated registry artifacts updated.
+- Red-green DOM test demonstrated missing page links before implementation. Fresh focused state/control/pagination/playground/stories/generated-TSX suite: **22 pass, zero failures/skips**, with 512 MiB inherited heap, serial tests and 120s process-tree deadline. Fresh strict focused tsc exit 0 at 512 MiB/120s.
+- Fresh registry build exit 0, then artifact/source/dependency closure suite **7 pass**, zero failures/skips. Formatting completed with one worker. Current control-file lint has eight pre-existing function-style errors; pagination complexity diagnostic resolved by separating presentation derivation from rendering. Overall inherited lint/integrated blockers remain, not claimed fixed.
+- Browser attempted approved `http://localhost:3000/docs/components/data-grid`; snapshot returned `chrome-error://chromewebdata/` with no content. Visual verification blocked by unavailable primary server. No new server, Playwright, or Storybook launched. Earlier full DataGrid integrated gates remain outstanding.
+
 ## Execution authorization
 
 - User selected direct inline execution on current `main`, in the existing checkout.

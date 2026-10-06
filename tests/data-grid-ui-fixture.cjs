@@ -140,7 +140,9 @@ exports.createFixture = async function createFixture() {
   };
   result.button = (text) =>
     [...host.querySelectorAll("button")].find(
-      (button) => button.textContent.trim() === text
+      (button) =>
+        button.textContent.trim() === text ||
+        button.getAttribute("aria-label") === text
     );
   result.dispose = async () => {
     await React.act(async () => root.unmount());

@@ -210,3 +210,33 @@ export function getDataGridPageCorrection(
   const last = Math.max(0, Math.ceil(rowCount / pagination.pageSize) - 1);
   return pagination.pageIndex > last ? last : null;
 }
+
+/** One-based page links. Work is bounded even for very large remote totals. */
+export const getDataGridPageLinks = (
+  current: number,
+  total: number
+): (number | "ellipsis")[] => {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, index) => index + 1);
+  }
+  const start = Math.max(2, Math.min(current - 1, total - 2));
+  const end = Math.min(total - 1, Math.max(current + 1, 3));
+  const pages = [1];
+  for (let page = start; page <= end; page += 1) {
+    pages.push(page);
+  }
+  pages.push(total);
+  const links: (number | "ellipsis")[] = [];
+  for (const page of pages) {
+    const previous = links.at(-1);
+    if (typeof previous === "number") {
+      if (page - previous === 2) {
+        links.push(previous + 1);
+      } else if (page - previous > 2) {
+        links.push("ellipsis");
+      }
+    }
+    links.push(page);
+  }
+  return links;
+};

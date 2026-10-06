@@ -195,7 +195,7 @@ test("native page controls and real visibility menu honor non-hideable columns",
     assert.ok(f.host.textContent.includes("1–25 of 60 results"));
     await f.click(f.button("Next page"));
     assert.equal(f.grid.request.pagination.pageIndex, 1);
-    await f.click(f.button("Last page"));
+    await f.click(f.host.querySelector('[data-page="3"]'));
     assert.equal(f.grid.request.pagination.pageIndex, 2);
     assert.ok(f.host.textContent.includes("51–60 of 60 results"));
     await f.click(f.button("Columns"));
