@@ -2,7 +2,7 @@
 
 Date: 2026-10-06
 
-Status: conversational design approved; written spec awaiting user review.
+Status: approved; presentation amended by user feedback on 2026-10-06.
 
 ## Goal and scope
 
@@ -38,8 +38,10 @@ not automatically authorize an implementation plan, commit, or implementation.
 
 1. A title-only notification remains a compact pill. Never expand an empty body.
 2. A notification with description or action appears as a pill and smoothly opens
-   a connected body. Header and body form one silhouette with a curved connection,
-   rather than visually separate cards.
+   a continuous stepped body, matching the user's second visual reference. There
+   is no narrow neck or gap: the header sits on the outer edge of the body and a
+   concave shoulder joins the wider body. Right/left placements mirror the header;
+   bottom placements open upward. Center placement uses a centered header.
 3. Once opened, the body stays visible until dismissal. Do not run an automatic
    expand-collapse-dismiss cycle or require hover to read the message.
 4. Loading starts as a pill and updates in place to success/error. Open a body only
@@ -50,14 +52,15 @@ not automatically authorize an implementation plan, commit, or implementation.
 
 ## Stack
 
-- Use a compact stack with at most three visible notifications.
-- The newest notification is fully presented; older visible notifications peek
-  from behind it.
-- Hover or keyboard focus expands the stack so notifications can be read and
-  acted upon. Mobile has an explicit, accessible tap control for expansion.
+- Show one active notification. Older notifications wait without rendering cards.
+- No hover/focus expansion and no scrolling list of notifications.
+- Queued notifications are represented by a compact stack icon/count beside a
+  separate close-all button in the free header area, matching the third reference.
+- Closing or expiry of the active notification reveals the next queued message
+  immediately through content crossfade inside a persistent shell. Hover/focus pauses expiry.
 - Notifications beyond the visible limit remain queued; a visual cap is not
   permission to discard messages. Older notifications and their actions must be
-  reachable through the expanded presentation.
+  reachable by sequential dismissal of newer messages.
 - Ensure bounded rendering and predictable dismissal under bursts. Exact overflow
   layout and timer behavior for queued, not-yet-presented notifications must be
   resolved explicitly during implementation review before declaring completion;
@@ -87,18 +90,23 @@ not automatically authorize an implementation plan, commit, or implementation.
 
 | Content/state | Default |
 | --- | --- |
-| Title only | 4 seconds |
-| Description, no persistent condition | 6 seconds |
-| Action present | Persistent until dismissed |
-| Error | Persistent until dismissed |
+| Title only, including error | 3 seconds |
+| Description or action, including error | 4 seconds |
 | Loading | Persistent until resolved or explicitly dismissed |
 
-- Persistent conditions take precedence over title/description duration defaults.
+- Only loading is persistent by default; explicit `duration: 0` remains supported.
+- A 2px inset countdown line follows the pill/body bottom, pauses with the timer,
+  resets on presentation, and is omitted for loading or explicit persistence.
+- Shell and controls stay mounted during arrivals and queued dismissal/swipe.
+  Content crossfades; new arrivals use a small content shift and one badge pulse.
+  Only empty-to-first and last-to-empty transitions animate the whole shell.
 - Allow per-toast duration overrides. After a loading toast resolves, apply the
   resulting state's duration unless the caller supplies an override.
 - Hover/focus pauses automatic dismissal. Do not dismiss a toast while its action
   is being used.
 - Provide an accessible close control on every toast and swipe-to-dismiss.
+- A completed swipe exits in its swipe direction from the existing drag offset;
+  never recenter before removal. Swipe exits must not create page scrollbars.
 - Explicit dismissal during an asynchronous operation must not cause its later
   resolution to unexpectedly resurrect the dismissed notification.
 
@@ -210,7 +218,7 @@ checks. No new server, alternative browser, or Playwright without user approval.
 - Registry generation, artifact validation, isolated consumer compilation and
   applicable real CLI installation checks, including optional stories targets.
 - Primary-browser evidence for desktop/mobile, both themes, long content,
-  keyboard/action access, stack expansion, reduced motion, Dialog/Drawer layering,
+  keyboard/action access, queue progression/close-all, reduced motion, Dialog/Drawer layering,
   and client-side navigation persistence.
 - Storybook types and meaningful portable composition checks. Storybook UI is not
   verified because this repository has no Storybook server; state this limitation.

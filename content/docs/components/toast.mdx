@@ -1,0 +1,185 @@
+---
+title: Toast
+description: An accessible notification system with a compact pill, connected detail morph, queued stack, and imperative async API.
+component: toast
+credits:
+  - name: Base UI
+    url: https://base-ui.com/react/components/toast
+    contribution: Public Toast state, lifecycle, swipe dismissal, announcement, and focus behavior.
+  - name: Sileo
+    url: https://sileo.aayushg.com/
+    contribution: Visual inspiration for compact-to-expanded toast motion; no source code is copied.
+---
+
+import { ToastDemo } from "@/examples/toast-demo";
+import { ToastActionDemo } from "@/examples/toast-action-demo";
+import { ToastPromiseDemo } from "@/examples/toast-promise-demo";
+import { ToastStackDemo } from "@/examples/toast-stack-demo";
+import { ToastNavigationDemo } from "@/examples/toast-navigation-demo";
+import { ToastOverlayDemo } from "@/examples/toast-overlay-demo";
+import { ToastQueryDemo } from "@/examples/toast-query-demo";
+
+## Usage
+
+Install the component and mount one provider and toaster above route-owned content. The provider survives client-side navigation; a full reload clears notifications.
+
+```tsx
+"use client";
+
+import { ToastProvider, Toaster } from "@/components/ui/toast";
+
+export function AppProviders({ children }: { children: React.ReactNode }) {
+  return (
+    <ToastProvider>
+      {children}
+      <Toaster />
+    </ToastProvider>
+  );
+}
+```
+
+Trigger a notification from any client event handler:
+
+```tsx
+import { toast } from "@/components/ui/toast";
+
+toast.success("Changes saved");
+toast.error("Could not save", { description: "Try again in a moment." });
+```
+
+The imperative API also includes `toast.warning`, `toast.info`, `toast.loading`, `toast.action`, `toast.promise`, `toast.update(id, options)`, and `toast.dismiss(id)` / `toast.close(id)`. New toast calls return an ID. All non-loading statuses expire after 3 seconds for a title or 4 seconds with detail/action. Loading waits until updated or dismissed; `duration: 0` explicitly opts into persistence.
+
+## Examples
+
+### Compact and detailed
+
+Title-only notifications remain pills. A description opens a connected body that stays open until dismissed.
+
+<ComponentPreview name="toast-demo" title="toast-demo.tsx">
+  <ToastDemo />
+</ComponentPreview>
+
+### Action
+
+Actions are separate keyboard-accessible controls, do not nest inside close, and default to 4 seconds. Hover/focus pauses expiry while they are used.
+
+<ComponentPreview name="toast-action-demo" title="toast-action-demo.tsx">
+  <ToastActionDemo />
+</ComponentPreview>
+
+### Async result in place
+
+`toast.promise` returns a new promise that preserves the operation's result/rejection and updates the loading notification in place. Handle rejections with `try/catch` or `.catch()`. Explicit dismissal prevents later promise settlement from recreating it.
+
+<ComponentPreview name="toast-promise-demo" title="toast-promise-demo.tsx">
+  <ToastPromiseDemo />
+</ComponentPreview>
+
+### Stack, placement, and overlays
+
+Only one notification is presented at a time. Older notifications wait without running timers, including async results. The stack icon/count in the free header area indicates waiting messages; its adjacent close-all button dismisses the entire queue. New arrivals and dismissal with waiting messages replace content immediately inside the existing silhouette. The shell, close button and queue control nodes stay mounted. Hover and focus pause expiry without expanding the layout. No unseen message expires; a notification receives its full duration when presented again.
+
+First arrival enters the whole shell; only the final dismissal exits it. Content replacements crossfade and the silhouette morphs in place. New arrivals use a small content shift and one badge pulse; advancing after dismissal has no pulse. With waiting messages, swipe advances content without moving the shell. The last toast follows the swipe direction.
+
+Dragging the last notification moves its entire surface, content and controls together. Center placements keep the pill and queue controls in one compact centered group, rather than pinning the controls to opposite viewport edges.
+
+A thin countdown line sits at the bottom of the pill or body, inset from the corners. It shrinks toward the placement side, or symmetrically for center placement. Hover/focus, dragging and window blur pause it alongside Base UI's timer. Loading and `duration: 0` have no line. A newly presented notification or explicit content update resets progress. Reduced motion disables transforms used for transitions; the informational countdown remains.
+
+The viewport supports `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, and `bottom-right`. Right/left placement mirrors the stepped shoulder; bottom placement opens upward. The default top-right placement moves to top-center below the existing `sm` breakpoint. Oversized descriptions remain scrollable within the active body using touch, wheel or keyboard, without visible scrollbars or horizontal overflow.
+
+<ComponentPreview name="toast-stack-demo" title="toast-stack-demo.tsx"><ToastStackDemo /></ComponentPreview>
+
+### Client-side navigation
+
+This link starts an operation and navigates while it is pending. The root provider remains mounted; the same toast resolves on the next page. This example uses Next.js Link; use your router's client-side link in other frameworks.
+
+<ComponentPreview name="toast-navigation-demo" title="toast-navigation-demo.tsx"><ToastNavigationDemo /></ComponentPreview>
+
+### Dialog and Drawer
+
+The root provider portals notifications into Vandor's shared overlay host so they can layer above Vandor Dialog and Drawer without disabling modal focus containment. This integration requires the matching current Vandor registry Dialog/Drawer sources; if you already installed those components before this Toast release, update them from the registry so they add the shared modal toast host. Third-party modal systems, native dialog top layers, and browser popovers are not covered by this guarantee. Keep the provider mounted across route changes.
+
+Create a notification before opening either modal, or trigger one inside. Both examples keep closed portals mounted to exercise inactive-host handling.
+
+<ComponentPreview name="toast-overlay-demo" title="toast-overlay-demo.tsx"><ToastOverlayDemo /></ComponentPreview>
+
+### Optional TanStack Query v5 adapter
+
+Install the adapter separately with `npx shadcn@latest add https://vandor-ui.vercel.app/r/toast-tanstack-query.json` after installing Toast and `@tanstack/react-query`. Mount it beside the root toaster under the long-lived `QueryClientProvider`:
+
+```tsx
+"use client";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastQueryAdapter } from "@/components/ui/toast-tanstack-query";
+import { ToastProvider, Toaster } from "@/components/ui/toast";
+
+const queryClient = new QueryClient();
+
+export function AppProviders({ children }: { children: React.ReactNode }) {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>
+        {children}
+        <Toaster />
+        <ToastQueryAdapter />
+      </ToastProvider>
+    </QueryClientProvider>
+  );
+}
+```
+
+Opt in per operation through metadata; query notifications only fire after configured queries reach terminal error state, after retries:
+
+```tsx
+useMutation({
+  mutationFn: saveChanges,
+  meta: {
+    vandorToast: {
+      loading: "Saving…",
+      success: "Changes saved",
+      error: "Could not save changes",
+    },
+  },
+});
+
+useQuery({
+  queryKey: ["report"],
+  queryFn: getReport,
+  meta: { vandorToast: { error: "Report unavailable" } },
+});
+```
+
+The adapter subscribes to the existing QueryClient caches and does not replace application or per-operation callbacks. Mutation instances are tracked independently. Raw errors are never shown by default; provide an explicit safe message or mapper. Background refetches and unconfigured operations remain silent.
+
+<ComponentPreview name="toast-query-demo" title="toast-query-demo.tsx"><ToastQueryDemo /></ComponentPreview>
+
+- Mutation retries keep one loading notification until the final result. Result/error mappers that throw use safe fallback text. Overlapping operations have different IDs. Dismissing loading is final; settlement does not recreate it.
+- Query failures notify only in idle terminal error state after retries. Deduplication uses the query's error-update counter, so repeated cache events do not duplicate feedback, but a later failed fetch can notify even if it throws the same Error object.
+- Adapter instances for one QueryClient share a reference-counted subscription. Remount reconciles pending mutations and tracked results without creating duplicate loading toasts. Keep ToastProvider and the adapter mounted at the root; removing the final adapter stops feedback until remount.
+- The optional `subscribeToastQueryClient(client)` function offers the same subscription for non-component integration; call its returned cleanup when releasing the client. Do not use it alongside a different toast lifecycle owner.
+
+## Behavior & Accessibility
+
+- Default durations are 3 seconds for a title and 4 seconds with description/action, including error. Loading remains until updated or explicitly dismissed. Pass `duration` to override; `0` is persistent.
+- Hover and focus pause timers. Every notification has a named close control and supports swipe dismissal.
+- Success/error updates retain the loading notification identity. Status is communicated with text and an icon, not color alone.
+- Reduced-motion preferences disable transition motion, including the loading spinner animation.
+- The compact stack count button is keyboard operable and announces the number of queued items.
+- The renderer mounts one active notification; closing unseen records drain in bounded batches. Waiting cards are not mounted. Queue state remains in Base UI, without a custom notification store or timer engine.
+
+### Updates and callbacks
+
+`toast.update(id, options)` is a partial update: omitted title, status, description, action and explicit duration override are preserved. Pass `description: null` or `actionLabel: ""` to clear those contents. Once opened, the body does not automatically collapse. A loading-to-result update without an explicit override uses the result state's default duration. `toast.update` returns the supplied ID; unknown or closing IDs are ignored. `toast.dismiss()` with no ID closes all notifications.
+
+`onClose` fires when dismissal starts, including explicit dismissal, swipe, and timeout. `onRemove` fires after the closing transition and removal. `actionOnClick` runs when the independent action button is activated; the action does not automatically dismiss the notification. Call `toast.dismiss(id)` in your handler when appropriate. Async action work should use a separate loading toast or `toast.promise` and handle its rejection.
+
+Mount one ToastProvider/Toaster pair per application. The exported manager is shared by the imperative API; multiple providers are not isolated scopes. The API is client-side only, not a server notification channel. F6 focuses notifications; Escape dismisses the focused toast. Low-priority feedback is polite and errors are urgent by default.
+
+## Stories
+
+Optional: first install Toast, then run `npx shadcn@latest add https://vandor-ui.vercel.app/r/toast-stories.json`. The stories file is placed in your configured UI directory and does not modify Storybook configuration or install Storybook packages. Use the same Storybook package version as your project. The stories inherit your theme and global styles; no Storybook server is provided by this repository.
+
+Stories are typed against Storybook React 10.6.1. Include `**/*.stories.tsx` in your existing story discovery, load your Tailwind stylesheet globally, and supply your normal `.dark` theme decorator. No optional addon is required. Each story owns its provider; use one canvas at a time because the imperative manager is shared. Storybook UI has not been verified: this repository has no Storybook server.
+
+The distributed `toast.tsx` imports `toast-utils.ts` beside it. Install through the registry CLI so both files are added. Manual copying requires both files, plus `@base-ui/react`, `cn`, `lucide-react`, and `motion`; use React 18.3+ and a Tailwind CSS 4 setup with the documented theme-mode `.dark` class behavior.

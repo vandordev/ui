@@ -186,6 +186,54 @@
       ]
     },
     {
+      "name": "toast",
+      "type": "registry:ui",
+      "title": "Toast",
+      "description": "A morphing, accessible toast system with a queued compact stack, responsive placement, async updates, and an optional TanStack Query adapter.",
+      "dependencies": [
+        "@base-ui/react@^1.8.0",
+        "cn",
+        "lucide-react",
+        "motion@^12.38.0"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/toast.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/toast.tsx"
+        },
+        {
+          "path": "registry/new-york/toast-utils.ts",
+          "type": "registry:ui",
+          "target": "components/ui/toast-utils.ts"
+        }
+      ]
+    },
+    {
+      "name": "toast-stories",
+      "type": "registry:item",
+      "title": "Toast Stories",
+      "description": "Optional portable Toast stories. Install Toast first; no component or Storybook configuration is overwritten.",
+      "files": [
+        { "path": "registry/new-york/toast.stories.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "toast-tanstack-query",
+      "type": "registry:item",
+      "title": "Toast TanStack Query Adapter",
+      "description": "Optional metadata-driven Toast integration for TanStack Query v5. Install Toast and @tanstack/react-query first.",
+      "registryDependencies": ["https://vandor-ui.vercel.app/r/toast.json"],
+      "dependencies": ["@tanstack/react-query@^5.0.0"],
+      "files": [
+        {
+          "path": "registry/new-york/toast-tanstack-query.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/toast-tanstack-query.tsx"
+        }
+      ]
+    },
+    {
       "name": "select-stories",
       "type": "registry:item",
       "title": "Select Stories",

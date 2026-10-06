@@ -25,6 +25,7 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
   renderPreview,
   getCode,
   hint,
+  onReset,
 }: {
   title: string;
   definitions: Record<string, PropDefinition>;
@@ -32,6 +33,7 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
   renderPreview: (values: T) => ReactNode;
   getCode: (values: T) => string;
   hint?: string;
+  onReset?: () => void;
 }) => {
   const id = useId();
   const [values, setValues] = useState<T>(() => ({ ...initialValues }));
@@ -80,6 +82,7 @@ export const ComponentPlayground = <T extends PlaygroundValues>({
               variant="ghost"
               size="sm"
               onClick={() => {
+                onReset?.();
                 setValues({ ...initialValues });
                 setPreviewReset((current) => current + 1);
               }}

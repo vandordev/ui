@@ -168,7 +168,11 @@ const AnimatedElement = ({
     const opacity = state.open ? 1 : 0;
     const scale = backdrop || reduceMotion ? 1 : targetScale;
     const translate = state.open || reduceMotion ? "0 0px" : "0 12px";
-    if (reduceMotion || typeof element.animate !== "function") {
+    if (
+      nativeProps.hidden ||
+      reduceMotion ||
+      typeof element.animate !== "function"
+    ) {
       element.style.opacity = String(opacity);
       if (!backdrop) {
         element.style.scale = String(scale);
@@ -194,7 +198,15 @@ const AnimatedElement = ({
       });
     }
     return () => animation.stop();
-  }, [animate, backdrop, reduceMotion, scope, state.open, targetScale]);
+  }, [
+    animate,
+    backdrop,
+    nativeProps.hidden,
+    reduceMotion,
+    scope,
+    state.open,
+    targetScale,
+  ]);
   return useRender({
     props: { ...nativeProps },
     ref: [nativeProps.ref ?? null, scope],
@@ -210,6 +222,22 @@ const DialogChildren = ({
 }) => {
   const control = useDialog();
   return <>{typeof children === "function" ? children(control) : children}</>;
+};
+const DialogToastHost = () => {
+  const control = useDialog();
+  return (
+    <span
+      data-vandor-modal-toast-host=""
+      data-toast-host-active={control.isOpen ? "true" : "false"}
+      ref={(node) => {
+        if (!node) return;
+        if (control.isOpen && !node.dataset.toastHostOrder)
+          node.dataset.toastHostOrder = String(performance.now());
+        if (!control.isOpen) delete node.dataset.toastHostOrder;
+      }}
+      style={{ display: "contents" }}
+    />
+  );
 };
 const owners = new WeakMap<DialogControl, object>();
 const Dialog = ({
@@ -404,6 +432,7 @@ const Dialog = ({
                 )}
               </Primitive.Popup>
             </Primitive.Viewport>
+            {modal === true && <DialogToastHost />}
           </Primitive.Portal>
         </Primitive.Root>
       </span>

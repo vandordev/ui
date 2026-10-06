@@ -25,6 +25,7 @@
     "loading",
     "popover",
     "select",
-    "textarea"
+    "textarea",
+    "toast"
   ]
 }

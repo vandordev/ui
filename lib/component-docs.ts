@@ -65,6 +65,11 @@ import {
   getSelectDefaults,
   selectProps,
 } from "@/lib/select-playground";
+import {
+  getToastCode,
+  getToastDefaults,
+  toastApiProps,
+} from "@/lib/toast-playground";
 import registry from "@/registry.json";
 
 interface ComponentDocDefinition {
@@ -128,6 +133,10 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   select: {
     playground: { code: getSelectCode(getSelectDefaults()) },
     props: selectProps,
+  },
+  toast: {
+    playground: { code: getToastCode(getToastDefaults()) },
+    props: toastApiProps,
   },
 };
 

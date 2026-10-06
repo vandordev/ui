@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { Analytics } from "@/components/analytics";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ToastSiteProvider } from "@/components/toast-site-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { META_THEME_COLORS } from "@/constants/site";
 import { fontVariables } from "@/lib/fonts";
@@ -43,7 +44,7 @@ const RootLayout = ({
     >
       <SoundProvider>
         <ThemeProvider>
-          {children}
+          <ToastSiteProvider>{children}</ToastSiteProvider>
           <Toaster position="top-center" />
           <Analytics />
         </ThemeProvider>

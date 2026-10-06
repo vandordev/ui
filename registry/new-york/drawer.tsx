@@ -353,6 +353,19 @@ const DrawerContent = ({
           </DrawerPrimitive.Content>
         </DrawerPrimitive.Popup>
       </DrawerPrimitive.Viewport>
+      {modal === true && (
+        <span
+          data-vandor-modal-toast-host=""
+          data-toast-host-active={control.isOpen ? "true" : "false"}
+          ref={(node) => {
+            if (!node) return;
+            if (control.isOpen && !node.dataset.toastHostOrder)
+              node.dataset.toastHostOrder = String(performance.now());
+            if (!control.isOpen) delete node.dataset.toastHostOrder;
+          }}
+          style={{ display: "contents" }}
+        />
+      )}
     </DrawerPortal>
   );
 };
