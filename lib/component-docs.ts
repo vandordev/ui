@@ -66,6 +66,11 @@ import {
   selectProps,
 } from "@/lib/select-playground";
 import {
+  getStatsCardCode,
+  getStatsCardDefaults,
+  statsCardProps,
+} from "@/lib/stats-card-playground";
+import {
   getToastCode,
   getToastDefaults,
   toastApiProps,
@@ -75,6 +80,7 @@ import registry from "@/registry.json";
 interface ComponentDocDefinition {
   playground?: { code: string };
   props?: Record<string, PropDefinition>;
+  nativePropsDescription?: string;
 }
 
 export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
@@ -133,6 +139,12 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   select: {
     playground: { code: getSelectCode(getSelectDefaults()) },
     props: selectProps,
+  },
+  "stats-card": {
+    nativePropsDescription:
+      "StatsCard supports only ariaLabel, items, and className. It does not forward native attributes, refs, or event handlers.",
+    playground: { code: getStatsCardCode(getStatsCardDefaults()) },
+    props: statsCardProps,
   },
   toast: {
     playground: { code: getToastCode(getToastDefaults()) },
@@ -281,7 +293,8 @@ export const buildComponentDocSections = (
       heading("Props"),
       section(name, "props", [table]),
       paragraph(
-        "The reference lists component-specific props and selected native props, not the complete React API. Other native attributes are forwarded to the rendered element."
+        definition.nativePropsDescription ??
+          "The reference lists component-specific props and selected native props, not the complete React API. Other native attributes are forwarded to the rendered element."
       )
     );
   }

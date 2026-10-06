@@ -1,0 +1,91 @@
+---
+title: StatsCard
+description: A responsive statistics group with animated numbers, exact display values, captions, and badges.
+component: stats-card
+---
+
+import { StatsCardDemo } from "@/examples/stats-card-demo";
+import { StatsCardValues } from "@/examples/stats-card-values";
+import { StatsCardUpdating } from "@/examples/stats-card-updating";
+
+## Usage
+
+```tsx
+"use client";
+
+import { Activity } from "lucide-react";
+import { StatsCard } from "@/components/ui/stats-card";
+
+export function Demo() {
+  return (
+    <StatsCard
+      ariaLabel="Delivery overview"
+      items={[
+        {
+          key: "delivered",
+          title: "Delivered",
+          value: { target: 1248 },
+          caption: "Last 30 days",
+          badge: { label: "Healthy", variant: "secondary" },
+          icon: Activity,
+        },
+      ]}
+    />
+  );
+}
+```
+
+Requires React 19, Tailwind CSS 4 with shadcn tokens, Motion 12.38+, `lucide-react`, and `cn`. Use your configured UI alias if it differs. Installation includes `stats-card.tsx` and its colocated supporting `stats-card-badge.tsx`; it does not install or overwrite your existing Badge component. No providers or website-specific styles are required. Copying the displayed Source alone is insufficient for manual installation: use the CLI command above to receive both files.
+
+## Examples
+
+### One metric
+
+Titles, values, captions, and badges wrap on narrow screens. The icon remains decorative.
+
+<ComponentPreview name="stats-card-demo" title="stats-card-demo.tsx">
+  <StatsCardDemo />
+</ComponentPreview>
+
+### Formatting, exact values, and missing data
+
+Use `value.target` for finite numbers and `value.format` for application-specific formatting. The default formatter uses `id-ID` with zero fractional digits. Formatters receive intermediate fractional numbers during animation, so round or use `Intl.NumberFormat` as appropriate.
+
+Use `value.display` for exact preformatted strings, including financial values beyond JavaScript's safe integer range. StatsCard does not parse, coerce, or animate these values. Numeric animation is presentation only, not financial arithmetic or a guarantee of integer precision. `null`, `NaN`, and infinite targets show `—`; zero and negative targets are valid. Display and target modes are mutually exclusive in TypeScript.
+
+<ComponentPreview name="stats-card-values" title="stats-card-values.tsx">
+  <StatsCardValues />
+</ComponentPreview>
+
+### Updating values
+
+Keep each item's key stable. The first numeric value counts from zero; subsequent changes animate from the current displayed number over 1.2 seconds. A new target interrupts the previous transition, and unmounting stops it. Reset in this example changes the target, not the component's identity.
+
+<ComponentPreview name="stats-card-updating" title="stats-card-updating.tsx">
+  <StatsCardUpdating />
+</ComponentPreview>
+
+## Behavior & Accessibility
+
+- The outer group requires `ariaLabel`. Metrics use a definition list, with titles in `dt` and values and supporting content in `dd`.
+- Screen readers receive the final formatted target, not every animated frame. Values are not a live region; applications should announce important asynchronous updates separately.
+- Reduced-motion preferences show the final number immediately. Server rendering also includes the final value before the client starts animation.
+- One metric fills the width. Three metrics use three columns from the `sm` breakpoint. Other counts use up to two columns at `sm` and four at `lg`, with dividers between rows and columns, including incomplete final rows. An empty array renders an empty group, not a loading or empty-state message.
+- The API is deliberately restricted to `ariaLabel`, `items`, and `className`. It does not forward native attributes, refs, or event handlers. Values, captions, and badge labels accept React nodes; avoid adding interactive content inside the animated numeric value.
+- Styling uses `card`, `card-foreground`, `border`, `muted-foreground`, `primary`, `primary-foreground`, `secondary`, `secondary-foreground`, `destructive`, and `destructive-foreground` tokens. Light and dark themes inherit your application setup.
+
+## Storybook Stories (Optional)
+
+Install StatsCard first, then add its portable stories to an existing React Storybook:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/stats-card-stories.json
+```
+
+This installs only `stats-card.stories.tsx` beside the component in your configured UI directory. It does not reinstall StatsCard, add Storybook packages, or change `.storybook/`. Review overwrite prompts for existing stories. Supply `@storybook/react` matching your existing Storybook packages; stories are typechecked and composed against version 10.6.1. No addons are required for Canvas and Controls.
+
+Include `../components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)` in your stories patterns, adjusting for your UI directory. Import your application's Tailwind/global stylesheet in `.storybook/preview.ts`, include the UI directory in Tailwind source scanning, and apply your dark-theme selector inside the preview iframe. Stories inherit your theme and decorators. Numeric transitions honor the preview's reduced-motion media preference.
+
+## Origin
+
+Adapted from Valcentra's StatsCard implementation, including its data API, numeric animation, and accessible definition-list structure. Vandor UI adds distributable badge support, wrapping for long content, and dividers for arbitrary item counts. The component does not depend on the Valcentra application.

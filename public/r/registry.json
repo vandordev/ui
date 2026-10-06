@@ -3,6 +3,32 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "stats-card",
+      "type": "registry:ui",
+      "title": "StatsCard",
+      "description": "A responsive statistics group with animated numbers, exact display values, captions, and badges.",
+      "dependencies": ["cn", "lucide-react", "motion@^12.38.0"],
+      "files": [
+        { "path": "registry/new-york/stats-card.tsx", "type": "registry:ui" },
+        {
+          "path": "registry/new-york/stats-card-badge.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "stats-card-stories",
+      "type": "registry:item",
+      "title": "StatsCard Stories",
+      "description": "Optional portable StatsCard stories. Install StatsCard first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/stats-card.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "blobatar",
       "type": "registry:ui",
       "title": "Blobatar",

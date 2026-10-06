@@ -25,6 +25,7 @@
     "loading",
     "popover",
     "select",
+    "stats-card",
     "textarea",
     "toast"
   ]

@@ -16,6 +16,7 @@ import { LoadingPlayground } from "@/components/loading-playground";
 import { PopoverPlayground } from "@/components/popover-playground";
 import { PropsReference } from "@/components/props-reference";
 import { SelectPlayground } from "@/components/select-playground";
+import { StatsCardPlayground } from "@/components/stats-card-playground";
 import { ToastPlayground } from "@/components/toast-playground";
 import { componentDocDefinitions } from "@/lib/component-docs";
 
@@ -45,8 +46,9 @@ const playgrounds: Record<string, () => ReactNode> = {
   loading: LoadingPlayground,
   popover: PopoverPlayground,
   select: SelectPlayground,
-  toast: ToastPlayground,
+  "stats-card": StatsCardPlayground,
   textarea: () => <InputFamilyPlayground component="textarea" />,
+  toast: ToastPlayground,
 };
 
 export const ComponentDocumentation = ({
