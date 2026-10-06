@@ -12,6 +12,43 @@ const headings = (nodes) =>
     .filter((node) => node.type === "heading")
     .map((node) => node.children[0].value);
 
+test("DataGrid documentation retains standard sections and native contract ownership", () => {
+  const { buildComponentDocSections, componentFrontmatterSchema } = jiti(
+    "../lib/component-docs.ts"
+  );
+  const sections = buildComponentDocSections(
+    { component: "data-grid" },
+    "export function DataGrid() {}"
+  );
+  assert.equal(
+    componentFrontmatterSchema.safeParse({ component: "data-grid" }).success,
+    true
+  );
+  assert.deepEqual(headings(sections.before), [
+    "Playground",
+    "Installation",
+    "Dependencies",
+  ]);
+  assert.deepEqual(headings(sections.after), ["Props", "Source"]);
+  const text = JSON.stringify(sections);
+  for (const value of [
+    "data-grid.json",
+    "@tanstack/react-table@^9.2.6",
+    "QueryClientProvider",
+    "renderEmpty",
+    "columnVisibility",
+    "DataGridFilter",
+  ])
+    assert.ok(text.includes(value), value);
+  const mdx = require("node:fs").readFileSync(
+    "content/docs/components/data-grid.mdx",
+    "utf8"
+  );
+  assert.ok(mdx.includes("Copying the Source block alone is insufficient"));
+  assert.ok(mdx.includes("data-grid-schema.json"));
+  assert.ok(mdx.includes("data-grid-stories.json"));
+});
+
 test("component metadata generates ordered sections from registry and shared props", () => {
   const { buildComponentDocSections } = jiti("../lib/component-docs.ts");
   const sections = buildComponentDocSections(

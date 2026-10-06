@@ -3,6 +3,89 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "data-grid-schema",
+      "type": "registry:item",
+      "title": "DataGrid Schema",
+      "description": "Server-safe Zod v4 pagination, sorting, output and remote-selection contracts.",
+      "dependencies": ["zod@^4.3.6"],
+      "files": [
+        {
+          "path": "registry/new-york/data-grid-schema.ts",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-grid",
+      "type": "registry:ui",
+      "title": "DataGrid",
+      "description": "Typed server-driven page and cursor grids with TanStack Table v9, native Query options, composable controls and remote selection.",
+      "dependencies": [
+        "@tanstack/react-table@^9.2.6",
+        "@tanstack/react-query@^5.104.1",
+        "zod@^4.3.6",
+        "cn",
+        "lucide-react"
+      ],
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/data-grid-schema.json",
+        "https://vandor-ui.vercel.app/r/button.json",
+        "https://vandor-ui.vercel.app/r/checkbox.json",
+        "https://vandor-ui.vercel.app/r/select.json",
+        "https://vandor-ui.vercel.app/r/dropdown.json",
+        "https://vandor-ui.vercel.app/r/input-search.json",
+        "https://vandor-ui.vercel.app/r/empty.json"
+      ],
+      "files": [
+        { "path": "registry/new-york/data-grid.tsx", "type": "registry:ui" },
+        {
+          "path": "registry/new-york/data-grid-columns.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/data-grid-context.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/data-grid-controls.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/data-grid-feedback.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/data-grid-labels.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/data-grid-selection.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/data-grid-state.ts",
+          "type": "registry:ui"
+        },
+        { "path": "registry/new-york/use-data-grid.ts", "type": "registry:ui" },
+        {
+          "path": "registry/new-york/error-state-base.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "data-grid-stories",
+      "type": "registry:item",
+      "title": "DataGrid Stories",
+      "description": "Optional portable stories. Install DataGrid first; no core component or Storybook setup is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/data-grid.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "page-header",
       "type": "registry:ui",
       "title": "PageHeader",
@@ -111,6 +194,10 @@
       "registryDependencies": ["https://vandor-ui.vercel.app/r/accordion.json"],
       "files": [
         { "path": "registry/new-york/error-state.tsx", "type": "registry:ui" },
+        {
+          "path": "registry/new-york/error-state-base.tsx",
+          "type": "registry:ui"
+        },
         {
           "path": "registry/new-york/error-state-details.tsx",
           "type": "registry:ui"
@@ -360,7 +447,6 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "registryDependencies": ["https://vandor-ui.vercel.app/r/loading.json"],
       "description": "A shadcn-based Button with subtle press feedback powered by Motion, using the new-york style and Base UI primitives.",
       "dependencies": [
         "class-variance-authority",
@@ -371,8 +457,11 @@
       "files": [
         {
           "path": "registry/new-york/button.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/button.tsx"
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/loading-arc.tsx",
+          "type": "registry:ui"
         }
       ]
     },
@@ -405,6 +494,7 @@
           "type": "registry:ui",
           "target": "components/ui/loading-variants.ts"
         },
+        { "path": "registry/new-york/loading-arc.tsx", "type": "registry:ui" },
         {
           "path": "components/loading-ui/LICENSE.md",
           "type": "registry:file",
@@ -656,8 +746,7 @@
       "files": [
         {
           "path": "registry/new-york/input.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/input.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -722,8 +811,7 @@
       "files": [
         {
           "path": "registry/new-york/input-search.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/input-search.tsx"
+          "type": "registry:ui"
         }
       ]
     },

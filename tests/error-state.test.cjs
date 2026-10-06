@@ -322,7 +322,7 @@ test("ErrorState stories compose meaningful variants and registry artifacts rema
     const item = registry.items.find((entry) => entry.name === name);
     assert.ok(item);
     const artifact = JSON.parse(readFileSync(`public/r/${name}.json`, "utf-8"));
-    assert.equal(artifact.files.length, name === "error-state" ? 2 : 1);
+    assert.equal(artifact.files.length, name === "error-state" ? 3 : 1);
     assert.equal(artifact.files[0].target, undefined);
     assert.equal(
       artifact.files[0].content,

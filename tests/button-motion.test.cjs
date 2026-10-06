@@ -24,9 +24,8 @@ test("registry Button declares cn directly without a utils registry dependency",
     "cn",
     "motion",
   ]);
-  assert.deepEqual(item.registryDependencies, [
-    `${registry.homepage}/r/loading.json`,
-  ]);
+  assert.deepEqual(item.registryDependencies ?? [], []);
+  assert.ok(item.files.some((file) => file.path.endsWith("/loading-arc.tsx")));
 });
 
 test("loading Button renders arc before its label and cannot be enabled by disabled=false", () => {

@@ -21,6 +21,11 @@ import {
   getCheckboxDefaults,
 } from "@/lib/checkbox-playground";
 import {
+  dataGridProps,
+  getDataGridCode,
+  getDataGridDefaults,
+} from "@/lib/data-grid-playground";
+import {
   dialogProps,
   getDialogCode,
   getDialogDefaults,
@@ -94,6 +99,12 @@ interface ComponentDocDefinition {
 }
 
 export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
+  "data-grid": {
+    playground: { code: getDataGridCode(getDataGridDefaults()) },
+    props: dataGridProps,
+    nativePropsDescription:
+      "Root/Viewport/Table/Column/Row/Cell forward their corresponding native element attributes, refs and handlers. Search forwards InputSearch props except controlled value/defaultValue. Filter is a typed render binding, not a DOM element. ColumnVisibility has no native-prop API; Pagination/SelectionBar/Toolbar forward div props. Apply/Reset forward Button props.",
+  },
   ...Object.fromEntries(
     Object.entries(inputComponentProps).map(([name, props]) => [
       name,

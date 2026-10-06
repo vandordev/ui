@@ -6,6 +6,7 @@ import { ButtonPlayground } from "@/components/button-playground";
 import { CheckboxPlayground } from "@/components/checkbox-playground";
 import { CodeCollapsibleWrapper } from "@/components/code-collapsible-wrapper";
 import { ComponentDependencies } from "@/components/component-dependencies";
+import { DataGridPlayground } from "@/components/data-grid-playground";
 import { DialogPlayground } from "@/components/dialog-playground";
 import { DrawerPlayground } from "@/components/drawer-playground";
 import { DropdownPlayground } from "@/components/dropdown-playground";
@@ -28,6 +29,7 @@ const playgrounds: Record<string, () => ReactNode> = {
   button: ButtonPlayground,
   calendar: () => <InputFamilyPlayground component="calendar" />,
   checkbox: CheckboxPlayground,
+  "data-grid": DataGridPlayground,
   "date-picker": () => <InputFamilyPlayground component="date-picker" />,
   "date-range-picker": () => (
     <InputFamilyPlayground component="date-range-picker" />

@@ -1,0 +1,133 @@
+---
+title: DataGrid
+description: Strictly typed server-driven tables, with page and cursor navigation, native Query options, and remote selection.
+component: data-grid
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { DataGridDemo } from "@/examples/data-grid-demo";
+import { DataGridCursorDemo } from "@/examples/data-grid-cursor-demo";
+import { DataGridFiltersDemo } from "@/examples/data-grid-filters-demo";
+import { DataGridSelectionDemo } from "@/examples/data-grid-selection-demo";
+import { DataGridControlledDemo } from "@/examples/data-grid-controlled-demo";
+import { DataGridRenderingDemo } from "@/examples/data-grid-rendering-demo";
+
+## Usage
+
+Supply an existing `QueryClientProvider`. Define the domain once with Zod, derive columns from it, and pass native Query options to `useDataGrid`. No duplicate wire interfaces or repeated generic arguments are needed.
+
+<ComponentPreview name="data-grid-demo" title="data-grid-demo.tsx">
+  <DataGridDemo />
+</ComponentPreview>
+
+Examples use an asynchronous in-memory backend simulation, not a database. It processes filters, deterministic sorting, and only the requested page. Replace the service with an authorized transport. Query owns remote data, cancellation, retries, and cache freshness; DataGrid never copies rows into another cache or replaces your `select`, keys, `enabled`, or placeholder policy.
+
+### Consumer setup
+
+Requires React 19-compatible Vandor primitives, Tailwind v4, Vandor/shadcn theme tokens (`background`, `foreground`, `muted`, `accent`, `border`, `ring`, `destructive`), and the existing primitives' animation setup. Verified integration uses Table 9.2.6, Query 5.104.1, and Zod 4.3.6. Backend-only schema installation has no React runtime imports:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/data-grid-schema.json
+```
+
+Use CLI installation for the complete UI. Copying the Source block alone is insufficient: DataGrid also needs `data-grid-columns`, `data-grid-context`, `data-grid-controls`, `data-grid-feedback`, `data-grid-labels`, `data-grid-selection`, `data-grid-state`, `use-data-grid`, `data-grid-schema`, and the shared `error-state-base` module, plus Button, Checkbox, Select, Dropdown, InputSearch, Empty and their dependencies. Review overwrite prompts for existing customized primitives. Supporting files share identical content with their owning registry items.
+
+### Backend reuse
+
+`createDataGridContract` exposes normal `.input`, `.output`, `.row`, `.filters`, `.pagination`, and `.sorting` Zod schemas. Reuse them in REST/server functions or tRPC:
+
+```ts
+const listUsers = procedure
+  .input(usersGrid.input)
+  .output(usersGrid.output)
+  .query(({ input, ctx }) => ctx.users.listAuthorized(input));
+```
+
+```tsx
+const grid = useDataGrid({
+  contract: usersGrid,
+  columns,
+  getRowId: row => row.id,
+  queryOptions: input => trpc.users.list.queryOptions(input),
+});
+```
+
+These are integration fragments; create the router/provider in your application. The native query key must include all result-affecting request fields and authorization/tenant scope. DataGrid does not rewrite tRPC keys or prove key completeness. Explicitly validate transport outputs at the transport boundary, not through a hidden grid `select`.
+
+Contracts default to 25 rows, maximum 100, empty sorting, and null initial cursors. Builders accept `pageSize`/`maxPageSize`. Page inputs use zero-based `pageIndex`; output `{ rows, rowCount }` counts all filtered results. Cursor outputs use `{ rows, nextCursor }`, with opaque strings or null. Sort keys are independently allowlisted; duplicate keys and unsafe integer bounds are rejected.
+
+### Raw drafts and transforms
+
+Draft bindings infer `z.input`, while `request` and query factories use normalized `z.output`. Changes parse raw filters once; pagination never parses applied filters again. The initial raw baseline is retained. Restoring externally controlled normalized filters uses Zod encode: transformed filters requiring this inverse must use reversible Zod v4 codecs. A one-way transform needing restoration throws a clear diagnostic rather than applying the transform twice. Row/transport transforms are unaffected.
+
+## Cursor pagination
+
+<ComponentPreview name="data-grid-cursor-demo" title="data-grid-cursor-demo.tsx">
+  <DataGridCursorDemo />
+</ComponentPreview>
+
+Next uses current successful response metadata. Previous uses successfully visited cursors, not cached rows. Failed requests remain retryable and do not append history. Filtering, sorting, and page-size changes reset history. There is no arbitrary jump, total, or last-page action. A remount/deep link starts fresh local history.
+
+## Filters and Apply
+
+<ComponentPreview name="data-grid-filters-demo" title="data-grid-filters-demo.tsx">
+  <DataGridFiltersDemo />
+</ComponentPreview>
+
+Immediate mode validates each changed field, with Search debounced 300 ms by default. Invalid values remain visible for correction without issuing a request. Independent debounces merge into the current applied filters; clear/reset cancels pending timers. Apply mode edits a whole draft and commits immediately when Apply is clicked, without waiting for debounce. Reset restores the captured initial baseline and resets pagination. Field reset restores only that field.
+
+`DataGridFilter` and `DataGridSearch` take an explicit typed `grid` prop because JSX parent context cannot infer domain field/value types. The render binding supplies `value`, `onChange`, `reset`, and `error`; it accepts arbitrary controls. The date example maps DateRangePicker's committed dates to local `yyyy-MM-dd` calendar strings. Calendar Cancel does not change the grid draft. Calendar Apply changes the draft; grid Apply sends the group. Pick date-only versus timestamp semantics explicitly; there is no implicit UTC conversion.
+
+## Remote selection
+
+<ComponentPreview name="data-grid-selection-demo" title="data-grid-selection-demo.tsx">
+  <DataGridSelectionDemo />
+</ComponentPreview>
+
+Selection defaults to none. Explicit IDs survive paging and sorting. The header checkbox toggles only the visible eligible page and supports indeterminate state. Opt-in all-matching selection emits `{ mode: "allMatching", filters, excludedIds }`, not a million-ID list. Deselected rows/pages become exclusions. Effective applied-filter changes clear selection; draft edits do not. Placeholder rows cannot be selected, and Clear remains available.
+
+Validate descriptors with `createDataGridSelectionSchema({ filters, id })`. UI IDs are stable unique strings; selection schemas deduplicate IDs/exclusions. All-matching means matching at action execution time, not a frozen dataset. Backend authorization, tenant boundaries, eligibility, destructive confirmation, and exact-time snapshot tokens remain application responsibilities. Totals are informational; changed/deleted exclusions can make an exact selected count unknowable. Do not submit only Table's loaded selected rows as the full remote selection.
+
+## Controlled state
+
+<ComponentPreview name="data-grid-controlled-demo" title="data-grid-controlled-demo.tsx">
+  <DataGridControlledDemo />
+</ComponentPreview>
+
+Control slices independently through `state` and matching `onStateChange` callbacks: `request`, `columnVisibility`, `columnOrder`, `selection`. Request contains pagination, applied filters, and sorting as one atomic value. A supplied slice is authoritative; callbacks propose values without competing internal writes. Parent updates actually apply controlled requests. External filter restoration rebases raw drafts and cancels pending edits. `initialState` is read once and is the reset baseline, not a controlled prop.
+
+URL/router adapters remain application-owned. Remount with a scope key when tenant/resource identity changes to clear incompatible draft, selection, and cursor history. Never carry placeholder data across an authorization scope.
+
+## Rendering and columns
+
+<ComponentPreview name="data-grid-rendering-demo" title="data-grid-rendering-demo.tsx">
+  <DataGridRenderingDemo />
+</ComponentPreview>
+
+Column definitions are the single configuration source. Key accessors infer the field value; computed accessors need a stable ID and infer their result; display columns need an ID but no accessor. `cell({ value, row, native })` receives domain data and the real Table context. Backend `sortBy`, column ID, label, and accessor are independent. Non-text headers require a text `label`. Multiple columns sharing a backend sort key do not produce duplicate request sort entries.
+
+Array order initializes display order. Restored `columnOrder` ignores obsolete IDs and appends missing known IDs; non-hideable columns stay visible. Default cells show strings/numbers directly and a placeholder for null/undefined/complex values; explicitly format currency, dates, and objects.
+
+`renderColumn`, `renderRow`, and `renderCell` receive `grid`, native context, and spreadable primitive props; row/cell overrides also receive the inferred domain row. Heterogeneous Table-level cell values are unknown; use typed column cell callbacks for value-specific rendering. Spread `context.props` to retain default children, selection/sorting controls, and semantics. Replacing children or an entire primitive makes native/ref/event responsibility yours. Use accessible links/buttons for navigation, not click-only rows.
+
+Root owns variant/density/labels. Column, Row, and Cell are native `th`/`tr`/`td` primitives, not JSX registration effects. Table supplies overflow by default; an explicit Viewport becomes the sole scroll container. Sticky headers stay within that viewport. Toolbar, pagination, and selection bar are optional presentation.
+
+## Behavior & Accessibility
+
+- Server processing only: returned backend order is retained, without client-side filtering/sorting/pagination factories. A filter/sort/page-size change resets pagination in one request. Three-state sorting cycles ascending, descending, unsorted; Shift adds multi-sort priority.
+- Current successful out-of-range pages correct once to the last valid index. Zero results display page one and `0–0`, never negative ranges. Placeholder metadata never corrects or navigates another request.
+- Initial active requests show skeleton rows. Successful empty results use Empty, with reset for non-baseline filters. Initial/request-key errors use centered ErrorState with retry; same-key background errors retain rows with inline feedback. Raw backend messages/stacks are not rendered by default.
+- Refresh and placeholder indicators are explicit. Disabled queries show neutral inactive feedback; paused network requests show waiting feedback, not an endless active skeleton. Query cancellation/race policy remains native.
+- Native table semantics, keyboard-accessible sort buttons, `aria-sort`, labeled checkboxes, visible focus and live async/selection feedback are preserved. Add an accessible table name or caption. Custom filters must associate visible labels/help/errors with their controls.
+- Localize all visible/accessible strings through root `labels`; `sort`, `selectRow`, `page`, `range`, `selected`, and `selectAllMatching` are formatter functions. Avoid parsing English strings for localization. Toolbars wrap on narrow screens; wide tables scroll within their viewport.
+- Controller exposes native `query`/`table`, `request`, raw `filterDraft`, field/form errors, selection/preferences/presentation and typed actions: `setFilter`, `setFilters`, `resetFilter`, `applyFilters`, `resetFilters`, `setSorting`, `setPageSize`, `nextPage`, `previousPage`, `toggleRow`, `togglePage`, `selectAllMatching`, `clearSelection`. `setPageIndex` exists only on page grids. `getFilterBinding` returns the typed raw field binding.
+
+### Optional portable stories
+
+Install DataGrid first, then add stories separately:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/data-grid-stories.json
+```
+
+Stories do not reinstall core or modify `.storybook`. Use an existing React Storybook with matching package versions, `@storybook/react` types, and a story glob covering your configured UI directory (`**/*.stories.tsx`). Types target the installed 10.6.1 version; use matching versions in your setup. Inherit your global Tailwind/theme CSS and decorators. Stories include their own QueryClientProvider and simulated service, with no website imports or extra addon requirement. Storybook UI is not verified: this project has no Storybook server.

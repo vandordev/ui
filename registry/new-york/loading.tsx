@@ -52,6 +52,7 @@ import { Typing } from "@/components/loading-ui/typing";
 import { WanderingEyes } from "@/components/loading-ui/wandering-eyes";
 import { Wave } from "@/components/loading-ui/wave";
 
+import { LoadingArc } from "./loading-arc";
 import type { LoadingVariant } from "./loading-variants";
 export { loadingVariants, type LoadingVariant } from "./loading-variants";
 
@@ -204,6 +205,22 @@ export const Loading = ({
   ...props
 }: LoadingProps) => {
   const reducedMotion = useReducedMotion();
+  if (variant === "arc" && !variantProps) {
+    return (
+      <LoadingArc
+        {...props}
+        size={size}
+        className={className}
+        aria-label={ariaLabel}
+        style={
+          {
+            ...(duration === undefined ? {} : { "--duration": `${duration}s` }),
+            ...style,
+          } as CSSProperties
+        }
+      />
+    );
+  }
   // The public discriminated union validates each variant's own props. The common
   // rendering boundary only adds className and string children to text components.
   const Component = loadingComponents[variant] as ComponentType<{

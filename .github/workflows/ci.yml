@@ -25,7 +25,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Lint and format
-        run: pnpm check
+        run: NODE_OPTIONS="--max-old-space-size=1024" timeout --signal=TERM --kill-after=5s 180s pnpm check
 
   typecheck:
     runs-on: ubuntu-latest
@@ -38,10 +38,10 @@ jobs:
       - name: Build
         env:
           NEXT_TELEMETRY_DISABLED: 1
-        run: pnpm build
+        run: NODE_OPTIONS="--max-old-space-size=2048" timeout --signal=TERM --kill-after=5s 600s pnpm build
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: NODE_OPTIONS="--max-old-space-size=2048" timeout --signal=TERM --kill-after=5s 300s pnpm typecheck
 
       - name: Tests
-        run: pnpm test
+        run: NODE_OPTIONS="--max-old-space-size=512" timeout --signal=TERM --kill-after=5s 900s node --test --test-concurrency=1 tests/*.test.cjs

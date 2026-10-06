@@ -71,7 +71,7 @@ Set `isLoading` while an action is pending. The Button shows the Loading compone
 <Button isLoading={isSaving}>Save</Button>
 ```
 
-Installing Button also installs Loading through its registry dependency. The loading indicator inherits the button's color and respects reduced-motion preferences. The playground's **Is Loading** toggle updates both the preview and generated code.
+Installing Button includes the small licensed `loading-arc.tsx` supporting primitive, not the entire Loading animation catalog. The public Loading item remains separately installable and shares this default Arc primitive. The loading indicator inherits the button's color and respects reduced-motion preferences. The playground's **Is Loading** toggle updates both the preview and generated code.
 
 <ComponentPreview name="button-loading" title="button-loading.tsx">
   <ButtonLoading />
@@ -109,7 +109,7 @@ npx shadcn@latest add https://vandor-ui.vercel.app/r/button-stories.json
 
 The stories-only item installs `button.stories.tsx` beside Button in your configured UI directory. It does not reinstall Button or Loading, add packages, or modify `.storybook/`. If a stories file already exists, review the CLI diff rather than overwriting your customizations.
 
-The stories import `Button` relatively (`./button`) and use only `@storybook/react` types and `lucide-react` icons. Ensure these packages are available in your project; keep `@storybook/react` on the same version as the rest of your Storybook packages. The stories are typechecked and composed against Storybook React 10.6.1; other versions are not verified. A working Button and its Loading dependency remain required.
+The stories import `Button` relatively (`./button`) and use only `@storybook/react` types and `lucide-react` icons. Ensure these packages are available in your project; keep `@storybook/react` on the same version as the rest of your Storybook packages. The stories are typechecked and composed against Storybook React 10.6.1; other versions are not verified. A working Button and its `loading-arc.tsx` supporting module remain required.
 
 ### Discover the stories
 

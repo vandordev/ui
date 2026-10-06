@@ -114,6 +114,15 @@ Provide inferred public input/output/row types. Respect the distinction between
 rendering consumes the declared output row type. Transforms must not be silently
 applied twice.
 
+Amendment approved during inline implementation: controlled request state holds
+normalized `z.output` values; filter controls edit raw `z.input` drafts. Retain
+known raw drafts without re-parsing applied output. Reconstructing a draft after
+an external controlled filter restoration uses public Zod v4 encode. Filters
+with transforms that need this inverse must use reversible Zod codecs; a one-way
+transform without an inverse produces a clear diagnostic, never a second parse.
+Ordinary filters and row/transport transforms are unaffected. Draft bindings infer
+their field/value types from the raw filter input schema.
+
 Filter request values and cursors are serializable. Date filters use explicitly
 chosen date-only strings or timestamps; no implicit locale/timezone inference.
 Do not derive sortable fields or filter permissions from all row fields.
@@ -477,6 +486,11 @@ for every custom filter. DateRangePicker, custom filter controls, and Dialog bul
 confirmation are example/application dependencies, not unconditional core imports.
 Do not pull ErrorStateDetails or unrelated feature catalogs into the installed
 grid accidentally; inspect the existing transitive graph.
+
+Packaging amendment approved during inline implementation: Button's default Arc
+spinner is a small licensed supporting primitive rather than a dependency on the
+entire Loading variant catalog. Preserve Button's API, default visual/state and
+reduced-motion behavior; leave explicit full Loading installation available.
 
 ## 11. Accessibility, responsive behavior, and localization
 
