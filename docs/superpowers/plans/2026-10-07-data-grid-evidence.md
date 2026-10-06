@@ -1,5 +1,21 @@
 # DataGrid execution evidence
 
+## Quiet async feedback follow-up
+
+- User explicitly chose no status badge. Async loading/refreshing/updating and
+  paused-with-existing-rows text now uses `sr-only`, preserving polite accessible
+  announcements without a visible row above the table. Skeletons, `aria-busy`,
+  empty/error/Retry feedback, inactive and paused-without-rows states are unchanged.
+- Regression first failed on the visible status row, then passed across initial
+  loading, same-key refetch, changed-filter placeholders and offline pause/resume.
+- Fresh affected feedback/rendering/stories/distribution/docs suite: **21 pass**,
+  zero failures/skips; inherited 512 MiB heap, serial workers, 120s deadline.
+  Focused strict TypeScript and registry generation also exited 0 with 512 MiB
+  heap and 120s deadlines. Formatting and diff checks passed.
+- Browser opened approved localhost:3000 DataGrid URL but scoped snapshot returned
+  `chrome-error://chromewebdata/`. Visual verification remains blocked; no new
+  server or alternative browser launched. No commit requested for this follow-up.
+
 ## Pagination follow-up after checkpoint `1bd860b`
 
 - User chose direct inline implementation on current clean `main`: icon-only navigation; numbered page links replace First/Last, while unnumbered mode retains all four icon actions. No automatic commit requested for this follow-up.

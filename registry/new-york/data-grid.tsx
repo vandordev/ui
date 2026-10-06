@@ -390,7 +390,7 @@ export function DataGridTable<C extends DataGridContract>({
         <div
           role="status"
           aria-live="polite"
-          className="text-sm text-muted-foreground"
+          className="sr-only"
         >
           {status === "placeholder"
             ? labels.updating

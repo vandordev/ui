@@ -156,3 +156,92 @@ test("inactive query is neutral while pending active query renders skeleton rows
     await f.dispose();
   }
 });
+
+test("async loading, refreshing, updating and paused announcements are screen-reader-only without a status badge", async () => {
+  const f = await createFixture();
+  const pending = [];
+  const rows = { rows: [{ id: "a", name: "Ada" }], rowCount: 1 };
+  const wasOnline = f.query.onlineManager.isOnline();
+  try {
+    await f.mount({
+      options: {
+        queryOptions: (input) =>
+          f.query.queryOptions({
+            queryKey: ["quiet-feedback", input],
+            placeholderData: (previous) => previous,
+            queryFn: () => new Promise((resolve) => pending.push(resolve)),
+          }),
+      },
+    });
+    const verify = (text, busy = "true") => {
+      const announcement = f.host.querySelector(
+        '[role="status"][aria-live="polite"]'
+      );
+      assert.ok(
+        Boolean(announcement),
+        "Accessible async announcement remains available"
+      );
+      assert.equal(announcement.textContent, text);
+      assert.ok(
+        announcement.classList.contains("sr-only"),
+        "Async text must not occupy a visible layout row"
+      );
+      assert.equal(f.host.querySelectorAll('[data-slot="badge"]').length, 0);
+      assert.equal(
+        f.host.querySelector("table").getAttribute("aria-busy"),
+        busy
+      );
+    };
+    verify("Loading results");
+    assert.equal(
+      f.host.querySelectorAll('tbody tr[aria-hidden="true"]').length,
+      5
+    );
+    await f.React.act(async () => pending.shift()(rows));
+    await f.settle();
+    assert.ok(
+      f.host.querySelector('[role="status"][aria-live="polite"]') === null,
+      "Ready state has no async announcement"
+    );
+    let refresh;
+    await f.React.act(async () => {
+      refresh = f.grid.query.refetch();
+    });
+    await f.settle();
+    verify("Refreshing results");
+    assert.ok(f.host.querySelector("tbody").textContent.includes("Ada"));
+    await f.React.act(async () => {
+      pending.shift()(rows);
+      await refresh;
+    });
+    await f.settle();
+    await f.React.act(async () => f.grid.setFilter("search", "updated"));
+    await f.settle();
+    verify("Updating results. Previous rows are shown temporarily.");
+    assert.ok(f.host.querySelector("tbody").textContent.includes("Ada"));
+    await f.React.act(async () => pending.shift()(rows));
+    await f.settle();
+    assert.equal(
+      f.host.querySelector("table").getAttribute("aria-busy"),
+      "false"
+    );
+    let pausedRefresh;
+    await f.React.act(async () => {
+      f.query.onlineManager.setOnline(false);
+      pausedRefresh = f.grid.query.refetch();
+    });
+    await f.settle();
+    verify("Waiting for a network connection", "false");
+    assert.ok(f.host.querySelector("tbody").textContent.includes("Ada"));
+    await f.React.act(async () => f.query.onlineManager.setOnline(true));
+    await f.settle();
+    await f.React.act(async () => {
+      pending.shift()(rows);
+      await pausedRefresh;
+    });
+    await f.settle();
+  } finally {
+    await f.React.act(async () => f.query.onlineManager.setOnline(wasOnline));
+    await f.dispose();
+  }
+});
