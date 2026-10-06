@@ -1,0 +1,81 @@
+---
+title: Badge
+description: Compact labels with semantic solid, light, and outline styles, five sizes, and Base UI composition.
+component: badge
+credits:
+  - name: ReUI
+    url: https://reui.io/docs/components/base/badge
+    contribution: Badge implementation adapted under the MIT license. Vandor supplies token-based radius, semantic foreground/text colors, public ref handling, and portable registry packaging. The full license notice is retained in the distributed source.
+---
+
+import { BadgeVariants } from "@/examples/badge-variants";
+import { BadgeSizes } from "@/examples/badge-sizes";
+import { BadgeComposition } from "@/examples/badge-composition";
+
+## Usage
+
+```tsx
+import { Badge } from "@/components/ui/badge";
+
+export const Demo = () => <Badge variant="success-light">Ready</Badge>;
+```
+
+Use your project's configured UI alias if it differs from `@/components/ui`. Badge is a presentational label, not a data-fetching component. Applications own the status and its text.
+
+## Examples
+
+### Variants
+
+Use solid styles for emphasis, light styles for quiet status indicators, and outline styles for metadata. Color never replaces a meaningful label.
+
+<ComponentPreview name="badge-variants" title="badge-variants.tsx">
+  <BadgeVariants />
+</ComponentPreview>
+
+The primary family uses Vandor's primary tokens. `focus`, `focus-light`, and `focus-outline` are ReUI-compatible aliases for the primary family, not keyboard-focus states. `invert` uses foreground/background tokens instead of an additional color scheme.
+
+### Sizes and Pill Radius
+
+The five sizes are `xs`, `sm`, `default`, `lg`, and `xl`. Prefer `default` or `xl` for status text. The smaller sizes are intended for dense metadata. `radius="default"` uses the theme's `rounded-md`; `radius="full"` makes a pill.
+
+<ComponentPreview name="badge-sizes" title="badge-sizes.tsx">
+  <BadgeSizes />
+</ComponentPreview>
+
+### Icons, Spinner, and Links
+
+Compose icons, dots, or a spinner as children. These are not Badge props. Icons inherit the current color, and SVG sizing is handled by Badge unless the icon supplies an explicit `size-*` class.
+
+<ComponentPreview name="badge-composition" title="badge-composition.tsx">
+  <BadgeComposition />
+</ComponentPreview>
+
+Use Base UI's `render` to replace the span with a link. Badge has no `asChild`, `disabled`, or `isLoading` prop. Give interactive elements their native semantics; use Button for actions rather than putting click behavior on a span. Badge merges public refs and handlers with the replacement element.
+
+## Theme and Consumer Setup
+
+Requires React 19, Tailwind CSS 4, and the standard shadcn theme tokens. CLI installation includes Base UI 1.8+, `class-variance-authority`, `cn`, and semantic CSS variables for both light and dark themes. It installs a single Badge source file with its MIT notice, not another component catalog.
+
+Additional tokens are `--success`, `--info`, and `--warning`, each with `-foreground` for solid badges and `-text` for light/outline badges. `--destructive-foreground` and `--destructive-text` complete the destructive family. Tailwind's `@theme inline` mappings are included by the registry's `cssVars.theme`. The distinction avoids using white text on a pale status background. Review existing custom token values when installing into an already themed project.
+
+If copying the Source manually, also copy the `cssVars.theme`, `cssVars.light`, and `cssVars.dark` entries from [the Badge registry artifact](/r/badge.json) into your Tailwind theme, `:root`, and `.dark` respectively. Copying the TSX alone does not supply the semantic colors. Preserve its license comment and install all listed dependencies. The icon/spinner examples additionally require `lucide-react`; Badge itself does not.
+
+## Storybook Stories (Optional)
+
+Install Badge first, then install the stories separately:
+
+```bash
+pnpm dlx shadcn@latest add https://vandor-ui.vercel.app/r/badge-stories.json
+```
+
+The stories-only item does not reinstall Badge, modify `.storybook/`, or install/upgrade Storybook packages. Use `@storybook/react` matching your existing Storybook setup (verified against 10.6.1), plus `lucide-react` for the examples. Include `**/*.stories.tsx` in story discovery and import your Tailwind/theme CSS in preview setup. Light/dark decorators belong to the consumer. Stories include variants, sizes, pill, dot, icon, spinner, link, and long labels; no addons are required by the story source.
+
+## Behavior & Accessibility
+
+- Badge renders a `span` by default and is not focusable. It does not announce every static label automatically.
+- For changing async status, the application can supply `role="status"` and `aria-live="polite"`. Reserve a consistent toolbar slot when replacing status text to avoid layout jumps.
+- Use “Live” only when your application actually updates data automatically. Successful fetches alone do not establish a live connection.
+- Hide decorative icons/dots with `aria-hidden="true"`. Keep the status readable as text.
+- `motion-safe:animate-spin` in the spinner example stops animation when reduced motion is preferred.
+- Links retain native keyboard navigation and a visible focus ring. `variant="outline"` alone does not make a Badge a link.
+- Labels stay on one line. For constrained layouts, keep labels short or provide a scrollable parent. Badge does not silently truncate meaningful status text.

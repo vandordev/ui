@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "accordion",
+    "badge",
     "blobatar",
     "button",
     "calendar",

@@ -6,6 +6,11 @@ import {
   getAccordionDefaults,
 } from "@/lib/accordion-playground";
 import {
+  badgeProps,
+  getBadgeCode,
+  getBadgeDefaults,
+} from "@/lib/badge-playground";
+import {
   blobatarProps,
   getBlobatarCode,
   getBlobatarDefaults,
@@ -114,6 +119,12 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   accordion: {
     playground: { code: getAccordionCode(getAccordionDefaults()) },
     props: accordionProps,
+  },
+  badge: {
+    nativePropsDescription:
+      "Badge forwards native span attributes, handlers and React 19 refs through Base UI useRender. Use render for links or other elements; Badge does not add button semantics, disabled behavior, or an automatic live region.",
+    playground: { code: getBadgeCode(getBadgeDefaults()) },
+    props: badgeProps,
   },
   blobatar: {
     playground: { code: getBlobatarCode(getBlobatarDefaults()) },
