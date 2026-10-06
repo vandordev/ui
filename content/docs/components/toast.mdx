@@ -54,6 +54,7 @@ The imperative API also includes `toast.warning`, `toast.info`, `toast.loading`,
 ### Compact and detailed
 
 Title-only notifications remain pills. A description opens a connected body that stays open until dismissed.
+On first arrival, the pill/title appears first, then the body opens after a brief 220ms lead with a soft fade. Actions reveal with the description. Replacements inside an existing shell do not repeat this entrance; reduced motion shows details immediately.
 
 <ComponentPreview name="toast-demo" title="toast-demo.tsx">
   <ToastDemo />
@@ -155,6 +156,7 @@ The adapter subscribes to the existing QueryClient caches and does not replace a
 <ComponentPreview name="toast-query-demo" title="toast-query-demo.tsx"><ToastQueryDemo /></ComponentPreview>
 
 - Mutation retries keep one loading notification until the final result. Result/error mappers that throw use safe fallback text. Overlapping operations have different IDs. Dismissing loading is final; settlement does not recreate it.
+- The adapter does not override Toast durations. Loading has no countdown; its title-only success/error result defaults to 3 seconds, with the progress bar starting when presented. If you update that toast to include description/action, the core default is 4 seconds. Adapter metadata configures messages only, not duration overrides.
 - Query failures notify only in idle terminal error state after retries. Deduplication uses the query's error-update counter, so repeated cache events do not duplicate feedback, but a later failed fetch can notify even if it throws the same Error object.
 - Adapter instances for one QueryClient share a reference-counted subscription. Remount reconciles pending mutations and tracked results without creating duplicate loading toasts. Keep ToastProvider and the adapter mounted at the root; removing the final adapter stops feedback until remount.
 - The optional `subscribeToastQueryClient(client)` function offers the same subscription for non-component integration; call its returned cleanup when releasing the client. Do not use it alongside a different toast lifecycle owner.

@@ -517,16 +517,17 @@ const ToastCard = ({
     data.actionLabel,
   ]);
   useEffect(() => {
-    if (!hasBody || opened) {
+    if (!hasBody || opened || item.transitionStatus === "ending") {
       return;
     }
-    if (reduceMotion) {
+    if (reduceMotion || entry !== "first") {
       setOpened(true);
       return;
     }
-    const frame = requestAnimationFrame(() => setOpened(true));
-    return () => cancelAnimationFrame(frame);
-  }, [hasBody, opened, reduceMotion]);
+    // Let the pill/title entrance establish the message before opening details.
+    const timer = window.setTimeout(() => setOpened(true), 220);
+    return () => window.clearTimeout(timer);
+  }, [hasBody, opened, reduceMotion, entry, item.id, item.transitionStatus]);
   useEffect(() => {
     if (opened && !data.bodyOpened && item.transitionStatus !== "ending") {
       manager.update(item.id, (previous) => ({
@@ -629,12 +630,18 @@ const ToastCard = ({
                   left: `calc(50% + ${centerInset / 2 - size.pill / 2 - 8}px)`,
                   transform: "translateX(-100%)",
                 }
-              : undefined
+              : {
+                  left: position.endsWith("left")
+                    ? size.start + size.pill + 8
+                    : size.start - 8,
+                  transform: position.endsWith("left")
+                    ? "none"
+                    : "translateX(-100%)",
+                }
           }
           className={cn(
             "absolute z-10 flex h-12 items-center gap-1.5",
-            isTop ? "top-0" : "bottom-0",
-            !isCenter && (position.endsWith("left") ? "right-0" : "left-0")
+            isTop ? "top-0" : "bottom-0"
           )}
         >
           <motion.div

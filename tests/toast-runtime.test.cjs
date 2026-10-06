@@ -3,7 +3,7 @@
 const assert = require("node:assert/strict");
 const { test, after, afterEach } = require("node:test");
 const { createJiti } = require("jiti");
-let React, createRoot, dom, api, root, host, snapshot;
+let React, createRoot, dom, api, root, host, snapshot, reducedMotionQuery;
 const ready = (async () => {
   const { Window } = await import("happy-dom");
   dom = new Window({ url: "http://localhost" });
@@ -39,7 +39,17 @@ const ready = (async () => {
   globalThis.IS_REACT_ACT_ENVIRONMENT = true;
   // Happy DOM cancels native WAAPI promises differently from browsers. These
   // lifecycle tests deliberately use the reduced-motion rendering path.
-  dom.matchMedia("(prefers-reduced-motion)").matches = true;
+  reducedMotionQuery = dom.matchMedia("(prefers-reduced-motion)");
+  Object.defineProperty(reducedMotionQuery, "matches", {
+    configurable: true,
+    value: true,
+    writable: true,
+  });
+  const matchMedia = dom.matchMedia.bind(dom);
+  dom.matchMedia = (query) =>
+    query === "(prefers-reduced-motion)"
+      ? reducedMotionQuery
+      : matchMedia(query);
   delete dom.Element.prototype.animate;
   React = require("react");
   ({ createRoot } = require("react-dom/client"));
@@ -315,6 +325,73 @@ test("dismissed loading toast is not resurrected by async settlement", async () 
     "dismissal remains final"
   );
 });
+test("first detailed arrival presents title before revealing description and action", async () => {
+  await mount();
+  await React.act(async () => root.unmount());
+  host.remove();
+  root = null;
+  const preference = reducedMotionQuery;
+  preference.matches = false;
+  preference.dispatchEvent(new Event("change"));
+  try {
+    await mount();
+    await React.act(async () =>
+      api.toast.info("Title first", {
+        actionLabel: "Undo",
+        description: "Details later",
+        duration: 0,
+      })
+    );
+    assert.ok(
+      document.body.textContent.includes("Title first"),
+      "title is available immediately"
+    );
+    assert.ok(
+      !document.body.textContent.includes("Details later"),
+      "detail waits until after title entrance"
+    );
+    assert.ok(
+      !document.querySelector("[data-toast-id] button"),
+      "action waits with description"
+    );
+    await React.act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 90));
+    });
+    assert.ok(
+      !document.body.textContent.includes("Details later"),
+      "title has a deliberate readable lead"
+    );
+    await React.act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 220));
+    });
+    assert.ok(
+      document.body.textContent.includes("Details later"),
+      "detail is eventually revealed"
+    );
+    assert.ok(
+      document.body.textContent.includes("Undo"),
+      "action is revealed with detail"
+    );
+    const shell = document.querySelector("[data-toast-shell]");
+    await React.act(async () =>
+      api.toast.info("Replacement", {
+        description: "No extra entrance delay",
+        duration: 0,
+      })
+    );
+    assert.ok(
+      document.querySelector("[data-toast-shell]") === shell,
+      "replacement preserves the shell"
+    );
+    assert.ok(
+      document.body.textContent.includes("No extra entrance delay"),
+      "replacement does not repeat title-first delay"
+    );
+  } finally {
+    preference.matches = true;
+    preference.dispatchEvent(new Event("change"));
+  }
+});
 test("opening detail survives a later content-only update", async () => {
   await mount();
   let id;
@@ -419,6 +496,21 @@ test("adapter catches an in-flight mutation when mounted and preserves cache cal
       "Completed"
     );
     assert.equal(callbacks, 1);
+    const completed = snapshot.toasts.find((item) => item.id === id);
+    assert.equal(
+      completed.data.duration,
+      3000,
+      "adapter success uses the title-only default"
+    );
+    assert.equal(
+      completed.data.durationOverride,
+      undefined,
+      "adapter does not force a custom duration"
+    );
+    assert.equal(
+      document.querySelector("[data-toast-progress]").dataset.duration,
+      "3000"
+    );
   } finally {
     await React.act(async () => {
       resolve?.("cleanup");
@@ -864,6 +956,42 @@ test("center placement centers the pill and anchors queue controls beside it", a
     "controls sit adjacent to pill, not viewport edge"
   );
 });
+for (const position of [
+  "top-right",
+  "bottom-right",
+  "top-left",
+  "bottom-left",
+]) {
+  test(`${position} queue controls stay 8px from measured pill instead of viewport edge`, async () => {
+    await mount(position);
+    await React.act(async () => api.toast.info("Short", { duration: 0 }));
+    const header = document.querySelector("[data-toast-header-row] > div");
+    Object.defineProperty(header, "offsetLeft", {
+      configurable: true,
+      value: position.endsWith("left") ? 0 : 208,
+    });
+    Object.defineProperty(header, "offsetWidth", {
+      configurable: true,
+      value: 160,
+    });
+    const id = document.querySelector("[data-toast-id]").dataset.toastId;
+    await React.act(async () => api.toast.update(id, { title: "Measured" }));
+    const controls = document.querySelector("[data-toast-queue-controls]");
+    assert.equal(
+      controls.style.left,
+      position.endsWith("left") ? "168px" : "200px"
+    );
+    assert.equal(
+      controls.style.transform,
+      position.endsWith("left") ? "none" : "translateX(-100%)"
+    );
+    assert.ok(
+      !controls.className.includes("left-0") &&
+        !controls.className.includes("right-0"),
+      "no viewport-edge anchor remains"
+    );
+  });
+}
 test("portable Toast story args affect the emitted notification", async () => {
   await ready;
   const jiti = createJiti(__filename, {

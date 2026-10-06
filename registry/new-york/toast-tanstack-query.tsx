@@ -96,7 +96,7 @@ export const subscribeToastQueryClient = (queryClient: QueryClient) => {
         } catch {
           title = "Done";
         }
-        toast.update(id, { duration: 4000, title, type: "success" });
+        toast.update(id, { title, type: "success" });
         mutationToasts.delete(mutation);
       } else if (status === "error") {
         const id = mutationToasts.get(mutation);
