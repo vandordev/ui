@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "page-container-stories",
+  "title": "PageContainer Stories",
+  "description": "Optional portable PageContainer stories. Install PageContainer first; no component or Storybook configuration is overwritten.",
+  "files": [
+    {
+      "path": "registry/new-york/page-container.stories.tsx",
+      "content": "import type { Meta, StoryObj } from \"@storybook/react\";\n\nimport { PageContainer } from \"./page-container\";\n\nconst meta = {\n  argTypes: {\n    children: { control: \"text\" },\n    className: { control: \"text\" },\n    ref: { control: false },\n    size: { control: \"select\", options: [\"sm\", \"md\", \"lg\", \"xl\", \"full\"] },\n  },\n  args: { children: \"Page content\", size: \"lg\" },\n  component: PageContainer,\n  parameters: { layout: \"fullscreen\" },\n  render: ({ children, ...args }) => (\n    <PageContainer {...args}>\n      <div className=\"bg-muted py-8 text-sm text-foreground\">{children}</div>\n    </PageContainer>\n  ),\n  tags: [\"autodocs\"],\n  title: \"Vandor UI/PageContainer\",\n} satisfies Meta<typeof PageContainer>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\n\nexport const Playground: Story = {};\nexport const FullWidth: Story = { args: { size: \"full\" } };\nexport const LongContent: Story = {\n  args: {\n    children:\n      \"Page content stays within the available width. Long prose wraps naturally; tables and unbroken values should manage overflow inside the page, not on the container.\",\n    size: \"sm\",\n  },\n};\nexport const Sizes: Story = {\n  argTypes: { children: { control: false }, size: { control: false } },\n  render: (args) => (\n    <div className=\"flex flex-col gap-6 py-6\">\n      {([\"sm\", \"md\", \"lg\", \"xl\", \"full\"] as const).map((size) => (\n        <PageContainer {...args} key={size} size={size}>\n          <div className=\"bg-muted py-4 text-sm text-foreground\">{size}</div>\n        </PageContainer>\n      ))}\n    </div>\n  ),\n};\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:item"
+}

@@ -13,6 +13,8 @@ import { EmptyPlayground } from "@/components/empty-playground";
 import { ErrorStatePlayground } from "@/components/error-state-playground";
 import { InputFamilyPlayground } from "@/components/input-family-playground";
 import { LoadingPlayground } from "@/components/loading-playground";
+import { PageContainerPlayground } from "@/components/page-container-playground";
+import { PageHeaderPlayground } from "@/components/page-header-playground";
 import { PopoverPlayground } from "@/components/popover-playground";
 import { PropsReference } from "@/components/props-reference";
 import { SelectPlayground } from "@/components/select-playground";
@@ -44,6 +46,8 @@ const playgrounds: Record<string, () => ReactNode> = {
   "input-search": () => <InputFamilyPlayground component="input-search" />,
   "input-secret": () => <InputFamilyPlayground component="input-secret" />,
   loading: LoadingPlayground,
+  "page-container": PageContainerPlayground,
+  "page-header": PageHeaderPlayground,
   popover: PopoverPlayground,
   select: SelectPlayground,
   "stats-card": StatsCardPlayground,

@@ -3,6 +3,53 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "page-header",
+      "type": "registry:ui",
+      "title": "PageHeader",
+      "description": "A responsive dashboard heading with supporting content, breadcrumbs, status, and actions.",
+      "dependencies": ["cn"],
+      "files": [
+        { "path": "registry/new-york/page-header.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "page-header-stories",
+      "type": "registry:item",
+      "title": "PageHeader Stories",
+      "description": "Optional portable PageHeader stories. Install PageHeader first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/page-header.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "page-container",
+      "type": "registry:ui",
+      "title": "PageContainer",
+      "description": "Centered page content with a maximum width and responsive horizontal gutters.",
+      "dependencies": ["cn"],
+      "files": [
+        {
+          "path": "registry/new-york/page-container.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "page-container-stories",
+      "type": "registry:item",
+      "title": "PageContainer Stories",
+      "description": "Optional portable PageContainer stories. Install PageContainer first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/page-container.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "stats-card",
       "type": "registry:ui",
       "title": "StatsCard",

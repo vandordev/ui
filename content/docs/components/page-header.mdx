@@ -1,0 +1,68 @@
+---
+title: PageHeader
+description: A responsive dashboard heading with supporting content, breadcrumbs, status, and actions.
+component: page-header
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { PageHeaderDemo } from "@/examples/page-header-demo";
+import { PageHeaderDashboardDemo } from "@/examples/page-header-dashboard-demo";
+
+## Usage
+
+```tsx
+import { PageHeader } from "@/components/ui/page-header";
+
+<PageHeader title="Projects" description="Manage your workspace projects." />;
+```
+
+PageHeader provides the identity and primary actions of a dashboard page. It is not the app's global navigation bar. Keep filters, tabs, summaries, and page content outside the header.
+
+## Examples
+
+### Simple heading
+
+<ComponentPreview name="page-header-demo" title="page-header-demo.tsx">
+  <PageHeaderDemo />
+</ComponentPreview>
+
+Only `title` is required. The component renders an `h1`, supporting content, and a bottom divider. It adds no outer margin, background, width cap, sticky positioning, state, or animation. Remove the divider with `className="border-b-0"` if the surrounding layout already provides one.
+
+### Dashboard composition
+
+<ComponentPreview
+  name="page-header-dashboard-demo"
+  title="page-header-dashboard-demo.tsx"
+>
+  <PageHeaderDashboardDemo />
+</ComponentPreview>
+
+Install [PageContainer](/docs/components/page-container) separately for this example. It sets the page width and gutters; `className="flex flex-col gap-6"` provides spacing between the header and content. Example links are placeholders for your app's routes, not routes supplied by PageHeader.
+
+The `breadcrumb` slot accepts your existing breadcrumb component without adding another navigation landmark. Supply a named `nav`, an ordered list, and `aria-current="page"` where appropriate. Plain text, as used by the playground control, is not automatically breadcrumb navigation.
+
+Use `status` for a badge or other contextual content alongside the heading. Use `actions` for one or more links or buttons; fragments work without an extra wrapper. Actions follow the copy in DOM order. Below Tailwind's `md` breakpoint (768px by default), they appear below the heading and align to the start. On wider screens they align to the trailing side and wrap when needed. Breakpoint selection follows the viewport, not the width of an embedded preview.
+
+### Consumer setup and optional stories
+
+Requires React 19, Tailwind CSS 4, and `cn`. Load your global Tailwind stylesheet with the semantic `border` and `muted-foreground` tokens. Example content and stories also use `muted`, `foreground`, `primary`, `primary-foreground`, and `ring`. There are no automatic Button, Badge, Breadcrumb, or PageContainer registry dependencies; supply or install your chosen components separately.
+
+PageHeader has no provider, browser API, or client directive. It can be imported into a Next.js Server Component; interactive actions need their own appropriate client boundary. Installation follows the UI alias in `components.json`. For manual setup, install `cn` and copy the Source into your UI directory. Review overwrite prompts before replacing an existing PageHeader. Examples and playground adapters are not distributed.
+
+Install PageHeader first, then optionally install its portable stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/page-header-stories.json
+```
+
+Use your existing `@storybook/react` installation with matching Storybook package versions (types and composition checked with 10.6.1). Discover `**/*.stories.tsx` in your UI directory and load your global Tailwind/theme stylesheet in the preview. No extra providers or addons are required. The stories-only item does not reinstall PageHeader or modify Storybook configuration. This project has no Storybook server; Storybook UI appearance is not verified here.
+
+## Behavior & Accessibility
+
+The root is a native `header`, with attributes, handlers, and React 19 ref forwarded. `title` is the required heading text, not the native HTML tooltip attribute. Native `children` is not supported: use the named slots instead. Descriptions render inside a `div` so rich content such as a paragraph does not create invalid nested paragraphs.
+
+Use one PageHeader as the page's primary `h1` inside its `main` content. A header scoped inside `main` is not the global banner. The component does not label your main landmark, announce changing statuses, or move focus; add appropriate application-level accessibility where needed. Empty strings, null, undefined, and booleans omit optional slot wrappers; numeric zero remains visible. Empty fragments and arrays are not inspected for content.
+
+Titles and descriptions wrap rather than truncate. Arbitrary wide custom slot content must provide its own responsive layout. Prefer actions directly inside a fragment so the actions container can wrap them. Preserve meaningful action names and native link/button semantics.
+
+The playground's `showActions` is a composition control, not a public prop. Generated code uses the same text, optional slots, and sample action link as the preview. Reset restores these settings. The fixed sample link demonstrates layout, not project creation behavior.

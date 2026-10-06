@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "page-container",
+  "title": "PageContainer",
+  "description": "Centered page content with a maximum width and responsive horizontal gutters.",
+  "dependencies": [
+    "cn"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/page-container.tsx",
+      "content": "import { cn } from \"cn\";\nimport type { ComponentProps } from \"react\";\n\nconst widths = {\n  full: \"max-w-none\",\n  lg: \"max-w-6xl\",\n  md: \"max-w-4xl\",\n  sm: \"max-w-2xl\",\n  xl: \"max-w-7xl\",\n} as const;\n\nexport type PageContainerProps = ComponentProps<\"div\"> & {\n  size?: keyof typeof widths;\n};\n\nexport const PageContainer = ({\n  className,\n  size = \"lg\",\n  ...props\n}: PageContainerProps) => (\n  <div\n    data-slot=\"page-container\"\n    data-size={size}\n    className={cn(\n      \"mx-auto w-full min-w-0 px-4 sm:px-6 lg:px-8\",\n      widths[size],\n      className\n    )}\n    {...props}\n  />\n);\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "page-header",
+  "title": "PageHeader",
+  "description": "A responsive dashboard heading with supporting content, breadcrumbs, status, and actions.",
+  "dependencies": [
+    "cn"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/page-header.tsx",
+      "content": "import { cn } from \"cn\";\nimport type { ComponentProps, ReactNode } from \"react\";\n\nexport type PageHeaderProps = Omit<\n  ComponentProps<\"header\">,\n  \"title\" | \"children\"\n> & {\n  title: string;\n  description?: ReactNode;\n  breadcrumb?: ReactNode;\n  status?: ReactNode;\n  actions?: ReactNode;\n};\n\nconst hasContent = (value: ReactNode) =>\n  value !== null &&\n  value !== undefined &&\n  typeof value !== \"boolean\" &&\n  value !== \"\";\n\nexport const PageHeader = ({\n  title,\n  description,\n  breadcrumb,\n  status,\n  actions,\n  className,\n  ...props\n}: PageHeaderProps) => (\n  <header\n    data-slot=\"page-header\"\n    className={cn(\n      \"flex min-w-0 flex-col gap-4 border-b border-border pb-6 md:flex-row md:items-end md:justify-between md:gap-6\",\n      className\n    )}\n    {...props}\n  >\n    <div className=\"flex min-w-0 flex-1 flex-col gap-3\">\n      {hasContent(breadcrumb) ? (\n        <div\n          data-slot=\"page-header-breadcrumb\"\n          className=\"min-w-0 text-sm text-muted-foreground\"\n        >\n          {breadcrumb}\n        </div>\n      ) : null}\n      <div className=\"flex min-w-0 flex-wrap items-center gap-2\">\n        <h1 className=\"min-w-0 text-2xl font-semibold tracking-tight wrap-break-word\">\n          {title}\n        </h1>\n        {hasContent(status) ? (\n          <div data-slot=\"page-header-status\" className=\"min-w-0 text-sm\">\n            {status}\n          </div>\n        ) : null}\n      </div>\n      {hasContent(description) ? (\n        <div\n          data-slot=\"page-header-description\"\n          className=\"max-w-[65ch] text-sm leading-relaxed text-muted-foreground wrap-break-word\"\n        >\n          {description}\n        </div>\n      ) : null}\n    </div>\n    {hasContent(actions) ? (\n      <div\n        data-slot=\"page-header-actions\"\n        className=\"flex min-w-0 max-w-full flex-wrap items-center gap-2 md:justify-end\"\n      >\n        {actions}\n      </div>\n    ) : null}\n  </header>\n);\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

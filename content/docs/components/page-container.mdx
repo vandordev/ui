@@ -1,0 +1,68 @@
+---
+title: PageContainer
+description: Centered page content with a maximum width and responsive horizontal gutters.
+component: page-container
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { PageContainerDemo } from "@/examples/page-container-demo";
+import { PageContainerFullDemo } from "@/examples/page-container-full-demo";
+
+## Usage
+
+```tsx
+import { PageContainer } from "@/components/ui/page-container";
+
+<main>
+  <PageContainer>
+    <h1>Workspace</h1>
+  </PageContainer>
+</main>;
+```
+
+PageContainer controls the width and horizontal spacing of page content. It is not an app shell or Card: it adds no background, border, shadow, vertical spacing, header, sidebar, height, or scrolling behavior.
+
+## Examples
+
+### Default page
+
+<ComponentPreview name="page-container-demo" title="page-container-demo.tsx">
+  <PageContainerDemo />
+</ComponentPreview>
+
+The default `lg` caps the outer width at 72rem. Use `sm` (42rem) for focused content, `md` (56rem) for settings, or `xl` (80rem) for wider pages. These are fixed maximum widths, not viewport breakpoints, and include the horizontal gutters under Tailwind's border-box reset. Sizes larger than a preview's available width can look identical.
+
+### Full-width content
+
+<ComponentPreview
+  name="page-container-full-demo"
+  title="page-container-full-demo.tsx"
+>
+  <PageContainerFullDemo />
+</ComponentPreview>
+
+`size="full"` removes the width cap but keeps the gutters. Use it for dashboards and wide tables. The example owns its table's horizontal scrolling; PageContainer never clips content or installs an overflow policy.
+
+### Gutters and overrides
+
+Gutters are 1rem below 640px, 1.5rem from 640px, and 2rem from 1024px with Tailwind's default spacing and breakpoints. They follow your Tailwind configuration. Add vertical spacing explicitly, for example `className="py-8"`. To remove gutters at every breakpoint, use `className="px-0 sm:px-0 lg:px-0"`; `px-0` alone does not override responsive classes. `className="max-w-5xl"` overrides the selected width cap.
+
+### Consumer setup and optional stories
+
+Requires React 19, Tailwind CSS 4 with its preflight reset, and `cn`. PageContainer has no provider, animation, theme-token dependency, or client directive and can be imported by a Next.js Server Component. Example content and stories use your `muted` and `foreground` semantic tokens; these surfaces are not built into the component.
+
+Installation uses the UI alias in your `components.json`. For manual setup, install `cn` and copy the generated Source into your UI directory. Review the CLI overwrite prompt before replacing an existing PageContainer. Playground and example files are not distributed.
+
+Install PageContainer first, then optionally install its portable stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/page-container-stories.json
+```
+
+Use your existing `@storybook/react` installation with matching Storybook package versions (types and composition checked with 10.6.1). Discover `**/*.stories.tsx` in your UI directory and load your global Tailwind/theme stylesheet in the preview. No extra addons or providers are required. The stories-only item does not reinstall the component or change Storybook configuration. This project has no Storybook server; Storybook UI appearance is not verified here.
+
+## Behavior & Accessibility
+
+PageContainer renders a native `div` and forwards its attributes, event handlers, children, and React 19 ref. It adds no landmark, heading, focus management, state, or motion. Wrap it in your page's `main` rather than creating multiple main landmarks. Use native headings appropriate to your page hierarchy. Arbitrary long URLs and tables need an application-level wrapping or scrolling policy.
+
+The playground content and size controls share configuration with the generated runnable code. Reset restores both to their defaults; the sample muted area only makes gutters visible.

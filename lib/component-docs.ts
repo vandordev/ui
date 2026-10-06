@@ -54,6 +54,16 @@ import {
   getLoadingDefaults,
   loadingProps,
 } from "@/lib/loading-playground";
+import {
+  getPageContainerCode,
+  getPageContainerDefaults,
+  pageContainerProps,
+} from "@/lib/page-container-playground";
+import {
+  getPageHeaderCode,
+  getPageHeaderDefaults,
+  pageHeaderProps,
+} from "@/lib/page-header-playground";
 import type { PropDefinition } from "@/lib/playground";
 import {
   getPopoverCode,
@@ -131,6 +141,16 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   loading: {
     playground: { code: getLoadingCode(getLoadingDefaults()) },
     props: loadingProps,
+  },
+  "page-container": {
+    playground: { code: getPageContainerCode(getPageContainerDefaults()) },
+    props: pageContainerProps,
+  },
+  "page-header": {
+    nativePropsDescription:
+      "PageHeader forwards native header attributes, handlers, and React 19 refs except children and title. Use its named slots; title sets the h1 text, not the native tooltip attribute.",
+    playground: { code: getPageHeaderCode(getPageHeaderDefaults()) },
+    props: pageHeaderProps,
   },
   popover: {
     playground: { code: getPopoverCode(getPopoverDefaults()) },

@@ -23,6 +23,8 @@
     "input-search",
     "input-secret",
     "loading",
+    "page-container",
+    "page-header",
     "popover",
     "select",
     "stats-card",
