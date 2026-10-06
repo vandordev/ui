@@ -64,14 +64,20 @@ test("StatsCard preserves exact display values and handles missing numeric value
 
 test("every StatsCard playground control matches runnable generated code", () => {
   const { StatsCard } = jiti("../registry/new-york/stats-card.tsx");
-  const { getStatsCardCode, getStatsCardDefaults, getStatsCardPreviewProps } =
-    jiti("../lib/stats-card-playground.ts");
+  const {
+    getStatsCardCode,
+    getStatsCardDefaults,
+    getStatsCardPreviewProps,
+    statsCardPlaygroundDefinitions,
+  } = jiti("../lib/stats-card-playground.ts");
   const defaults = getStatsCardDefaults();
+  assert.equal(getStatsCardPreviewProps(defaults).items.length, 2);
+  assert.equal(statsCardPlaygroundDefinitions.count.control.max, 2);
   const changes = {
     ariaLabel: 'Summary "quoted" <now>\nnext',
     badgeVariant: "destructive",
     caption: 'Caption "quoted"',
-    count: 5,
+    count: 1,
     showBadge: false,
     showCaption: false,
     target: -42,
@@ -85,7 +91,7 @@ test("every StatsCard playground control matches runnable generated code", () =>
       [key]: value,
     })),
     { ...defaults, ...changes },
-    ...[1, 2, 3, 4, 6].map((count) => ({ ...defaults, count })),
+    ...[1, 2].map((count) => ({ ...defaults, count })),
   ];
   for (const values of configs) {
     const compiled = ts.transpileModule(getStatsCardCode(values), {
@@ -200,7 +206,7 @@ test("StatsCard generated demos and distributed stories typecheck against artifa
     {
       ...defaults,
       badgeVariant: "outline",
-      count: 6,
+      count: 2,
       showBadge: false,
       showCaption: false,
       target: -25,

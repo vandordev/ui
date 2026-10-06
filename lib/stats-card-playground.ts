@@ -97,15 +97,16 @@ export const statsCardPlaygroundDefinitions = {
   },
   count: {
     control: {
-      initialValue: 4 as number,
+      initialValue: 2 as number,
       kind: "range",
       label: "Metrics",
-      max: 6,
+      max: 2,
       min: 1,
       step: 1,
     },
-    defaultValue: "4",
-    description: "Demo item count, not a component prop.",
+    defaultValue: "2",
+    description:
+      "Documentation demo item count (one or two), not a component limit.",
     type: "number",
   },
   showBadge: {

@@ -7,6 +7,7 @@ component: stats-card
 import { StatsCardDemo } from "@/examples/stats-card-demo";
 import { StatsCardValues } from "@/examples/stats-card-values";
 import { StatsCardUpdating } from "@/examples/stats-card-updating";
+import { StatsCardMissing } from "@/examples/stats-card-missing";
 
 ## Usage
 
@@ -47,7 +48,7 @@ Titles, values, captions, and badges wrap on narrow screens. The icon remains de
   <StatsCardDemo />
 </ComponentPreview>
 
-### Formatting, exact values, and missing data
+### Formatting and exact values
 
 Use `value.target` for finite numbers and `value.format` for application-specific formatting. The default formatter uses `id-ID` with zero fractional digits. Formatters receive intermediate fractional numbers during animation, so round or use `Intl.NumberFormat` as appropriate.
 
@@ -55,6 +56,14 @@ Use `value.display` for exact preformatted strings, including financial values b
 
 <ComponentPreview name="stats-card-values" title="stats-card-values.tsx">
   <StatsCardValues />
+</ComponentPreview>
+
+### Missing data
+
+Use `target: null` when a measurement is unavailable. An optional badge can explain why no value is shown.
+
+<ComponentPreview name="stats-card-missing" title="stats-card-missing.tsx">
+  <StatsCardMissing />
 </ComponentPreview>
 
 ### Updating values

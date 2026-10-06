@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Wallet, CircleCheck } from "lucide-react";
+import { Activity, Wallet } from "lucide-react";
 
 import { StatsCard } from "@/registry/new-york/stats-card";
 
@@ -27,13 +27,6 @@ export const StatsCardValues = () => (
         key: "volume",
         title: "Exact payment volume",
         value: { display: "Rp9.007.199.254.740.993" },
-      },
-      {
-        badge: { label: "Awaiting data", variant: "outline" },
-        icon: CircleCheck,
-        key: "rate",
-        title: "Success rate",
-        value: { target: null },
       },
     ]}
   />
