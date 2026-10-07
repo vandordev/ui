@@ -13,9 +13,9 @@ import { motion, useReducedMotion } from "motion/react";
 import { createContext, useCallback, useContext, useId, useState } from "react";
 import type { ComponentProps, Ref, ReactNode } from "react";
 
-import { AutocompleteRoot, useAutocomplete } from "./autocomplete-root";
 import { AutocompleteFeedback } from "./autocomplete-feedback";
 import { AutocompletePagination } from "./autocomplete-pagination";
+import { AutocompleteRoot, useAutocomplete } from "./autocomplete-root";
 import type {
   AutocompleteContentProps,
   AutocompleteInputProps,
@@ -249,22 +249,28 @@ export const AutocompleteList = ({
 }: Combobox.List.Props) => {
   const a = useAutocomplete();
   return (
-  <Combobox.List
-    {...props}
-    data-slot="autocomplete-list"
-    onScroll={(event) => {
-      props.onScroll?.(event);
-      const page = a.config.pagination;
-      const list = event.currentTarget;
-      if (!event.defaultPrevented && page?.automatic !== false && list.scrollTop > 0 && list.scrollHeight > list.clientHeight && list.scrollHeight - list.clientHeight - list.scrollTop <= 48) {
-        void a.loadPage().catch(() => undefined);
-      }
-    }}
-    className={cn(
-      "max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1",
-      className
-    )}
-  />
+    <Combobox.List
+      {...props}
+      data-slot="autocomplete-list"
+      onScroll={(event) => {
+        props.onScroll?.(event);
+        const page = a.config.pagination;
+        const list = event.currentTarget;
+        if (
+          !event.defaultPrevented &&
+          page?.automatic !== false &&
+          list.scrollTop > 0 &&
+          list.scrollHeight > list.clientHeight &&
+          list.scrollHeight - list.clientHeight - list.scrollTop <= 48
+        ) {
+          void a.loadPage().catch(() => undefined);
+        }
+      }}
+      className={cn(
+        "max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1",
+        className
+      )}
+    />
   );
 };
 export const AutocompleteItem = <Item,>({
@@ -341,7 +347,12 @@ export const AutocompleteEmpty = ({
   ...props
 }: ComponentProps<"div">) => {
   const a = useAutocomplete();
-  if (a.options.length || a.config.loading || a.config.error || a.config.hintMessage) {
+  if (
+    a.options.length ||
+    a.config.loading ||
+    a.config.error ||
+    a.config.hintMessage
+  ) {
     return null;
   }
   return (

@@ -14,7 +14,9 @@ const {
 } = require("node:fs");
 const path = require("node:path");
 const { createJiti } = require("jiti");
-const { prepareFamilyArtifacts } = require("../../../scripts/component-family-artifacts.cjs");
+const {
+  prepareFamilyArtifacts,
+} = require("../../../scripts/component-family-artifacts.cjs");
 
 const repository = path.resolve(__dirname, "../../..");
 const directory = mkdtempSync("/tmp/opencode/autocomplete-consumer-");
@@ -103,7 +105,13 @@ try {
   );
   const preparedDirectory = path.join(directory, "local-registry");
   mkdirSync(preparedDirectory);
-  const prepare = (name) => prepareFamilyArtifacts({ artifactDirectory: path.join(repository, "public/r"), cwd: directory, name, outputDirectory: preparedDirectory });
+  const prepare = (name) =>
+    prepareFamilyArtifacts({
+      artifactDirectory: path.join(repository, "public/r"),
+      cwd: directory,
+      name,
+      outputDirectory: preparedDirectory,
+    });
   check(process.execPath, [
     cliEntry,
     "add",
@@ -136,10 +144,7 @@ try {
       });
       writeFileSync(
         path.join(directory, `demo-${mode}-${multiple}.tsx`),
-        code.replaceAll(
-          "@/components/autocomplete",
-          "@/shared/autocomplete"
-        )
+        code.replaceAll("@/components/autocomplete", "@/shared/autocomplete")
       );
     }
   }

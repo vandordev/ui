@@ -15,21 +15,40 @@
         "motion@^12.38.0"
       ],
       "files": [
-        { "path": "registry/new-york/autocomplete.tsx", "type": "registry:component", "target": "components/autocomplete/autocomplete.tsx" },
-        { "path": "registry/new-york/autocomplete-index.ts", "type": "registry:component", "target": "components/autocomplete/index.ts" },
-        { "path": "registry/new-york/autocomplete-feedback.tsx", "type": "registry:component", "target": "components/autocomplete/autocomplete-feedback.tsx" },
-        { "path": "registry/new-york/autocomplete-pagination.tsx", "type": "registry:component", "target": "components/autocomplete/autocomplete-pagination.tsx" },
+        {
+          "path": "registry/new-york/autocomplete.tsx",
+          "type": "registry:component",
+          "target": "components/autocomplete/autocomplete.tsx"
+        },
+        {
+          "path": "registry/new-york/autocomplete-index.ts",
+          "type": "registry:component",
+          "target": "components/autocomplete/index.ts"
+        },
+        {
+          "path": "registry/new-york/autocomplete-feedback.tsx",
+          "type": "registry:component",
+          "target": "components/autocomplete/autocomplete-feedback.tsx"
+        },
+        {
+          "path": "registry/new-york/autocomplete-pagination.tsx",
+          "type": "registry:component",
+          "target": "components/autocomplete/autocomplete-pagination.tsx"
+        },
         {
           "path": "registry/new-york/autocomplete-root.tsx",
-          "type": "registry:component", "target": "components/autocomplete/autocomplete-root.tsx"
+          "type": "registry:component",
+          "target": "components/autocomplete/autocomplete-root.tsx"
         },
         {
           "path": "registry/new-york/autocomplete-types.ts",
-          "type": "registry:component", "target": "components/autocomplete/autocomplete-types.ts"
+          "type": "registry:component",
+          "target": "components/autocomplete/autocomplete-types.ts"
         },
         {
           "path": "registry/new-york/autocomplete-utils.ts",
-          "type": "registry:component", "target": "components/autocomplete/autocomplete-utils.ts"
+          "type": "registry:component",
+          "target": "components/autocomplete/autocomplete-utils.ts"
         }
       ]
     },
@@ -39,14 +58,40 @@
       "title": "Autocomplete Query",
       "description": "Optional native TanStack Query search and cursor integration. Application-owned Query provider required.",
       "dependencies": ["@tanstack/react-query@^5.104.1"],
-      "registryDependencies": ["https://vandor-ui.vercel.app/r/autocomplete.json"],
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/autocomplete.json"
+      ],
       "files": [
-        { "path": "registry/new-york/autocomplete-query.ts", "type": "registry:component", "target": "components/autocomplete/query.ts" },
-        { "path": "registry/new-york/autocomplete-query-types.ts", "type": "registry:component", "target": "components/autocomplete/autocomplete-query-types.ts" },
-        { "path": "registry/new-york/autocomplete-query-state.ts", "type": "registry:component", "target": "components/autocomplete/autocomplete-query-state.ts" },
-        { "path": "registry/new-york/use-autocomplete-query-state.ts", "type": "registry:component", "target": "components/autocomplete/use-autocomplete-query-state.ts" },
-        { "path": "registry/new-york/use-autocomplete-query.ts", "type": "registry:component", "target": "components/autocomplete/use-autocomplete-query.ts" },
-        { "path": "registry/new-york/use-autocomplete-infinite-query.ts", "type": "registry:component", "target": "components/autocomplete/use-autocomplete-infinite-query.ts" }
+        {
+          "path": "registry/new-york/autocomplete-query.ts",
+          "type": "registry:component",
+          "target": "components/autocomplete/query.ts"
+        },
+        {
+          "path": "registry/new-york/autocomplete-query-types.ts",
+          "type": "registry:component",
+          "target": "components/autocomplete/autocomplete-query-types.ts"
+        },
+        {
+          "path": "registry/new-york/autocomplete-query-state.ts",
+          "type": "registry:component",
+          "target": "components/autocomplete/autocomplete-query-state.ts"
+        },
+        {
+          "path": "registry/new-york/use-autocomplete-query-state.ts",
+          "type": "registry:component",
+          "target": "components/autocomplete/use-autocomplete-query-state.ts"
+        },
+        {
+          "path": "registry/new-york/use-autocomplete-query.ts",
+          "type": "registry:component",
+          "target": "components/autocomplete/use-autocomplete-query.ts"
+        },
+        {
+          "path": "registry/new-york/use-autocomplete-infinite-query.ts",
+          "type": "registry:component",
+          "target": "components/autocomplete/use-autocomplete-infinite-query.ts"
+        }
       ]
     },
     {
@@ -57,7 +102,8 @@
       "files": [
         {
           "path": "registry/new-york/autocomplete.stories.tsx",
-          "type": "registry:component", "target": "components/autocomplete/autocomplete.stories.tsx"
+          "type": "registry:component",
+          "target": "components/autocomplete/autocomplete.stories.tsx"
         }
       ]
     },
@@ -134,9 +180,14 @@
       "files": [
         {
           "path": "registry/new-york/data-grid-schema.ts",
-          "type": "registry:component", "target": "components/data-grid/data-grid-schema.ts"
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid-schema.ts"
         },
-        { "path": "registry/new-york/data-grid-schema-entry.ts", "type": "registry:component", "target": "components/data-grid/schema.ts" }
+        {
+          "path": "registry/new-york/data-grid-schema-entry.ts",
+          "type": "registry:component",
+          "target": "components/data-grid/schema.ts"
+        }
       ]
     },
     {
@@ -161,37 +212,56 @@
         "https://vandor-ui.vercel.app/r/empty.json"
       ],
       "files": [
-        { "path": "registry/new-york/data-grid.tsx", "type": "registry:component", "target": "components/data-grid/data-grid.tsx" },
-        { "path": "registry/new-york/data-grid-index.ts", "type": "registry:component", "target": "components/data-grid/index.ts" },
+        {
+          "path": "registry/new-york/data-grid.tsx",
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid.tsx"
+        },
+        {
+          "path": "registry/new-york/data-grid-index.ts",
+          "type": "registry:component",
+          "target": "components/data-grid/index.ts"
+        },
         {
           "path": "registry/new-york/data-grid-columns.tsx",
-          "type": "registry:component", "target": "components/data-grid/data-grid-columns.tsx"
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid-columns.tsx"
         },
         {
           "path": "registry/new-york/data-grid-context.tsx",
-          "type": "registry:component", "target": "components/data-grid/data-grid-context.tsx"
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid-context.tsx"
         },
         {
           "path": "registry/new-york/data-grid-controls.tsx",
-          "type": "registry:component", "target": "components/data-grid/data-grid-controls.tsx"
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid-controls.tsx"
         },
         {
           "path": "registry/new-york/data-grid-feedback.tsx",
-          "type": "registry:component", "target": "components/data-grid/data-grid-feedback.tsx"
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid-feedback.tsx"
         },
         {
           "path": "registry/new-york/data-grid-labels.ts",
-          "type": "registry:component", "target": "components/data-grid/data-grid-labels.ts"
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid-labels.ts"
         },
         {
           "path": "registry/new-york/data-grid-selection.ts",
-          "type": "registry:component", "target": "components/data-grid/data-grid-selection.ts"
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid-selection.ts"
         },
         {
           "path": "registry/new-york/data-grid-state.ts",
-          "type": "registry:component", "target": "components/data-grid/data-grid-state.ts"
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid-state.ts"
         },
-        { "path": "registry/new-york/use-data-grid.ts", "type": "registry:component", "target": "components/data-grid/use-data-grid.ts" },
+        {
+          "path": "registry/new-york/use-data-grid.ts",
+          "type": "registry:component",
+          "target": "components/data-grid/use-data-grid.ts"
+        },
         {
           "path": "registry/new-york/error-state-base.tsx",
           "type": "registry:ui"
@@ -206,7 +276,8 @@
       "files": [
         {
           "path": "registry/new-york/data-grid.stories.tsx",
-          "type": "registry:component", "target": "components/data-grid/data-grid.stories.tsx"
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid.stories.tsx"
         }
       ]
     },

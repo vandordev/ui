@@ -1,5 +1,73 @@
 # Autocomplete Query implementation evidence
 
+## Verification continuation after checkpoint `fa04f79`
+
+User authorized up to 1 GB RAM for verification. All checks ran sequentially in
+`systemd-run --user --scope --quiet -p MemoryMax=1G -p MemorySwapMax=0`, with finite
+`timeout --signal=TERM --kill-after=5s` deadlines. Node tests retained 512 MiB
+heap and `--test-concurrency=1`; compiler heap was 768 MiB to leave native headroom.
+No memory limit was increased beyond the user's authorization.
+
+- Added consumer stage labels and `FAMILY_VERIFY_LAYOUT` case selection. Individual
+  runs report `GATE-FAMILY-CASE`, not full matrix acceptance.
+- Three individual real CLI cases PASS: `schema-only`, `default`, and
+  `src-divergent`. Schema-only compiles without React/Query/Table; other cases
+  compile UI without Query, then optional Query native selected-data/page types,
+  DataGrid/schema and installed stories with customized-core checksums.
+  These runs used artifacts before the subsequent hook type repair/formatting;
+  fresh final consumer acceptance remains pending. Plain divergent consumer with
+  Query/DataGrid is not covered by these three cases.
+- First affected suite PASS: 107/107, no skips. Registry artifacts regenerated.
+- Typecheck exposed native infinite options' selected `InfiniteData<Page>` using
+  unknown page-param metadata, while the adapter incorrectly required `Param` in
+  selected data. Separated selected metadata from native request `Param`; no
+  runtime fetch behavior changed. Typecheck then PASS.
+- Full serial repository suite after regeneration: **393 PASS / 2 FAIL / 0
+  skipped**, 395 tests. Full output in disposable
+  `/tmp/opencode/autocomplete-verification-tests.log`.
+  One failure was obsolete DataGrid installation-command expectation. Updated
+  only that expectation to the approved wrapper; focused docs test PASS (1/1).
+  The other, Dropdown overlay focus restoration, also FAILS in isolation (1 test,
+  0 pass). No Dropdown source/test assertions were changed; root cause remains
+  unproven and no baseline PASS or unrelated-regression diagnosis is claimed.
+- `pnpm check` FAIL: 42 formatting files, including task-owned and other existing
+  files. Formatted only checkpoint-owned non-generated files using repository
+  `oxfmt` config with one thread, plus the changed docs assertion. Initial shell
+  argument expansion formatted only one file; corrected explicit argument list
+  formatted 41 files. Did not modify unrelated formatting offenders.
+- Separate scoped lint FAIL: **141 errors / 0 warnings** in 36 selected code
+  files, including task-owned files and existing violations in touched files.
+  No lint acceptance claimed and no blanket disable or broad autofix applied.
+  Disposable diagnostics: `/tmp/opencode/autocomplete-verification-scoped-lint.log`.
+- After formatting, registry regeneration PASS and repository typecheck PASS.
+  Latest typecheck scope peak was 759.6 MiB per systemd. Full tests and consumers
+  were not rerun after this final formatting/regeneration.
+
+### Production build safety stop
+
+Command: `VANDOR_BOUNDED_BUILD=1 NODE_OPTIONS="--max-old-space-size=768"
+UV_THREADPOOL_SIZE=1` with the same total 1 GiB scope, executing
+`timeout --signal=TERM --kill-after=5s 600s pnpm exec next build --webpack`.
+One configured build CPU. Build output reached optimization and repeated retry
+messages but never reported successful compilation. Tool reported SIGTERM.
+Read-only systemd journal confirmed scope `run-p587230-i594076.scope` ended
+with **`oom-kill`, 1 GiB memory peak, about 51 seconds elapsed**. This was NOT a
+600-second timeout. No build worker remained in the process listing afterward.
+Build is BLOCKED. No heavy verification rerun, heap increase, swap allowance,
+heap dump, alternative build or server restart followed the OOM.
+Disposable build log: `/tmp/opencode/autocomplete-verification-build.log`.
+The repository uses `next/font/google`, but retry source/network causality was
+not proven; do not label this solely a font/network failure.
+
+Current verification is incomplete: lint, Dropdown focus failure, bounded
+production build, fresh post-format consumer/full-test gates, outstanding spec
+coverage and browser verification remain. Primary browser URL is still unknown;
+no server was started. No issue/PR was identified to link to this session. Work
+is included in a user-requested verification checkpoint on `main`; no push or
+merge performed. Commit does not close failed or blocked gates. Automatic mutating
+pre-commit checks are disabled for this checkpoint after the recorded OOM stop;
+fresh staged whitespace checking is the only additional check before committing.
+
 ## Execution authority and initial state
 
 - User selected direct execution in this session on `main`, without subagents,
@@ -197,7 +265,7 @@ NODE_OPTIONS="--max-old-space-size=512" timeout --signal=TERM --kill-after=5s 12
    target changed to ES2023; runtime DataGrid behavior was not altered.
 3. Third run **BLOCKED by V8 heap OOM at 512 MiB** in a child Node command. Final
    primitive report: exit status null, `Allocation failed - JavaScript heap out of
-   memory`, followed by timeout's process-abort report. Driver does not yet print
+memory`, followed by timeout's process-abort report. Driver does not yet print
    stage labels, so exact child stage has not been proven. Disposable fixture
    removed in finally; no known-RAM-exhausting rerun or heap increase was attempted.
 

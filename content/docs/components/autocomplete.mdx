@@ -150,7 +150,10 @@ Import `useAutocompleteQuery` or `useAutocompleteInfiniteQuery` from
 `@/components/autocomplete/query`. Install `@tanstack/react-query@^5.104.1` and
 provide your own `QueryClientProvider`; no hidden provider is installed.
 
-<ComponentPreview name="autocomplete-query-demo" title="autocomplete-query-demo.tsx">
+<ComponentPreview
+  name="autocomplete-query-demo"
+  title="autocomplete-query-demo.tsx"
+>
   <AutocompleteQueryDemo />
 </ComponentPreview>
 
@@ -178,7 +181,10 @@ previous-key placeholders are not selectable. Same-search cached results remain
 selectable during background refresh. `formatError` returns safe compact content;
 raw Error objects are never rendered.
 
-<ComponentPreview name="autocomplete-infinite-demo" title="autocomplete-infinite-demo.tsx">
+<ComponentPreview
+  name="autocomplete-infinite-demo"
+  title="autocomplete-infinite-demo.tsx"
+>
   <AutocompleteInfiniteDemo />
 </ComponentPreview>
 
@@ -188,15 +194,15 @@ Load more remains available; page failure latches automatic retry until explicit
 Retry or query change. Existing results and selections remain during page loading,
 page errors and background refresh. Infinite scrolling is not virtualization.
 
-| State | Compact presentation |
-| --- | --- |
-| Below minimum | Hint, old options blocked |
-| Debouncing / initial fetch | Public Loading and text |
-| Initial error | Error and Retry |
-| Successful empty | Dedicated empty message |
-| Same-search background fetch | Retained options and Loading |
-| Next page fetching / error | Retained options, footer Loading / Retry |
-| More / exhausted | Load more / no action |
+| State                        | Compact presentation                     |
+| ---------------------------- | ---------------------------------------- |
+| Below minimum                | Hint, old options blocked                |
+| Debouncing / initial fetch   | Public Loading and text                  |
+| Initial error                | Error and Retry                          |
+| Successful empty             | Dedicated empty message                  |
+| Same-search background fetch | Retained options and Loading             |
+| Next page fetching / error   | Retained options, footer Loading / Retry |
+| More / exhausted             | Load more / no action                    |
 
 Customize `loadingProps={{ variant: "dots", size: 16 }}`, `hintMessage`,
 `loadingMessage`, `emptyMessage`, `retryLabel`, and pagination labels/messages.

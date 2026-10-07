@@ -139,16 +139,86 @@ export const Invalid: Story = { args: { invalid: true } };
 export const Loading: Story = { args: { loading: true } };
 export const Error: Story = { args: { error: "Suggestions unavailable." } };
 export const FloatingLabel: Story = { args: { labelStyle: "floating" } };
-const PaginationExample = ({ label, disabled, readOnly }: Controls & { state?: "more" | "loading" | "error" }) => {
+const PaginationExample = ({
+  label,
+  disabled,
+  readOnly,
+}: Controls & { state?: "more" | "loading" | "error" }) => {
   const [error, setError] = useState(true);
   const [more, setMore] = useState(true);
-  return <Autocomplete label={label} disabled={disabled} readOnly={readOnly} items={people} mode="selection" getItemLabel={(person) => person.label} getItemValue={(person) => person.id} defaultOpen pagination={{ hasNextPage: more, fetchingNextPage: false, error: error ? "Could not load the next page." : undefined, onLoadMore: () => setMore(false), onRetry: () => setError(false) }} />;
+  return (
+    <Autocomplete
+      label={label}
+      disabled={disabled}
+      readOnly={readOnly}
+      items={people}
+      mode="selection"
+      getItemLabel={(person) => person.label}
+      getItemValue={(person) => person.id}
+      defaultOpen
+      pagination={{
+        hasNextPage: more,
+        fetchingNextPage: false,
+        error: error ? "Could not load the next page." : undefined,
+        onLoadMore: () => setMore(false),
+        onRetry: () => setError(false),
+      }}
+    />
+  );
 };
-export const NextPageError: Story = { render: (args) => <PaginationExample {...args} /> };
-export const NextPageLoading: Story = { render: (args) => <Autocomplete label={args.label} items={["Ada", "Grace"]} defaultOpen loadingProps={{ variant: "dots", size: 16 }} pagination={{ hasNextPage: true, fetchingNextPage: true, onLoadMore: () => undefined }} /> };
-export const LoadMore: Story = { render: (args) => <Autocomplete label={args.label} items={["Ada", "Grace"]} defaultOpen pagination={{ hasNextPage: true, fetchingNextPage: false, onLoadMore: () => undefined }} /> };
-export const MinimumHint: Story = { render: (args) => <Autocomplete label={args.label} items={[]} defaultOpen hintMessage="Enter at least two characters." /> };
-export const BackgroundRefresh: Story = { render: (args) => <Autocomplete label={args.label} items={["Ada", "Grace"]} defaultOpen backgroundLoading loadingProps={{ variant: "dots", size: 16 }} /> };
+export const NextPageError: Story = {
+  render: (args) => <PaginationExample {...args} />,
+};
+export const NextPageLoading: Story = {
+  render: (args) => (
+    <Autocomplete
+      label={args.label}
+      items={["Ada", "Grace"]}
+      defaultOpen
+      loadingProps={{ variant: "dots", size: 16 }}
+      pagination={{
+        hasNextPage: true,
+        fetchingNextPage: true,
+        onLoadMore: () => undefined,
+      }}
+    />
+  ),
+};
+export const LoadMore: Story = {
+  render: (args) => (
+    <Autocomplete
+      label={args.label}
+      items={["Ada", "Grace"]}
+      defaultOpen
+      pagination={{
+        hasNextPage: true,
+        fetchingNextPage: false,
+        onLoadMore: () => undefined,
+      }}
+    />
+  ),
+};
+export const MinimumHint: Story = {
+  render: (args) => (
+    <Autocomplete
+      label={args.label}
+      items={[]}
+      defaultOpen
+      hintMessage="Enter at least two characters."
+    />
+  ),
+};
+export const BackgroundRefresh: Story = {
+  render: (args) => (
+    <Autocomplete
+      label={args.label}
+      items={["Ada", "Grace"]}
+      defaultOpen
+      backgroundLoading
+      loadingProps={{ variant: "dots", size: 16 }}
+    />
+  ),
+};
 export const RichItems: Story = {
   argTypes: {
     grouping: { control: false },

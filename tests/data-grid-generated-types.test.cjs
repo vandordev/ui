@@ -48,7 +48,9 @@ test("generated page and cursor TSX compile against actual public modules", () =
           paths: {
             "@/components/ui/*": ["registry/new-york/*"],
             "@/components/data-grid": ["registry/new-york/data-grid-index.ts"],
-            "@/components/data-grid/schema": ["registry/new-york/data-grid-schema-entry.ts"],
+            "@/components/data-grid/schema": [
+              "registry/new-york/data-grid-schema-entry.ts",
+            ],
             "@/*": ["*"],
             react: ["node_modules/@types/react"],
             "@tanstack/react-query": ["node_modules/@tanstack/react-query"],

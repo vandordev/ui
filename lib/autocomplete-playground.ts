@@ -135,7 +135,10 @@ export const autocompleteProps = {
       "Suppress stale result commits, preserve text editing and free-text creation.",
     type: "boolean",
   },
-  loadingVariant: selectControl("Loading variant", "arc" as "arc" | "dots", ["arc", "dots"]),
+  loadingVariant: selectControl("Loading variant", "arc" as "arc" | "dots", [
+    "arc",
+    "dots",
+  ]),
   automaticPagination: booleanControl("Automatic pagination", true),
   hasNextPage: booleanControl("Has next page", true),
   loadingMessage: {
@@ -201,8 +204,29 @@ export const autocompleteProps = {
   },
   scenario: selectControl(
     "Status scenario",
-    "ready" as "ready" | "loading" | "error" | "empty" | "hint" | "background" | "more" | "page-loading" | "page-error" | "end",
-    ["ready", "loading", "error", "empty", "hint", "background", "more", "page-loading", "page-error", "end"]
+    "ready" as
+      | "ready"
+      | "loading"
+      | "error"
+      | "empty"
+      | "hint"
+      | "background"
+      | "more"
+      | "page-loading"
+      | "page-error"
+      | "end",
+    [
+      "ready",
+      "loading",
+      "error",
+      "empty",
+      "hint",
+      "background",
+      "more",
+      "page-loading",
+      "page-error",
+      "end",
+    ]
   ),
   showTrigger: {
     ...booleanControl("Show trigger"),
@@ -252,16 +276,24 @@ export const getAutocompletePreviewConfig = (
     labelStyle: values.labelStyle,
     loading: values.scenario === "loading",
     loadingProps: { variant: values.loadingVariant, size: 16 },
-    hintMessage: values.scenario === "hint" ? "Enter at least two characters." : undefined,
+    hintMessage:
+      values.scenario === "hint" ? "Enter at least two characters." : undefined,
     backgroundLoading: values.scenario === "background",
-    pagination: ["more", "page-loading", "page-error", "end"].includes(values.scenario) ? {
-      hasNextPage: values.hasNextPage && values.scenario !== "end",
-      fetchingNextPage: values.scenario === "page-loading",
-      automatic: values.automaticPagination,
-      error: values.scenario === "page-error" ? "Could not load more suggestions." : undefined,
-      onLoadMore: () => undefined,
-      onRetry: () => undefined,
-    } : undefined,
+    pagination: ["more", "page-loading", "page-error", "end"].includes(
+      values.scenario
+    )
+      ? {
+          hasNextPage: values.hasNextPage && values.scenario !== "end",
+          fetchingNextPage: values.scenario === "page-loading",
+          automatic: values.automaticPagination,
+          error:
+            values.scenario === "page-error"
+              ? "Could not load more suggestions."
+              : undefined,
+          onLoadMore: () => undefined,
+          onRetry: () => undefined,
+        }
+      : undefined,
     placeholder: values.placeholder,
     readOnly: values.readOnly,
     showTrigger: values.showTrigger,

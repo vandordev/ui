@@ -33,14 +33,22 @@ const resolveAliasDirectory = (cwd, alias) => {
         : null;
     })
     .filter(Boolean)
-    .sort((a, b) => b.key.replace("*", "").length - a.key.replace("*", "").length);
+    .sort(
+      (a, b) => b.key.replace("*", "").length - a.key.replace("*", "").length
+    );
   const exact = matches.find((match) => !match.key.includes("*"));
   const match = exact ?? matches[0];
   if (!match || match.values.length !== 1) {
     throw new Error(`Alias ${alias} needs one unambiguous TypeScript path`);
   }
-  const base = parsed.options.baseUrl ?? parsed.options.pathsBasePath ?? path.dirname(configPath);
-  const directory = path.resolve(base, match.values[0].replace("*", match.suffix));
+  const base =
+    parsed.options.baseUrl ??
+    parsed.options.pathsBasePath ??
+    path.dirname(configPath);
+  const directory = path.resolve(
+    base,
+    match.values[0].replace("*", match.suffix)
+  );
   const relative = path.relative(cwd, directory);
   if (relative.startsWith("..") || path.isAbsolute(relative)) {
     throw new Error(`Alias ${alias} resolves outside the consumer`);
@@ -50,10 +58,20 @@ const resolveAliasDirectory = (cwd, alias) => {
 
 // Prepare local closure without copying deployed artifacts or changing source files.
 // Caller owns outputDirectory and invokes stock CLI on the returned root artifact.
-const prepareFamilyArtifacts = ({ artifactDirectory, cwd, name, outputDirectory }) => {
-  const config = JSON.parse(readFileSync(path.join(cwd, "components.json"), "utf-8"));
+const prepareFamilyArtifacts = ({
+  artifactDirectory,
+  cwd,
+  name,
+  outputDirectory,
+}) => {
+  const config = JSON.parse(
+    readFileSync(path.join(cwd, "components.json"), "utf-8")
+  );
   const components = resolveAliasDirectory(cwd, config.aliases.components);
-  const ui = resolveAliasDirectory(cwd, config.aliases.ui ?? `${config.aliases.components}/ui`);
+  const ui = resolveAliasDirectory(
+    cwd,
+    config.aliases.ui ?? `${config.aliases.components}/ui`
+  );
   const prepared = new Map();
   const visiting = new Set();
   const visit = (itemName) => {
@@ -67,21 +85,35 @@ const prepareFamilyArtifacts = ({ artifactDirectory, cwd, name, outputDirectory 
       throw new Error("Invalid local registry item name");
     }
     visiting.add(itemName);
-    const artifact = JSON.parse(readFileSync(path.join(artifactDirectory, `${itemName}.json`), "utf-8"));
+    const artifact = JSON.parse(
+      readFileSync(path.join(artifactDirectory, `${itemName}.json`), "utf-8")
+    );
     // The CLI combines dependency strings literally. Avoid duplicate unversioned
     // and versioned foundation packages in a closure (pnpm can mis-pair specs).
-    const foundationVersions = { cn: "cn@^0.4.0", motion: "motion@^12.38.0", "lucide-react": "lucide-react@1.11.0" };
-    artifact.dependencies = artifact.dependencies?.map((dependency) => foundationVersions[dependency] ?? dependency);
-    artifact.registryDependencies = (artifact.registryDependencies ?? []).map((dependency) => {
-      const local = dependency.match(/^https:\/\/vandor-ui\.vercel\.app\/r\/([a-z0-9-]+)\.json$/);
-      if (local) {
-        return visit(local[1]);
+    const foundationVersions = {
+      cn: "cn@^0.4.0",
+      motion: "motion@^12.38.0",
+      "lucide-react": "lucide-react@1.11.0",
+    };
+    artifact.dependencies = artifact.dependencies?.map(
+      (dependency) => foundationVersions[dependency] ?? dependency
+    );
+    artifact.registryDependencies = (artifact.registryDependencies ?? []).map(
+      (dependency) => {
+        const local = dependency.match(
+          /^https:\/\/vandor-ui\.vercel\.app\/r\/([a-z0-9-]+)\.json$/
+        );
+        if (local) {
+          return visit(local[1]);
+        }
+        if (/^https?:/.test(dependency)) {
+          throw new Error(
+            `External registry dependency requires review: ${dependency}`
+          );
+        }
+        return visit(dependency);
       }
-      if (/^https?:/.test(dependency)) {
-        throw new Error(`External registry dependency requires review: ${dependency}`);
-      }
-      return visit(dependency);
-    });
+    );
     for (const file of artifact.files ?? []) {
       if (file.target?.startsWith("components/ui/")) {
         file.target = `~/${ui}/${file.target.slice("components/ui/".length)}`;
@@ -89,9 +121,14 @@ const prepareFamilyArtifacts = ({ artifactDirectory, cwd, name, outputDirectory 
         file.target = `~/${components}/loading-ui/${file.target.slice("components/loading-ui/".length)}`;
       }
       if (itemName === "loading") {
-        file.content = file.content?.replaceAll("@/components/loading-ui/", "@/registry/new-york/components/loading-ui/");
+        file.content = file.content?.replaceAll(
+          "@/components/loading-ui/",
+          "@/registry/new-york/components/loading-ui/"
+        );
       }
-      const family = file.path.match(/\/components\/(autocomplete|data-grid)\/(.+)$/) ?? file.target?.match(/^components\/(autocomplete|data-grid)\/(.+)$/);
+      const family =
+        file.path.match(/\/components\/(autocomplete|data-grid)\/(.+)$/) ??
+        file.target?.match(/^components\/(autocomplete|data-grid)\/(.+)$/);
       if (family) {
         if (family[2].split("/").includes("..")) {
           throw new Error("Invalid family source path");
@@ -100,12 +137,18 @@ const prepareFamilyArtifacts = ({ artifactDirectory, cwd, name, outputDirectory 
         file.target = `~/${components}/${family[1]}/${family[2]}`;
         // Repository source stays flat. Only cross-family primitive imports move;
         // stock CLI then rewrites this documented registry UI import namespace.
-        file.content = file.content?.replace(/(["'])\.\/([^"']+)\1/g, (whole, quote, module) => {
-          const owned = family[1] === "autocomplete"
-            ? /^(autocomplete|use-autocomplete)([.-]|$)/.test(module)
-            : /^(data-grid|use-data-grid)([.-]|$)/.test(module);
-          return owned ? whole : `${quote}@/registry/new-york/ui/${module}${quote}`;
-        });
+        file.content = file.content?.replace(
+          /(["'])\.\/([^"']+)\1/g,
+          (whole, quote, module) => {
+            const owned =
+              family[1] === "autocomplete"
+                ? /^(autocomplete|use-autocomplete)([.-]|$)/.test(module)
+                : /^(data-grid|use-data-grid)([.-]|$)/.test(module);
+            return owned
+              ? whole
+              : `${quote}@/registry/new-york/ui/${module}${quote}`;
+          }
+        );
       }
     }
     const destination = path.join(outputDirectory, `${itemName}.json`);

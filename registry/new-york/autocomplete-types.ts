@@ -1,5 +1,6 @@
 import type { Combobox } from "@base-ui/react/combobox";
 import type { ComponentProps, ReactNode, Ref } from "react";
+
 import type { LoadingProps } from "./loading";
 
 export interface AutocompletePaginationProps {

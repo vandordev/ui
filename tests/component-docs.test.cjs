@@ -32,7 +32,7 @@ test("DataGrid documentation retains standard sections and native contract owner
   assert.deepEqual(headings(sections.after), ["Props", "Source"]);
   const text = JSON.stringify(sections);
   for (const value of [
-    "data-grid.json",
+    "node scripts/install-component-family.cjs data-grid /absolute/path/to/consumer",
     "@tanstack/react-table@^9.2.6",
     "QueryClientProvider",
     "renderEmpty",

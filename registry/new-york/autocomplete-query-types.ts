@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import type { AutocompleteCommonProps, AutocompleteMode } from "./autocomplete-types";
+
+import type {
+  AutocompleteCommonProps,
+  AutocompleteMode,
+} from "./autocomplete-types";
 
 export interface AutocompleteQueryStateOptions {
   search?: string;
@@ -18,11 +22,19 @@ export type AutocompleteQueryBinding<
   Item,
   Mode extends AutocompleteMode,
   Multiple extends boolean,
-> = Pick<AutocompleteCommonProps<Item>, "items" | "filter" | "open" | "onOpenChange" | "loading" | "error"> & {
+> = Pick<
+  AutocompleteCommonProps<Item>,
+  "items" | "filter" | "open" | "onOpenChange" | "loading" | "error"
+> & {
   mode: Mode;
   multiple: Multiple;
 } & (Mode extends "free-text"
-  ? Multiple extends false
-    ? { value: string; onValueChange: (value: string) => void; inputValue?: never; onInputValueChange?: never }
-    : { inputValue: string; onInputValueChange: (value: string) => void }
-  : { inputValue: string; onInputValueChange: (value: string) => void });
+    ? Multiple extends false
+      ? {
+          value: string;
+          onValueChange: (value: string) => void;
+          inputValue?: never;
+          onInputValueChange?: never;
+        }
+      : { inputValue: string; onInputValueChange: (value: string) => void }
+    : { inputValue: string; onInputValueChange: (value: string) => void });

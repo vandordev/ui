@@ -9,7 +9,9 @@ export const validateAutocompleteQueryConfiguration = (
     !Number.isSafeInteger(minSearchLength) ||
     minSearchLength < 0
   ) {
-    throw new RangeError("Invalid autocomplete debounce or minimum search length");
+    throw new RangeError(
+      "Invalid autocomplete debounce or minimum search length"
+    );
   }
 };
 
@@ -25,9 +27,13 @@ export const isAutocompleteQueryEligible = ({
   debouncedSearch: string;
   minSearchLength: number;
   enabled: boolean;
-}) => open && enabled && search.length >= minSearchLength && search === debouncedSearch;
+}) =>
+  open &&
+  enabled &&
+  search.length >= minSearchLength &&
+  search === debouncedSearch;
 
-export const dedupeAutocompleteItems = <Item,>(
+export const dedupeAutocompleteItems = <Item>(
   items: readonly Item[],
   getItemValue: (item: Item) => string
 ): Item[] => {

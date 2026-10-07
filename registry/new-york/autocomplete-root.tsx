@@ -102,13 +102,22 @@ export const AutocompleteRoot = <Item,>(props: AutocompleteRootProps<Item>) => {
   const [pageBusy, setPageBusy] = useState(false);
   const loadPage = async (retry = false) => {
     const page = props.pagination;
-    if (!page || !open || blocked || stale || page.disabled || page.fetchingNextPage || pageLock.current || (!retry && (page.error || !page.hasNextPage))) {
+    if (
+      !page ||
+      !open ||
+      blocked ||
+      stale ||
+      page.disabled ||
+      page.fetchingNextPage ||
+      pageLock.current ||
+      (!retry && (page.error || !page.hasNextPage))
+    ) {
       return;
     }
     pageLock.current = true;
     setPageBusy(true);
     try {
-      await (retry ? page.onRetry ?? page.onLoadMore : page.onLoadMore)();
+      await (retry ? (page.onRetry ?? page.onLoadMore) : page.onLoadMore)();
     } finally {
       pageLock.current = false;
       setPageBusy(false);
