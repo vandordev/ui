@@ -95,6 +95,11 @@ import {
   getToastDefaults,
   toastApiProps,
 } from "@/lib/toast-playground";
+import {
+  getTooltipCode,
+  getTooltipDefaults,
+  tooltipProps,
+} from "@/lib/tooltip-playground";
 import registry from "@/registry.json";
 
 interface ComponentDocDefinition {
@@ -105,10 +110,10 @@ interface ComponentDocDefinition {
 
 export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   "data-grid": {
-    playground: { code: getDataGridCode(getDataGridDefaults()) },
-    props: dataGridProps,
     nativePropsDescription:
       "Root/Viewport/Table/Column/Row/Cell forward their corresponding native element attributes, refs and handlers. Search forwards InputSearch props except controlled value/defaultValue. Filter is a typed render binding, not a DOM element. ColumnVisibility has no native-prop API; Pagination/SelectionBar/Toolbar forward div props. Apply/Reset forward Button props.",
+    playground: { code: getDataGridCode(getDataGridDefaults()) },
+    props: dataGridProps,
   },
   ...Object.fromEntries(
     Object.entries(inputComponentProps).map(([name, props]) => [
@@ -191,6 +196,12 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   toast: {
     playground: { code: getToastCode(getToastDefaults()) },
     props: toastApiProps,
+  },
+  tooltip: {
+    nativePropsDescription:
+      "Tooltip and TooltipProvider inherit Base UI root/provider props and do not render DOM nodes. TooltipTrigger inherits Base UI Trigger props. TooltipContent forwards Popup props and only the listed Positioner options, retaining custom render elements, refs, and event handlers. TooltipTrigger.disabled disables the tooltip, not the button action.",
+    playground: { code: getTooltipCode(getTooltipDefaults()) },
+    props: tooltipProps,
   },
 };
 

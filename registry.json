@@ -960,6 +960,28 @@
       ]
     },
     {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "A compact, collision-aware Base UI tooltip with smooth Motion entrance and exit.",
+      "dependencies": ["@base-ui/react@^1.8.0", "cn", "motion@^12.38.0"],
+      "files": [
+        { "path": "registry/new-york/tooltip.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "tooltip-stories",
+      "type": "registry:item",
+      "title": "Tooltip Stories",
+      "description": "Optional portable stories. Install Tooltip first and use your existing Storybook React setup.",
+      "files": [
+        {
+          "path": "registry/new-york/tooltip.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "popover-stories",
       "type": "registry:item",
       "title": "Popover Stories",

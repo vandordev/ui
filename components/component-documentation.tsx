@@ -22,6 +22,7 @@ import { PropsReference } from "@/components/props-reference";
 import { SelectPlayground } from "@/components/select-playground";
 import { StatsCardPlayground } from "@/components/stats-card-playground";
 import { ToastPlayground } from "@/components/toast-playground";
+import { TooltipPlayground } from "@/components/tooltip-playground";
 import { componentDocDefinitions } from "@/lib/component-docs";
 
 const playgrounds: Record<string, () => ReactNode> = {
@@ -57,6 +58,7 @@ const playgrounds: Record<string, () => ReactNode> = {
   "stats-card": StatsCardPlayground,
   textarea: () => <InputFamilyPlayground component="textarea" />,
   toast: ToastPlayground,
+  tooltip: TooltipPlayground,
 };
 
 export const ComponentDocumentation = ({

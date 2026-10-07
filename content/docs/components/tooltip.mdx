@@ -1,0 +1,95 @@
+---
+title: Tooltip
+description: Compact visual hints with smooth Motion entrance and exit.
+component: tooltip
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/tooltip
+    contribution: Adapted Base Nova Tooltip composition and styling, with Vandor Motion transitions and viewport constraints.
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { TooltipDemo } from "@/examples/tooltip-demo";
+import { TooltipSidesDemo } from "@/examples/tooltip-sides-demo";
+import { TooltipControlledDemo } from "@/examples/tooltip-controlled-demo";
+
+## Usage
+
+```tsx
+import {
+  TooltipProvider,
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger>Save changes</TooltipTrigger>
+    <TooltipContent>Save changes</TooltipContent>
+  </Tooltip>
+</TooltipProvider>;
+```
+
+Wrap the app or a related group in `TooltipProvider`. It shares hover timing so moving between nearby tooltips feels immediate after the first reveal. The provider defaults to zero hover delay; set `delay={200}` for a short pause. Without a provider, Base UI's trigger defaults to 600ms. A trigger-level `delay` or `closeDelay` overrides provider timing.
+
+`TooltipContent` includes its portal, positioner, and optional arrow. Compose an existing button with `TooltipTrigger render={<Button variant="outline" />}`. This uses Base UI's `render` API, not Radix `asChild`. Install [Button](/docs/components/button) separately for the runnable examples.
+
+## Examples
+
+### Icon-only action
+
+The button has its own accessible name. The tooltip is a supplementary visual label, never a replacement for `aria-label`.
+
+<ComponentPreview name="tooltip-demo" title="tooltip-demo.tsx">
+  <TooltipDemo />
+</ComponentPreview>
+
+### Placement and shared delay
+
+Placement defaults to top/center with a 4px gap. Use `side`, `align`, `sideOffset`, and `alignOffset` to adjust it. Collision handling flips or shifts the tooltip near viewport edges with 8px clearance. The arrow and animation origin follow the resolved placement. Content wraps within 20rem and the available viewport width; keep hints short instead of using tooltips for long explanations.
+
+<ComponentPreview name="tooltip-sides-demo" title="tooltip-sides-demo.tsx">
+  <TooltipSidesDemo />
+</ComponentPreview>
+
+### Controlled visibility
+
+Use `open` and `onOpenChange` when the parent owns visibility. The callback receives the requested state and Base UI event details; `details.cancel()` rejects a request. Pass the trigger's `id` as `triggerId` to anchor externally opened content. For initially open uncontrolled content, use `defaultOpen` and `defaultTriggerId`.
+
+<ComponentPreview
+  name="tooltip-controlled-demo"
+  title="tooltip-controlled-demo.tsx"
+>
+  <TooltipControlledDemo />
+</ComponentPreview>
+
+### Motion
+
+`motion/react` combines a fade, a subtle 0.98-to-1 scale, and a 4px movement away from the anchor: 220ms entrance with a gentle ease-out, and a shorter 160ms exit toward the anchor. Opacity settles slightly earlier so the label is readable while movement finishes. The movement and animation origin follow the collision-resolved placement, without bounce. The popup stays mounted until exit finishes; reopening interrupts dismissal from its current animated position without removing the active tooltip. Set `animated={false}` for immediate transitions. Reduced motion and Base UI's instant states (keyboard focus, adjacent-tooltip handoff, immediate dismissal) skip transitions. Set `showArrow={false}` for an arrowless label. Avoid CSS animation/transform utilities on the same popup because they compete with Motion.
+
+### Disabled actions
+
+`Tooltip.disabled` and `TooltipTrigger.disabled` disable tooltip interaction, not the underlying button action. Native disabled buttons cannot receive keyboard focus; explain unavailable actions using visible helper text. A hover-only wrapper around a disabled button is not a reliable way to deliver important information to keyboard or touch users.
+
+### Consumer setup and optional stories
+
+Requires React 19, Tailwind CSS 4, Base UI 1.8+, Motion 12.38+, and `cn`. Load your Tailwind stylesheet and shadcn semantic tokens, including `foreground` and `background` for the inverse tooltip surface. No website-only CSS or animation provider is needed. The `new-york` directory name does not imply Radix; this component adapts shadcn Base Nova.
+
+Install Tooltip first. Stories are a separate optional item and do not reinstall or overwrite it:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/tooltip-stories.json
+```
+
+Use your existing `@storybook/react` setup with matching Storybook package versions (types/composition checked with 10.6.1). Discover `**/*.stories.tsx` in the configured UI directory and load your global Tailwind/theme stylesheet in the preview. Canvas and Controls require no additional addons; `autodocs` uses your existing `@storybook/addon-docs` setup. Stories include their own TooltipProvider and inherit your theme. This repository has no Storybook server; Storybook UI appearance is not verified here.
+
+Both items follow the UI alias in `components.json`; the default destination is `components/ui/tooltip.tsx`. Installing the component can overwrite a customized tooltip there, so review the CLI diff first. The stories-only item installs only the colocated stories file.
+
+## Behavior & Accessibility
+
+Mouse hover and keyboard focus reveal the hint. Escape, blur, and clicking the trigger dismiss it following Base UI behavior. Hovering the popup keeps it visible by default. The tooltip never takes focus and must not contain links, buttons, or inputs. Use [Popover](/docs/components/popover) for interactive content or explanations whose trigger exists specifically to show the popup.
+
+Base UI tooltips are supplementary visual hints, not an assistive-technology description mechanism. Provide a visible label or `aria-label` on the trigger independently. Touch input does not reveal tooltips. Essential instructions, validation messages, and unavailable-action reasons belong in inline text or an accessible popover, not only in this component.
+
+Root and Provider inherit their [Base UI Tooltip props](https://base-ui.com/react/components/tooltip). Trigger retains primitive semantics, native handlers, custom `render` elements, and public refs. Content forwards Popup props plus the positioning options listed below, not every Positioner prop. Generic payloads and detached handles remain supported through upstream `Tooltip.createHandle()` from `@base-ui/react/tooltip`.
