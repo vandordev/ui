@@ -75,7 +75,7 @@ test("DataGrid dependency closure has no feature catalog, stories, cycles or inc
   assert.deepEqual(stories.registryDependencies ?? [], []);
   assert.deepEqual(stories.dependencies ?? [], []);
   assert.equal(stories.files.length, 1);
-  assert.equal(stories.files[0].target, undefined);
+  assert.equal(stories.files[0].target, "components/data-grid/data-grid.stories.tsx");
   for (const name of ["button", "input", "input-search"]) {
     const item = registry.items.find((item) => item.name === name);
     assert.equal(

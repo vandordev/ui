@@ -1,5 +1,19 @@
 import type { Combobox } from "@base-ui/react/combobox";
 import type { ComponentProps, ReactNode, Ref } from "react";
+import type { LoadingProps } from "./loading";
+
+export interface AutocompletePaginationProps {
+  hasNextPage: boolean;
+  fetchingNextPage: boolean;
+  error?: ReactNode;
+  disabled?: boolean;
+  automatic?: boolean;
+  onLoadMore: () => void | Promise<unknown>;
+  onRetry?: () => void | Promise<unknown>;
+  loadMoreLabel?: string;
+  retryLabel?: string;
+  loadingMessage?: ReactNode;
+}
 
 export type AutocompleteMode = "free-text" | "selection";
 export type AutocompleteValue<
@@ -64,6 +78,12 @@ export type AutocompleteCommonProps<Item> = Identity<Item> & {
   form?: string;
   invalid?: boolean;
   loading?: boolean;
+  backgroundLoading?: boolean;
+  loadingProps?: LoadingProps;
+  hintMessage?: ReactNode;
+  onRetry?: () => void | Promise<unknown>;
+  retryLabel?: string;
+  pagination?: AutocompletePaginationProps;
   error?: ReactNode;
   emptyMessage?: ReactNode;
   loadingMessage?: ReactNode;

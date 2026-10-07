@@ -14,6 +14,7 @@ const {
 } = require("node:fs");
 const path = require("node:path");
 const { createJiti } = require("jiti");
+const { prepareFamilyArtifacts } = require("../../../scripts/component-family-artifacts.cjs");
 
 const repository = path.resolve(__dirname, "../../..");
 const directory = mkdtempSync("/tmp/opencode/autocomplete-consumer-");
@@ -68,7 +69,7 @@ try {
   );
   writeFileSync(
     path.join(directory, "app/page.tsx"),
-    'import { Autocomplete } from "@/shared/ui/autocomplete";\nexport default function Page() { return <main><Autocomplete items={["React", "Vue"]} label="Framework" /></main>; }\n'
+    'import { Autocomplete } from "@/shared/autocomplete";\nexport default function Page() { return <main><Autocomplete items={["React", "Vue"]} label="Framework" /></main>; }\n'
   );
   writeFileSync(
     path.join(directory, "next.config.mjs"),
@@ -100,20 +101,26 @@ try {
     path.dirname(cliPackagePath),
     typeof cliPackage.bin === "string" ? cliPackage.bin : cliPackage.bin.shadcn
   );
+  const preparedDirectory = path.join(directory, "local-registry");
+  mkdirSync(preparedDirectory);
+  const prepare = (name) => prepareFamilyArtifacts({ artifactDirectory: path.join(repository, "public/r"), cwd: directory, name, outputDirectory: preparedDirectory });
   check(process.execPath, [
     cliEntry,
     "add",
-    path.join(repository, "public/r/autocomplete.json"),
+    prepare("autocomplete"),
     "--cwd",
     directory,
     "--yes",
   ]);
-  const ui = path.join(directory, "shared/ui");
+  const ui = path.join(directory, "shared/autocomplete");
   assert.deepEqual(readdirSync(ui).toSorted(), [
+    "autocomplete-feedback.tsx",
+    "autocomplete-pagination.tsx",
     "autocomplete-root.tsx",
     "autocomplete-types.ts",
     "autocomplete-utils.ts",
     "autocomplete.tsx",
+    "index.ts",
   ]);
   const playground = createJiti(__filename, {
     alias: { "@": repository },
@@ -130,8 +137,8 @@ try {
       writeFileSync(
         path.join(directory, `demo-${mode}-${multiple}.tsx`),
         code.replaceAll(
-          "@/components/ui/autocomplete",
-          "@/shared/ui/autocomplete"
+          "@/components/autocomplete",
+          "@/shared/autocomplete"
         )
       );
     }
@@ -160,7 +167,7 @@ try {
   check(process.execPath, [
     cliEntry,
     "add",
-    path.join(repository, "public/r/autocomplete-stories.json"),
+    prepare("autocomplete-stories"),
     "--cwd",
     directory,
     "--yes",

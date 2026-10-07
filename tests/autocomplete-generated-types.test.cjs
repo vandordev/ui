@@ -13,7 +13,7 @@ test("generated four-mode code compiles with public imports and escaped strings"
   try {
     for (const mode of ["free-text", "selection"]) {
       for (const multiple of [false, true]) {
-        for (const scenario of ["ready", "loading", "error", "empty"]) {
+        for (const scenario of ["ready", "loading", "error", "empty", "hint", "background", "more", "page-loading", "page-error", "end"]) {
           writeFileSync(
             path.join(directory, `${mode}-${multiple}-${scenario}.tsx`),
             p.getAutocompleteCode({
@@ -41,6 +41,8 @@ test("generated four-mode code compiles with public imports and escaped strings"
           incremental: false,
           paths: {
             "@/components/ui/*": ["registry/new-york/*"],
+            "@/components/autocomplete": ["registry/new-york/autocomplete-index.ts"],
+            "@/*": ["*"],
             react: ["node_modules/@types/react"],
           },
           plugins: [],

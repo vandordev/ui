@@ -93,6 +93,23 @@ artifact works in a consumer project.
 
 ## 6. Required stories, optional installation
 
+### Narrow component-family exception
+
+Autocomplete and DataGrid install outside UI under the configured components
+alias with `index.ts` public entries, optional `query.ts` and server-safe
+`schema.ts`. Their modules and optional colocated stories use
+`registry:component` with default family targets. Other primitives retain the
+no-target UI convention below.
+
+Stock shadcn 4.5.0 cannot resolve arbitrary nested components aliases. Install
+these families through `scripts/install-component-family.cjs`, which reads the
+consumer TypeScript paths and components alias, generates disposable explicit
+targets and locally generated dependency closure, then invokes stock CLI with
+normal overwrite prompts. Never force overwrite a customized consumer. Generate
+registry artifacts first. Stories-only items declare no core registry dependencies
+and must preserve customized core files. Never automatically remove legacy UI
+copies. Real default/divergent/src CLI, compiler and checksum gates remain required.
+
 - Every public UI component must have a portable stories file and a separate
   `<registry-name>-stories` registry item. Follow the Button pilot: item type
   `registry:item`, with the stories file registered as `registry:ui` and no fixed

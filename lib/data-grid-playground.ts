@@ -201,10 +201,9 @@ export function getDataGridCode(values: DataGridPlaygroundValues) {
 import { QueryClient, QueryClientProvider, queryOptions } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { createDataGridContract } from "@/components/ui/data-grid-schema";
-import { createDataGridColumnHelper } from "@/components/ui/data-grid-columns";
-import { useDataGrid } from "@/components/ui/use-data-grid";
-import { DataGrid, DataGridToolbar, DataGridSearch, DataGridApplyFilters, DataGridResetFilters, DataGridColumnVisibility, DataGridSelectionBar, DataGridViewport, DataGridTable, DataGridPagination } from "@/components/ui/data-grid";
+import { createDataGridContract } from "@/components/data-grid/schema";
+import { createDataGridColumnHelper, useDataGrid } from "@/components/data-grid";
+import { DataGrid, DataGridToolbar, DataGridSearch, DataGridApplyFilters, DataGridResetFilters, DataGridColumnVisibility, DataGridSelectionBar, DataGridViewport, DataGridTable, DataGridPagination } from "@/components/data-grid";
 
 const contract = createDataGridContract({
   pagination: ${JSON.stringify(pagination)},

@@ -48,6 +48,8 @@ interface Adapter {
   actionsRef: RefObject<Combobox.Root.Actions | null>;
   composing: RefObject<boolean>;
   endingComposition: RefObject<boolean>;
+  pageBusy: boolean;
+  loadPage: (retry?: boolean) => Promise<void>;
 }
 const AdapterContext = createContext<Adapter | null>(null);
 export const useAutocomplete = () => {
@@ -95,7 +97,23 @@ export const AutocompleteRoot = <Item,>(props: AutocompleteRootProps<Item>) => {
   const composing = useRef(false);
   const endingComposition = useRef(false);
   const blocked = Boolean(props.disabled || props.readOnly);
-  const stale = Boolean(props.loading || props.error);
+  const stale = Boolean(props.loading || props.error || props.hintMessage);
+  const pageLock = useRef(false);
+  const [pageBusy, setPageBusy] = useState(false);
+  const loadPage = async (retry = false) => {
+    const page = props.pagination;
+    if (!page || !open || blocked || stale || page.disabled || page.fetchingNextPage || pageLock.current || (!retry && (page.error || !page.hasNextPage))) {
+      return;
+    }
+    pageLock.current = true;
+    setPageBusy(true);
+    try {
+      await (retry ? page.onRetry ?? page.onLoadMore : page.onLoadMore)();
+    } finally {
+      pageLock.current = false;
+      setPageBusy(false);
+    }
+  };
   const { contains } = Combobox.useFilter({ sensitivity: "base" });
   const allOptions: Option[] = [];
   const seen = new Set<string>();
@@ -380,6 +398,8 @@ export const AutocompleteRoot = <Item,>(props: AutocompleteRootProps<Item>) => {
     endingComposition,
     inputRef,
     multiple,
+    pageBusy,
+    loadPage,
     open,
     options,
     resolveOption: (item) => {

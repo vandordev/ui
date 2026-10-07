@@ -312,7 +312,12 @@ export const buildComponentDocSections = (
     paragraph(
       "Initialize shadcn in your React project, then install this component from the Vandor UI registry:"
     ),
-    code(`npx shadcn@latest add ${registry.homepage}/r/${name}.json`, "bash")
+    code(
+      /^(autocomplete|data-grid)(-query|-schema|-stories)?$/.test(name)
+        ? `# From the Vandor UI checkout, after initializing shadcn in the consumer:\npnpm registry:build\nnode scripts/install-component-family.cjs ${name} /absolute/path/to/consumer`
+        : `npx shadcn@latest add ${registry.homepage}/r/${name}.json`,
+      "bash"
+    )
   );
   const [firstFile] = item.files;
   const target =

@@ -14,6 +14,8 @@ import { createContext, useCallback, useContext, useId, useState } from "react";
 import type { ComponentProps, Ref, ReactNode } from "react";
 
 import { AutocompleteRoot, useAutocomplete } from "./autocomplete-root";
+import { AutocompleteFeedback } from "./autocomplete-feedback";
+import { AutocompletePagination } from "./autocomplete-pagination";
 import type {
   AutocompleteContentProps,
   AutocompleteInputProps,
@@ -244,16 +246,27 @@ export const AutocompleteContent = ({
 export const AutocompleteList = ({
   className,
   ...props
-}: Combobox.List.Props) => (
+}: Combobox.List.Props) => {
+  const a = useAutocomplete();
+  return (
   <Combobox.List
     {...props}
     data-slot="autocomplete-list"
+    onScroll={(event) => {
+      props.onScroll?.(event);
+      const page = a.config.pagination;
+      const list = event.currentTarget;
+      if (!event.defaultPrevented && page?.automatic !== false && list.scrollTop > 0 && list.scrollHeight > list.clientHeight && list.scrollHeight - list.clientHeight - list.scrollTop <= 48) {
+        void a.loadPage().catch(() => undefined);
+      }
+    }}
     className={cn(
       "max-h-[min(20rem,var(--available-height))] overflow-y-auto overscroll-contain p-1",
       className
     )}
   />
-);
+  );
+};
 export const AutocompleteItem = <Item,>({
   value,
   className,
@@ -267,7 +280,7 @@ export const AutocompleteItem = <Item,>({
 }) => {
   const a = useAutocomplete();
   const option = a.resolveOption(value);
-  if (!option || a.config.loading || a.config.error) {
+  if (!option || a.config.loading || a.config.error || a.config.hintMessage) {
     return null;
   }
   const { id } = option;
@@ -328,7 +341,7 @@ export const AutocompleteEmpty = ({
   ...props
 }: ComponentProps<"div">) => {
   const a = useAutocomplete();
-  if (a.options.length || a.config.loading || a.config.error) {
+  if (a.options.length || a.config.loading || a.config.error || a.config.hintMessage) {
     return null;
   }
   return (
@@ -556,11 +569,11 @@ const Assembly = <Item,>({ props }: { props: AutocompleteProps<Item> }) => {
         {floating && label}
       </div>
       <AutocompleteContent {...props.contentProps}>
-        <AutocompleteStatus />
-        <AutocompleteEmpty />
+        <AutocompleteFeedback />
         <AutocompleteList>
           {!props.loading &&
             !props.error &&
+            !props.hintMessage &&
             groups.map((group, index) => (
               <AutocompleteGroup key={group.label ?? index}>
                 {group.label !== undefined && (
@@ -574,6 +587,7 @@ const Assembly = <Item,>({ props }: { props: AutocompleteProps<Item> }) => {
               </AutocompleteGroup>
             ))}
         </AutocompleteList>
+        <AutocompletePagination />
       </AutocompleteContent>
     </div>
   );
@@ -584,6 +598,7 @@ export const Autocomplete = <Item,>(props: AutocompleteProps<Item>) => (
   </AutocompleteRoot>
 );
 export { AutocompleteRoot };
+export { AutocompleteFeedback, AutocompletePagination };
 export type {
   AutocompleteProps,
   AutocompleteRootProps,

@@ -135,6 +135,9 @@ export const autocompleteProps = {
       "Suppress stale result commits, preserve text editing and free-text creation.",
     type: "boolean",
   },
+  loadingVariant: selectControl("Loading variant", "arc" as "arc" | "dots", ["arc", "dots"]),
+  automaticPagination: booleanControl("Automatic pagination", true),
+  hasNextPage: booleanControl("Has next page", true),
   loadingMessage: {
     defaultValue: '"Loading suggestions…"',
     description: "Loading suggestion status.",
@@ -198,8 +201,8 @@ export const autocompleteProps = {
   },
   scenario: selectControl(
     "Status scenario",
-    "ready" as "ready" | "loading" | "error" | "empty",
-    ["ready", "loading", "error", "empty"]
+    "ready" as "ready" | "loading" | "error" | "empty" | "hint" | "background" | "more" | "page-loading" | "page-error" | "end",
+    ["ready", "loading", "error", "empty", "hint", "background", "more", "page-loading", "page-error", "end"]
   ),
   showTrigger: {
     ...booleanControl("Show trigger"),
@@ -248,6 +251,17 @@ export const getAutocompletePreviewConfig = (
     label: values.label,
     labelStyle: values.labelStyle,
     loading: values.scenario === "loading",
+    loadingProps: { variant: values.loadingVariant, size: 16 },
+    hintMessage: values.scenario === "hint" ? "Enter at least two characters." : undefined,
+    backgroundLoading: values.scenario === "background",
+    pagination: ["more", "page-loading", "page-error", "end"].includes(values.scenario) ? {
+      hasNextPage: values.hasNextPage && values.scenario !== "end",
+      fetchingNextPage: values.scenario === "page-loading",
+      automatic: values.automaticPagination,
+      error: values.scenario === "page-error" ? "Could not load more suggestions." : undefined,
+      onLoadMore: () => undefined,
+      onRetry: () => undefined,
+    } : undefined,
     placeholder: values.placeholder,
     readOnly: values.readOnly,
     showTrigger: values.showTrigger,
@@ -293,6 +307,9 @@ export const getAutocompleteCode = (values: AutocompletePlaygroundValues) => {
     "animated",
     "autoHighlight",
     "loading",
+    "loadingProps",
+    "hintMessage",
+    "backgroundLoading",
     "error",
     "className",
   ] as const;
@@ -306,7 +323,7 @@ export const getAutocompleteCode = (values: AutocompletePlaygroundValues) => {
   return `"use client";
 
 import { useState } from "react";
-import { Autocomplete } from "@/components/ui/autocomplete";
+import { Autocomplete } from "@/components/autocomplete";
 
 type Framework = { id: string; label: string; group: string };
 const items: readonly Framework[] = ${JSON.stringify(config.items, null, 2)};
@@ -320,7 +337,7 @@ export function AutocompleteDemo() {
       getItemValue={(item) => item.id}
       value={value}
       onValueChange={setValue}${query ? "\n      inputValue={query}\n      onInputValueChange={setQuery}" : ""}
-${attributes}${values.grouping ? "\n      groupBy={(item) => item.group}" : ""}
+${attributes}${values.grouping ? "\n      groupBy={(item) => item.group}" : ""}${config.pagination ? `\n      pagination={{ ...${JSON.stringify(config.pagination)}, onLoadMore: () => undefined, onRetry: () => undefined }}` : ""}
       inputProps={{ "aria-label": ${JSON.stringify(values.label || "Framework")} }}
     />
   );

@@ -12,6 +12,18 @@
 
 ## Discovery Evidence
 
+### Approved installation amendment
+
+User approved the amendment after commit `2dbe922` proved stock shadcn 4.5.0
+flattens nested families with divergent directory basenames. Use a thin wrapper
+to resolve consumer components aliases through TypeScript configuration and
+prepare local artifacts with explicit cwd-relative family targets. Invoke stock
+CLI; preserve its reviewed overwrite prompts, optional entries, primitive targets,
+and fully local generated dependency closure. No private CLI APIs or default-only
+alias restriction. Tasks 1, 6-8 additionally own wrapper resolution, safety, and
+actual CLI matrix verification. Existing batch dependencies and acceptance gates
+remain in force; approval does not turn failed probe evidence into PASS.
+
 - Branch observed `main...origin/main`; only the new Query spec untracked before this plan. No implementation branch/execution profile chosen. Existing component implementation is committed user work, not ours to revert.
 - Inspected `.agent/frontend-workflow.md`, `.agent/component-implementation.md`, `.agent/registry-distribution.md`, package scripts, registry graph and existing autocomplete/DataGrid source.
 - Current `AutocompleteProps`/`AutocompleteRootProps` are four-way discriminated unions in `registry/new-york/autocomplete-types.ts`. Single free text forbids inputValue; remaining modes have inputValue callbacks. Root resolves object IDs, preserves committed values, and treats `loading || error` as blocking suggestion state.

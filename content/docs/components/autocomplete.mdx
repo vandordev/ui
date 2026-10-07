@@ -20,6 +20,8 @@ import {
 import { AutocompleteAdvancedDemo } from "@/examples/autocomplete-advanced-demo";
 import { AutocompleteAsyncDemo } from "@/examples/autocomplete-async-demo";
 import { AutocompleteFormDemo } from "@/examples/autocomplete-form-demo";
+import { AutocompleteQueryDemo } from "@/examples/autocomplete-query-demo";
+import { AutocompleteInfiniteDemo } from "@/examples/autocomplete-infinite-demo";
 
 ## Usage
 
@@ -28,7 +30,7 @@ import { AutocompleteFormDemo } from "@/examples/autocomplete-form-demo";
 ```tsx
 "use client";
 
-import { Autocomplete } from "@/components/ui/autocomplete";
+import { Autocomplete } from "@/components/autocomplete";
 
 export function Demo() {
   return <Autocomplete items={["React", "Vue", "Svelte"]} label="Framework" />;
@@ -37,7 +39,26 @@ export function Demo() {
 
 Use your configured UI alias if it differs. React 19, Tailwind CSS 4 and the standard shadcn theme tokens are required. Runtime dependencies are `@base-ui/react@^1.8.0`, `cn@^0.4.0`, `lucide-react`, and `motion@^12.38.0`. No website stylesheet or provider is imported. Use your consumer's background, input, foreground, accent, popover, border, ring, destructive and muted-foreground tokens; standard shadcn CSS supplies these. Popup motion is JavaScript-driven and requires no extra animation stylesheet.
 
-CLI installation supplies **four colocated files**: `autocomplete.tsx`, `autocomplete-root.tsx`, `autocomplete-types.ts`, and `autocomplete-utils.ts`. Copying the displayed Source alone is insufficient; prefer CLI installation, or copy all four and install their listed dependencies. Review overwrite prompts before replacing customized source.
+Family installation supplies an `index.ts` UI entry, core modules, compact feedback
+and pagination under your components alias. It also installs the public `Loading`
+component's entire animation catalog and MIT license. Copying Source alone is
+insufficient. Core does not require TanStack Query.
+
+Stock shadcn 4.5.0 cannot preserve nested families under divergent aliases. From
+this registry checkout, generate local artifacts and use the alias-aware wrapper:
+
+```bash
+pnpm registry:build
+node scripts/install-component-family.cjs autocomplete /absolute/path/to/consumer
+node scripts/install-component-family.cjs autocomplete-query /absolute/path/to/consumer
+```
+
+The optional second command requires your own Query provider. The wrapper uses
+the real CLI, configured components/UI aliases and locally generated dependency
+closure. Review overwrite prompts, especially when optional Query installs core
+as a dependency. It never deletes old `ui/` copies. Transfer customizations and
+remove obsolete copies deliberately. Consumer TypeScript aliases must resolve to
+one in-project directory; ambiguous fallback paths are rejected, not guessed.
 
 ## Four value contracts
 
@@ -123,6 +144,67 @@ Error takes precedence over loading, then empty, then populated results. Loading
 
 This deterministic local service debounces for 300ms, aborts timers and ignores stale responses. Type `slow` to delay a result or `error` to see a predictable failure. Replace it with your own service, retaining cleanup.
 
+## Optional Query integration
+
+Import `useAutocompleteQuery` or `useAutocompleteInfiniteQuery` from
+`@/components/autocomplete/query`. Install `@tanstack/react-query@^5.104.1` and
+provide your own `QueryClientProvider`; no hidden provider is installed.
+
+<ComponentPreview name="autocomplete-query-demo" title="autocomplete-query-demo.tsx">
+  <AutocompleteQueryDemo />
+</ComponentPreview>
+
+Both hooks accept native options factories receiving debounced `search`, plus
+`getItems`. Infinite `getItems` receives each selected page, including a page shape
+changed by `select`, and object items require stable `getItemValue` IDs. Duplicate
+IDs retain the first object and order without mutating cached pages. Include search
+and every request identity in your query key.
+
+`debounceMs` defaults to 300 and `minSearchLength` to 0. Fetching requires an open
+popup, sufficient search length, settled debounce, hook `enabled`, and native
+boolean/function `enabled` and `skipToken` semantics. UI Retry and Load more cannot
+bypass these gates. Native Query results remain exposed as `query` for applications
+making their own decisions. Invalid configuration throws `RangeError`.
+
+Use `search/defaultSearch/onSearchChange` and `open/defaultOpen/onOpenChange` for
+controlled or uncontrolled state. Selection and free-text tags bind only the query;
+applications own committed `value/onValueChange`. Single free text binds search
+as `value/onValueChange`, never `inputValue`; controlled `search` makes text
+application-owned. Hook setters request changes without overriding controlled props.
+
+Consume `signal` in query functions for Query cancellation. Closing the popup
+alone does not guarantee abortion. Distinct keys prevent mixing search generations;
+previous-key placeholders are not selectable. Same-search cached results remain
+selectable during background refresh. `formatError` returns safe compact content;
+raw Error objects are never rendered.
+
+<ComponentPreview name="autocomplete-infinite-demo" title="autocomplete-infinite-demo.tsx">
+  <AutocompleteInfiniteDemo />
+</ComponentPreview>
+
+The actual list viewport triggers automatic loading near its bottom only after
+scrolling. Mounting a short list does not drain pages. An accessible `type="button"`
+Load more remains available; page failure latches automatic retry until explicit
+Retry or query change. Existing results and selections remain during page loading,
+page errors and background refresh. Infinite scrolling is not virtualization.
+
+| State | Compact presentation |
+| --- | --- |
+| Below minimum | Hint, old options blocked |
+| Debouncing / initial fetch | Public Loading and text |
+| Initial error | Error and Retry |
+| Successful empty | Dedicated empty message |
+| Same-search background fetch | Retained options and Loading |
+| Next page fetching / error | Retained options, footer Loading / Retry |
+| More / exhausted | Load more / no action |
+
+Customize `loadingProps={{ variant: "dots", size: 16 }}`, `hintMessage`,
+`loadingMessage`, `emptyMessage`, `retryLabel`, and pagination labels/messages.
+Compound Root uses the same bindings with `AutocompleteFeedback` and
+`AutocompletePagination`. Core feedback does not use registry ErrorState or Empty.
+Playground pagination scenarios simulate states, not real API requests; the two
+Query examples above use deterministic services and real Query caches.
+
 ## Forms and reset
 
 Single free text submits its string; selection submits the stable ID. Multiple values submit repeated `name` entries in insertion order. Empty multiples submit no entries; empty singles submit `""`. Drafts never submit. `form` supports an external form ID. Disabled controls are excluded; read-only controls remain focusable and submitted.
@@ -157,7 +239,7 @@ Inline completion, virtualization, tag reordering and creating selection objects
 Install Autocomplete first, then optionally install its stories:
 
 ```bash
-npx shadcn@latest add https://vandor-ui.vercel.app/r/autocomplete-stories.json
+node scripts/install-component-family.cjs autocomplete-stories /absolute/path/to/consumer
 ```
 
 This adds only colocated `autocomplete.stories.tsx` in the configured UI directory. It never reinstalls the component, adds/upgrades Storybook packages or modifies `.storybook/`. Supply matching Storybook React packages; verified types/composition target Storybook 10.6.1. Discover `**/*.stories.tsx`, import your own Tailwind/shadcn global stylesheet and theme in the preview, and retain your existing decorators. No optional addon is required. Ordinary component installation is Storybook-free. Storybook UI not verified: this project has no Storybook server.
