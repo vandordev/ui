@@ -1,0 +1,163 @@
+---
+title: Autocomplete
+description: Typed suggestions for free text, tags, and constrained single or multiple selection.
+component: autocomplete
+credits:
+  - name: ReUI
+    url: https://reui.io/docs/autocomplete
+    contribution: Design and API reference only. Vandor's adapter and styling are independently authored, not copied ReUI source.
+  - name: Base UI
+    url: https://base-ui.com/react/components/combobox
+    contribution: Public autocomplete, combobox and chip primitives provide accessible interaction.
+---
+
+import {
+  AutocompleteDemo,
+  AutocompleteFreeTextMultipleDemo,
+  AutocompleteSelectionDemo,
+  AutocompleteSelectionMultipleDemo,
+} from "@/examples/autocomplete-demo";
+import { AutocompleteAdvancedDemo } from "@/examples/autocomplete-advanced-demo";
+import { AutocompleteAsyncDemo } from "@/examples/autocomplete-async-demo";
+import { AutocompleteFormDemo } from "@/examples/autocomplete-form-demo";
+
+## Usage
+
+`Autocomplete` assembles the field, suggestions, optional actions and chips. Strings need no accessors:
+
+```tsx
+"use client";
+
+import { Autocomplete } from "@/components/ui/autocomplete";
+
+export function Demo() {
+  return <Autocomplete items={["React", "Vue", "Svelte"]} label="Framework" />;
+}
+```
+
+Use your configured UI alias if it differs. React 19, Tailwind CSS 4 and the standard shadcn theme tokens are required. Runtime dependencies are `@base-ui/react@^1.8.0`, `cn@^0.4.0`, `lucide-react`, and `motion@^12.38.0`. No website stylesheet or provider is imported. Use your consumer's background, input, foreground, accent, popover, border, ring, destructive and muted-foreground tokens; standard shadcn CSS supplies these. Popup motion is JavaScript-driven and requires no extra animation stylesheet.
+
+CLI installation supplies **four colocated files**: `autocomplete.tsx`, `autocomplete-root.tsx`, `autocomplete-types.ts`, and `autocomplete-utils.ts`. Copying the displayed Source alone is insufficient; prefer CLI installation, or copy all four and install their listed dependencies. Review overwrite prompts before replacing customized source.
+
+## Four value contracts
+
+| Mode                  | Multiple | Committed value   | Empty  |
+| --------------------- | -------- | ----------------- | ------ |
+| `free-text` (default) | false    | `string`          | `""`   |
+| `free-text`           | true     | `string[]`        | `[]`   |
+| `selection`           | false    | original `Item`   | `null` |
+| `selection`           | true     | original `Item[]` | `[]`   |
+
+Literal mode/multiple settings infer callback types. Narrow runtime unions before rendering. `value` is committed application state; controlled props stay authoritative. `defaultValue` initializes uncontrolled state. Readonly item collections are supported and supplied arrays are never mutated.
+
+### Free text
+
+Typing updates the string immediately. Selecting a suggestion replaces it. Blur retains arbitrary text. There is no separate `inputValue` in single free-text mode.
+
+<ComponentPreview name="autocomplete-demo" title="autocomplete-demo.tsx">
+  <AutocompleteDemo />
+</ComponentPreview>
+
+### Free-text tags
+
+Enter commits a trimmed draft when no suggestion is highlighted. Empty strings and exact case-sensitive duplicates are rejected without callbacks. Choosing a suggestion follows the same rule. Commas and pasted text stay intact; blur and Tab never create tags. An uncommitted draft survives blur and Escape, but is not submitted.
+
+<ComponentPreview
+  src="examples/autocomplete-demo.tsx"
+  title="autocomplete-demo.tsx"
+>
+  <AutocompleteFreeTextMultipleDemo />
+</ComponentPreview>
+
+### Single selection
+
+Objects require `getItemLabel` and `getItemValue`; the latter must return a unique stable string ID. Duplicate labels are allowed. Callbacks return the original current source item, not an ID. IDs compare newly fetched instances; an existing committed object remains displayable and submittable when absent from results.
+
+Typing changes only `inputValue`, not the selection. Choosing replaces the committed item. Blur/Escape discards the query and restores the prior label (or empty input). Clear resets both. Controlled query owners must honor cleanup requests through `onInputValueChange`.
+
+<ComponentPreview
+  src="examples/autocomplete-demo.tsx"
+  title="autocomplete-demo.tsx"
+>
+  <AutocompleteSelectionDemo />
+</ComponentPreview>
+
+### Multiple selection
+
+Only known items can be selected. New choices append in insertion order; duplicate IDs are rejected. Query cleanup never emits a value change. Blur/Escape discards the query, keeping all choices. Successful additions clear the query and keep the popup open.
+
+<ComponentPreview
+  src="examples/autocomplete-demo.tsx"
+  title="autocomplete-demo.tsx"
+>
+  <AutocompleteSelectionMultipleDemo />
+</ComponentPreview>
+
+## Rich items and composition
+
+`renderItem` changes visual content, not identity, search labels or submitted values. `groupBy` preserves first-seen group order and source order within each group. Empty groups are omitted. `isItemDisabled` prevents choosing a suggestion.
+
+<ComponentPreview
+  name="autocomplete-advanced-demo"
+  title="autocomplete-advanced-demo.tsx"
+>
+  <AutocompleteAdvancedDemo />
+</ComponentPreview>
+
+Named parts: `AutocompleteRoot`, `AutocompleteInput`, `AutocompleteContent`, `AutocompleteList`, `AutocompleteItem`, `AutocompleteGroup`, `AutocompleteGroupLabel`, `AutocompleteEmpty`, `AutocompleteStatus`, `AutocompleteClear`, `AutocompleteTrigger`, `AutocompleteChips`, `AutocompleteChip`, `AutocompleteChipRemove`.
+
+The Root uses the same four-mode contract, not an arbitrary Base UI pass-through. Provide `items` for identity/filtering. Pass original items to `AutocompleteItem.value`; put items in List and Group. Chips are supported only under `multiple` Root, inside `AutocompleteChips`, in committed-value order. `AutocompleteChip.label` is required; removal uses its label for the accessible name. In compound usage, supply your own associated label or input `aria-label`, and your layout/classes. Status and Empty are optional, mode-aware parts. Do not mix parts from unrelated primitive roots. Root's `groupBy`/`renderItem` do not assemble compound children; those are convenience assembly options.
+
+## Async suggestions
+
+Applications own debounce, requests, cancellation, stale-response protection and caching. Set `filter={null}` for server-filtered results. Default filtering is case/accent-insensitive label matching; a custom `filter(item, query)` can replace it.
+
+Error takes precedence over loading, then empty, then populated results. Loading/error suppress stale suggestion commits, but never erase choices or disable free-text edits/creation. Status feedback uses a polite region; no “no results” appears while loading/error is active. The component does not fetch or own retry logic.
+
+<ComponentPreview
+  name="autocomplete-async-demo"
+  title="autocomplete-async-demo.tsx"
+>
+  <AutocompleteAsyncDemo />
+</ComponentPreview>
+
+This deterministic local service debounces for 300ms, aborts timers and ignores stale responses. Type `slow` to delay a result or `error` to see a predictable failure. Replace it with your own service, retaining cleanup.
+
+## Forms and reset
+
+Single free text submits its string; selection submits the stable ID. Multiple values submit repeated `name` entries in insertion order. Empty multiples submit no entries; empty singles submit `""`. Drafts never submit. `form` supports an external form ID. Disabled controls are excluded; read-only controls remain focusable and submitted.
+
+`required` checks a committed selection/tag, not a typed query. The editable input receives validity feedback. Native reset restores uncontrolled defaults and initial drafts, closes the popup and resets transient state. Controlled state remains application-owned; the example's `onReset` explicitly restores its controlled value.
+
+<ComponentPreview
+  name="autocomplete-form-demo"
+  title="autocomplete-form-demo.tsx"
+>
+  <AutocompleteFormDemo />
+</ComponentPreview>
+
+## Behavior & Accessibility
+
+- Give the field a `label` or input ARIA name; placeholder alone is not a label. Static labels are default, floating labels opt in.
+- Default height is 36px, `size="sm"` is 32px. Multiple chips expand and wrap the field. Popup width follows the anchor and its list scrolls within available viewport height.
+- `className` owns the outer convenience field. `inputProps` owns native attributes, descriptions, handlers and ref; managed value/form/type/disabled/readOnly/required/size props are excluded. `contentProps` owns popup props and positioning/collision options, excluding children/render. Top-level ref targets the editable input and is merged with `inputProps.ref`.
+- `invalid` marks the input; connect help/error text using `inputProps["aria-describedby"]`. Suggestion `error` is not automatically a validation error.
+- Arrow keys navigate suggestions, Enter selects highlighted suggestions. A handled Enter does not submit the form. Ordinary single free-text Enter without a highlighted suggestion retains native submission behavior.
+- IME Enter cannot select/create; the composition-ending Enter is guarded. No comma delimiters or paste splitting.
+- Empty-draft Backspace focuses the last chip first. Delete/Backspace on that chip removes it and focuses the prior chip or input. Removal actions have accessible names and stay keyboard reachable.
+- Read-only blocks choosing, clear, removal and value-changing shortcuts without excluding submission. Disabled blocks interaction and native submission.
+- Consumer handlers are composed; `preventDefault()` cancels adapter behavior and underlying Base UI handlers. Public Base UI `preventBaseUIHandler()` is also supported on compound primitive events.
+- `onValueChange` fires only on real edits/commits/removals/clear, never opening, highlighting, failed duplicates or query-only edits. Callbacks request controlled changes; no cancelable event-details contract is promised.
+- `clearable` defaults false; trigger defaults on for selection, off for free text; `autoHighlight` defaults false. `animated` defaults true; popup fade/scale uses 180ms opening and 120ms closing, respecting reduced motion. Query edits are not animated.
+
+Inline completion, virtualization, tag reordering and creating selection objects are not part of this release. Underlying [Base UI Autocomplete](https://base-ui.com/react/components/autocomplete) and [Combobox](https://base-ui.com/react/components/combobox) supply list navigation; Vandor `mode` is not Base UI's inline-completion mode.
+
+## Portable Storybook stories
+
+Install Autocomplete first, then optionally install its stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/autocomplete-stories.json
+```
+
+This adds only colocated `autocomplete.stories.tsx` in the configured UI directory. It never reinstalls the component, adds/upgrades Storybook packages or modifies `.storybook/`. Supply matching Storybook React packages; verified types/composition target Storybook 10.6.1. Discover `**/*.stories.tsx`, import your own Tailwind/shadcn global stylesheet and theme in the preview, and retain your existing decorators. No optional addon is required. Ordinary component installation is Storybook-free. Storybook UI not verified: this project has no Storybook server.

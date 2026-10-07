@@ -6,6 +6,11 @@ import {
   getAccordionDefaults,
 } from "@/lib/accordion-playground";
 import {
+  autocompleteProps,
+  getAutocompleteCode,
+  getAutocompleteDefaults,
+} from "@/lib/autocomplete-playground";
+import {
   badgeProps,
   getBadgeCode,
   getBadgeDefaults,
@@ -109,6 +114,12 @@ interface ComponentDocDefinition {
 }
 
 export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
+  autocomplete: {
+    nativePropsDescription:
+      "Autocomplete owns its managed value/query/form state. inputProps forwards input attributes, handlers, ARIA descriptions and ref except managed state, form, disabled/readOnly/required, type and size. contentProps forwards popup attributes and listed positioning/collision options, excluding children/render. Compound parts use the same root contract; chips require multiple.",
+    playground: { code: getAutocompleteCode(getAutocompleteDefaults()) },
+    props: autocompleteProps,
+  },
   "data-grid": {
     nativePropsDescription:
       "Root/Viewport/Table/Column/Row/Cell forward their corresponding native element attributes, refs and handlers. Search forwards InputSearch props except controlled value/defaultValue. Filter is a typed render binding, not a DOM element. ColumnVisibility has no native-prop API; Pagination/SelectionBar/Toolbar forward div props. Apply/Reset forward Button props.",

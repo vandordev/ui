@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "accordion",
+    "autocomplete",
     "badge",
     "blobatar",
     "button",

@@ -38,10 +38,15 @@ jobs:
       - name: Build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+          VANDOR_BOUNDED_BUILD: 1
+          RAYON_NUM_THREADS: 1
         run: NODE_OPTIONS="--max-old-space-size=2048" timeout --signal=TERM --kill-after=5s 600s pnpm build
 
       - name: Typecheck
         run: NODE_OPTIONS="--max-old-space-size=2048" timeout --signal=TERM --kill-after=5s 300s pnpm typecheck
+
+      - name: Autocomplete isolated consumer (network required)
+        run: NODE_OPTIONS="--max-old-space-size=512" timeout --signal=TERM --kill-after=5s 1200s node tests/fixtures/autocomplete-consumer/verify.cjs
 
       - name: Tests
         run: NODE_OPTIONS="--max-old-space-size=512" timeout --signal=TERM --kill-after=5s 900s node --test --test-concurrency=1 tests/*.test.cjs

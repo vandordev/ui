@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { AccordionPlayground } from "@/components/accordion-playground";
+import { AutocompletePlayground } from "@/components/autocomplete-playground";
 import { BadgePlayground } from "@/components/badge-playground";
 import { BlobatarPlayground } from "@/components/blobatar-playground";
 import { ButtonPlayground } from "@/components/button-playground";
@@ -27,6 +28,7 @@ import { componentDocDefinitions } from "@/lib/component-docs";
 
 const playgrounds: Record<string, () => ReactNode> = {
   accordion: AccordionPlayground,
+  autocomplete: AutocompletePlayground,
   badge: BadgePlayground,
   blobatar: BlobatarPlayground,
   button: ButtonPlayground,

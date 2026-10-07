@@ -3,6 +3,45 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "autocomplete",
+      "type": "registry:ui",
+      "title": "Autocomplete",
+      "description": "Typed free-text and selection fields, single or multiple, with accessible suggestions, tags and compound composition.",
+      "dependencies": [
+        "@base-ui/react@^1.8.0",
+        "cn@^0.4.0",
+        "lucide-react",
+        "motion@^12.38.0"
+      ],
+      "files": [
+        { "path": "registry/new-york/autocomplete.tsx", "type": "registry:ui" },
+        {
+          "path": "registry/new-york/autocomplete-root.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/autocomplete-types.ts",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/autocomplete-utils.ts",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "autocomplete-stories",
+      "type": "registry:item",
+      "title": "Autocomplete Stories",
+      "description": "Optional portable stories. Install Autocomplete first; no component or Storybook setup is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/autocomplete.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "badge",
       "type": "registry:ui",
       "title": "Badge",

@@ -10,6 +10,7 @@ const { ROUTES } = await jiti.import("./constants/routes");
 const nextConfig = {
   devIndicators: false,
   experimental: {
+    ...(process.env.VANDOR_BOUNDED_BUILD === "1" ? { cpus: 1 } : {}),
     viewTransition: true,
   },
   headers() {
