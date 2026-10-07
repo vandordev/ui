@@ -96,6 +96,11 @@ import {
   statsCardProps,
 } from "@/lib/stats-card-playground";
 import {
+  switchProps,
+  getSwitchCode,
+  getSwitchDefaults,
+} from "@/lib/switch-playground";
+import {
   getToastCode,
   getToastDefaults,
   toastApiProps,
@@ -203,6 +208,12 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
       "StatsCard supports only ariaLabel, items, and className. It does not forward native attributes, refs, or event handlers.",
     playground: { code: getStatsCardCode(getStatsCardDefaults()) },
     props: statsCardProps,
+  },
+  switch: {
+    nativePropsDescription:
+      "Switch forwards Base UI Root props, handlers, state-aware className/style and React 19 refs. Children are reserved for the thumb. The default root is a span with switch semantics and a native input; use an enclosing label or Base UI Field.",
+    playground: { code: getSwitchCode(getSwitchDefaults()) },
+    props: switchProps,
   },
   toast: {
     playground: { code: getToastCode(getToastDefaults()) },

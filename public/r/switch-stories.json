@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "switch-stories",
+  "title": "Switch Stories",
+  "description": "Optional portable Switch stories. Install Switch first; no component or Storybook configuration is overwritten.",
+  "files": [
+    {
+      "path": "registry/new-york/switch.stories.tsx",
+      "content": "import type { Meta, StoryObj } from \"@storybook/react\";\nimport { useState } from \"react\";\n\nimport type { SwitchProps } from \"./switch\";\nimport { Switch } from \"./switch\";\n\nconst meta = {\n  argTypes: {\n    animated: { control: \"boolean\" },\n    \"aria-invalid\": { control: \"boolean\" },\n    \"aria-label\": { control: \"text\" },\n    checked: { control: false },\n    defaultChecked: { control: \"boolean\" },\n    dir: { control: \"select\", options: [\"ltr\", \"rtl\"] },\n    disabled: { control: \"boolean\" },\n    inputRef: { control: false },\n    onCheckedChange: { control: false },\n    readOnly: { control: \"boolean\" },\n    render: { control: false },\n    size: { control: \"select\", options: [\"default\", \"sm\"] },\n  },\n  args: {\n    animated: true,\n    \"aria-label\": \"Enable notifications\",\n    defaultChecked: false,\n    disabled: false,\n    readOnly: false,\n    size: \"default\",\n  },\n  component: Switch,\n  parameters: { layout: \"centered\" },\n  render: (args) => (\n    <label className=\"flex items-center gap-3 text-sm\">\n      <Switch key={String(args.defaultChecked)} {...args} />\n      <span>{args[\"aria-label\"]}</span>\n    </label>\n  ),\n  tags: [\"autodocs\"],\n  title: \"Vandor UI/Switch\",\n} satisfies Meta<typeof Switch>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\nexport const Playground: Story = {};\nexport const Checked: Story = { args: { defaultChecked: true } };\nexport const Small: Story = { args: { defaultChecked: true, size: \"sm\" } };\nexport const Disabled: Story = {\n  args: { defaultChecked: true, disabled: true },\n};\nexport const ReadOnly: Story = {\n  args: { defaultChecked: true, readOnly: true },\n};\nexport const Invalid: Story = { args: { \"aria-invalid\": true } };\nexport const WithoutMotion: Story = { args: { animated: false } };\nexport const RTL: Story = { args: { defaultChecked: true, dir: \"rtl\" } };\n\nconst ControlledExample = (args: SwitchProps) => {\n  const [checked, setChecked] = useState(false);\n  return (\n    <label className=\"flex items-center gap-3 text-sm\">\n      <Switch {...args} checked={checked} onCheckedChange={setChecked} />\n      <span>{checked ? \"Notifications enabled\" : \"Enable notifications\"}</span>\n    </label>\n  );\n};\nexport const Controlled: Story = {\n  argTypes: {\n    \"aria-label\": { control: false },\n    defaultChecked: { control: false },\n  },\n  render: (args) => <ControlledExample {...args} aria-label={undefined} />,\n};\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:item"
+}

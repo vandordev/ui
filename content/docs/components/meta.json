@@ -31,6 +31,7 @@
     "popover",
     "select",
     "stats-card",
+    "switch",
     "textarea",
     "toast",
     "tooltip"

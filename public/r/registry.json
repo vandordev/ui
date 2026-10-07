@@ -462,6 +462,28 @@
       ]
     },
     {
+      "name": "switch",
+      "type": "registry:ui",
+      "title": "Switch",
+      "description": "A shadcn Base UI Switch with smooth Motion thumb transitions and reduced-motion support.",
+      "dependencies": ["@base-ui/react@^1.8.0", "cn", "motion@^12.38.0"],
+      "files": [
+        { "path": "registry/new-york/switch.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "switch-stories",
+      "type": "registry:item",
+      "title": "Switch Stories",
+      "description": "Optional portable Switch stories. Install Switch first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/switch.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "empty",
       "type": "registry:ui",
       "title": "Empty",

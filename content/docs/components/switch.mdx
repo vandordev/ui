@@ -1,0 +1,78 @@
+---
+title: Switch
+description: A shadcn-based Switch with smooth thumb motion, two sizes, and accessible form semantics.
+component: switch
+credits:
+  - name: shadcn/ui
+    url: https://ui.shadcn.com/docs/components/base/switch
+    contribution: Adapted Base Nova Switch foundation. Vandor UI adds Motion thumb transitions, direction support, and reduced-motion handling.
+---
+
+import { SwitchDemo } from "@/examples/switch-demo";
+import { SwitchStates } from "@/examples/switch-states";
+import { SwitchForm } from "@/examples/switch-form";
+
+## Usage
+
+```tsx
+"use client";
+
+import { Switch } from "@/components/ui/switch";
+
+export function Demo() {
+  return (
+    <label className="flex items-center gap-3 text-sm">
+      <Switch defaultChecked />
+      Enable notifications
+    </label>
+  );
+}
+```
+
+Use your configured UI alias if it differs. Requires React 19, Tailwind CSS 4 with shadcn theme tokens (`background`, `foreground`, `input`, `primary`, `primary-foreground`, `ring`, and `destructive`), Base UI 1.8+, Motion 12.38+, and `cn`. No website-specific CSS or provider is required for LTR. For manual installation, install these packages and copy the complete Source into your UI directory, preserving the upstream MIT notice.
+
+## Examples
+
+### Basic
+
+Wrap the switch and text in a label so the whole row is clickable. `defaultChecked` initializes uncontrolled state. Changing it does not update a mounted switch; the playground remounts when this configuration changes. A switch represents an immediate on/off setting, not a submit action or mixed selection.
+
+<ComponentPreview name="switch-demo" title="switch-demo.tsx">
+  <SwitchDemo />
+</ComponentPreview>
+
+### Sizes and states
+
+Use `size="sm"` for a compact control. Disabled switches cannot change and are omitted from submission. Read-only switches remain focusable and retain their submitted value. Use `aria-invalid` for error semantics and styling, with `aria-describedby` connecting the error text. This does not implement validation by itself.
+
+<ComponentPreview name="switch-states" title="switch-states.tsx">
+  <SwitchStates />
+</ComponentPreview>
+
+### Controlled state, submission and reset
+
+Use `checked` with `onCheckedChange` to control state. The callback receives the next boolean and Base UI event details immediately, without waiting for animation; `details.cancel()` rejects the change. Set `name` and `value` for form submission. The checked value defaults to `"on"`; unchecked switches are omitted unless `uncheckedValue` is set. Base UI does not synchronize uncontrolled visual state with native form reset. Restore controlled state in `onReset` when reset is needed, as shown here.
+
+<ComponentPreview name="switch-form" title="switch-form.tsx">
+  <SwitchForm />
+</ComponentPreview>
+
+## Behavior & Accessibility
+
+- Tab focuses the switch; Space toggles it. The default root is a span with switch semantics and a hidden native checkbox input. Use an enclosing label or Base UI Field. For a sibling `htmlFor` label, use `render={<button />}` and `nativeButton` as explained in the [Base UI API](https://base-ui.com/react/components/switch).
+- `ref` targets the visible root and `inputRef` targets the native input. Root props, event handlers, state-aware `className`/`style`, and composition are forwarded; children are reserved for the thumb. `required` enables native constraint validation; `form` associates an external input with a form.
+- The thumb slides over 200 ms using an interruptible ease-out transform, without bounce, scaling, or delayed state updates. `animated={false}` and reduced-motion preferences make thumb changes immediate. Reduced motion also disables the CSS track-color transition; `animated={false}` alone does not.
+- Sizes retain the shadcn foundation: default track 32 × 18.4 px with a 16 px thumb, small track 24 × 14 px with a 12 px thumb. The invisible hit area extends beyond the track; leave adequate space between controls. Labels provide a larger interaction target.
+- Light and dark styles inherit shadcn tokens. Use `dir="rtl"` or Base UI `DirectionProvider` for RTL thumb motion; an ancestor HTML `dir` alone does not configure Base UI direction. Keep visible keyboard-focus treatment when customizing classes.
+
+## Storybook Stories (Optional)
+
+Install Switch first, then add its portable stories to your existing React Storybook:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/switch-stories.json
+```
+
+This adds only `switch.stories.tsx` beside Switch in your configured UI directory. It does not reinstall Switch, add packages, or modify `.storybook/`. Review overwrite prompts for existing stories. Supply `@storybook/react` matching your Storybook version and React; stories are typechecked and composed against Storybook React 10.6.1. No extra example dependencies are required.
+
+Include `../components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)` in `.storybook/main.ts`, adjusted for your UI directory. Import your application's Tailwind/global stylesheet in `.storybook/preview.ts` and include the UI/stories directory in Tailwind source scanning. Stories inherit your theme and decorators. Apply the dark-theme selector inside the preview iframe. The `autodocs` tag needs your existing `@storybook/addon-docs` configuration; Canvas and Controls do not.
