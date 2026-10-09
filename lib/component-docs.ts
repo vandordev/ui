@@ -21,6 +21,11 @@ import {
   getBlobatarDefaults,
 } from "@/lib/blobatar-playground";
 import {
+  boringAvatarProps,
+  getBoringAvatarCode,
+  getBoringAvatarDefaults,
+} from "@/lib/boring-avatar-playground";
+import {
   buttonProps,
   getButtonCode,
   getButtonDefaults,
@@ -151,6 +156,12 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   blobatar: {
     playground: { code: getBlobatarCode(getBlobatarDefaults()) },
     props: blobatarProps,
+  },
+  "boring-avatar": {
+    nativePropsDescription:
+      "Native span attributes, handlers, style, and React 19 refs target the outer span. Children and Base UI render composition are not exposed.",
+    playground: { code: getBoringAvatarCode(getBoringAvatarDefaults()) },
+    props: boringAvatarProps,
   },
   button: {
     playground: {

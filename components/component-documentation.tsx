@@ -4,6 +4,7 @@ import { AccordionPlayground } from "@/components/accordion-playground";
 import { AutocompletePlayground } from "@/components/autocomplete-playground";
 import { BadgePlayground } from "@/components/badge-playground";
 import { BlobatarPlayground } from "@/components/blobatar-playground";
+import { BoringAvatarPlayground } from "@/components/boring-avatar-playground";
 import { ButtonPlayground } from "@/components/button-playground";
 import { CheckboxPlayground } from "@/components/checkbox-playground";
 import { CodeCollapsibleWrapper } from "@/components/code-collapsible-wrapper";
@@ -33,6 +34,7 @@ const playgrounds: Record<string, () => ReactNode> = {
   autocomplete: AutocompletePlayground,
   badge: BadgePlayground,
   blobatar: BlobatarPlayground,
+  "boring-avatar": BoringAvatarPlayground,
   button: ButtonPlayground,
   calendar: () => <InputFamilyPlayground component="calendar" />,
   checkbox: CheckboxPlayground,

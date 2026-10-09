@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "boring-avatar",
+  "title": "BoringAvatar",
+  "description": "Local Boring Avatars artwork with six variants, profile photo fallback, and no extra wrapper background.",
+  "dependencies": [
+    "@base-ui/react@^1.8.0",
+    "boring-avatars@^2.0.4",
+    "cn"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/boring-avatar.tsx",
+      "content": "\"use client\";\n\nimport { Avatar } from \"@base-ui/react/avatar\";\nimport GeneratedAvatar from \"boring-avatars\";\nimport { cn } from \"cn\";\nimport type * as React from \"react\";\n\nexport type BoringAvatarVariant =\n  | \"beam\"\n  | \"marble\"\n  | \"pixel\"\n  | \"sunset\"\n  | \"ring\"\n  | \"bauhaus\";\n\nexport type BoringAvatarProps = Omit<\n  React.ComponentProps<\"span\">,\n  \"children\"\n> & {\n  /** Stable, case-sensitive identity for local generation. */\n  name: string;\n  /** Optional photo; loading and failed photos show the generated fallback. */\n  src?: string;\n  /** Shared accessible label. Empty means decorative. */\n  alt?: string;\n  /** Pixel dimensions. Explicit style overrides these. */\n  size?: number;\n  variant?: BoringAvatarVariant;\n  /** Square clipping for both the generated SVG and the photo. */\n  square?: boolean;\n  /** Non-empty palette of hexadecimal colors; empty uses upstream defaults. */\n  colors?: string[];\n};\n\nexport const BoringAvatar = ({\n  name,\n  src,\n  alt = \"\",\n  size = 40,\n  variant = \"beam\",\n  square = false,\n  colors,\n  className,\n  style,\n  ...props\n}: BoringAvatarProps) => (\n  <Avatar.Root\n    data-slot=\"boring-avatar\"\n    className={cn(\"relative inline-flex shrink-0 align-middle\", className)}\n    style={{ height: size, width: size, ...style }}\n    {...props}\n  >\n    <Avatar.Fallback\n      data-slot=\"boring-avatar-fallback\"\n      className=\"flex size-full\"\n    >\n      <GeneratedAvatar\n        name={name}\n        variant={variant}\n        colors={colors?.length ? colors : undefined}\n        square={square}\n        size=\"100%\"\n        title={false}\n        role={alt ? \"img\" : undefined}\n        aria-label={alt || undefined}\n        aria-hidden={alt ? undefined : true}\n        focusable=\"false\"\n        className=\"size-full\"\n      />\n    </Avatar.Fallback>\n    {src ? (\n      <Avatar.Image\n        data-slot=\"boring-avatar-image\"\n        src={src}\n        alt={alt}\n        keepMounted\n        className={cn(\n          \"absolute inset-0 size-full object-cover data-[loading]:invisible data-[error]:invisible\",\n          !square && \"rounded-full\"\n        )}\n      />\n    ) : null}\n  </Avatar.Root>\n);\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:ui"
+}

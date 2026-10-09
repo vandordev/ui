@@ -1,0 +1,109 @@
+---
+title: BoringAvatar
+description: Six locally generated avatar styles with profile photo fallback and no extra wrapper background.
+component: boring-avatar
+credits:
+  - name: Boring Avatars by Boring Designers
+    url: https://github.com/boringdesigners/boring-avatars
+    contribution: MIT-licensed SVG generator used as a dependency. Vandor UI adds Base UI photo/fallback composition, accessible labeling, sizing, playground, and portable stories.
+---
+
+import { BoringAvatarDemo } from "@/examples/boring-avatar-demo";
+import { BoringAvatarVariantsDemo } from "@/examples/boring-avatar-variants-demo";
+import { BoringAvatarPhotoDemo } from "@/examples/boring-avatar-photo-demo";
+import { BoringAvatarPaletteDemo } from "@/examples/boring-avatar-palette-demo";
+import { BoringAvatarPopoverDemo } from "@/examples/boring-avatar-popover-demo";
+
+## Usage
+
+```tsx
+import { BoringAvatar } from "@/components/ui/boring-avatar";
+
+export function Demo() {
+  return <BoringAvatar name="vandor" alt="Vandor" size={48} />;
+}
+```
+
+The wrapper adds no background, border, or shadow. **The original SVG artwork still contains its colored fields and backdrop**: this is not a transparent-silhouette renderer. Unlike Blobatar, there is no additional backdrop option, animation, expression control, or pointer tracking.
+
+Generation runs locally through `boring-avatars`, without an avatar-service request. Names are case-sensitive and are not trimmed or normalized. Prefer a stable public ID over sensitive personal data. Identical names, variants, and palettes produce identical artwork within the installed generator version; upgrades may change the mapping.
+
+<ComponentPreview name="boring-avatar-demo" title="boring-avatar-demo.tsx">
+  <BoringAvatarDemo />
+</ComponentPreview>
+
+Requires React 19, Tailwind CSS 4, Base UI 1.8+, `boring-avatars` 2.0.4+, and `cn`. Installation adds only the wrapper and declared packages, not a separate Avatar component. No extra stylesheet or theme tokens are required for the avatar itself. Source can be copied manually after installing these packages.
+
+## Variants
+
+`beam` is the default face style. `marble`, `pixel`, `sunset`, `ring`, and `bauhaus` expose the original generator artwork. Change the variant in the playground to inspect the same identity in all six styles.
+
+<ComponentPreview
+  name="boring-avatar-variants-demo"
+  title="boring-avatar-variants-demo.tsx"
+>
+  <BoringAvatarVariantsDemo />
+</ComponentPreview>
+
+## Profile Photos
+
+Pass `src` for a profile photo. The generated fallback stays visible during loading and after a failure. A loaded photo replaces it. Changing `src` starts the new image lifecycle; removing it restores the generated avatar. `alt` labels whichever image is visible.
+
+<ComponentPreview
+  name="boring-avatar-photo-demo"
+  title="boring-avatar-photo-demo.tsx"
+>
+  <BoringAvatarPhotoDemo />
+</ComponentPreview>
+
+## Palette and Shape
+
+`colors` accepts a non-empty array of hexadecimal colors. Omit it or pass an empty array to use the upstream palette: `#92A1C6`, `#146A7C`, `#F0AB3D`, `#C271B4`, and `#C20D90`. Beam chooses dark or light facial features based on the body color, so use six-digit hex colors for predictable contrast. The playground provides default, warm, and cool presets.
+
+`square` affects both the SVG clipping and profile photo. By default both are circular. `size` controls the wrapper; explicit `style` dimensions override it and the artwork fills the wrapper.
+
+<ComponentPreview
+  name="boring-avatar-palette-demo"
+  title="boring-avatar-palette-demo.tsx"
+>
+  <BoringAvatarPaletteDemo />
+</ComponentPreview>
+
+## Actionable Avatar
+
+Wrap the avatar in a real button or link for actions. Here the button labels the action and the avatar is decorative to avoid a repeated accessible label. The trigger retains a minimum 44px hit area and a visible keyboard focus ring. Escape or an outside click closes the popover.
+
+Install Popover separately for this example:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/boring-avatar.json https://vandor-ui.vercel.app/r/popover.json
+```
+
+<ComponentPreview
+  name="boring-avatar-popover-demo"
+  title="boring-avatar-popover-demo.tsx"
+>
+  <BoringAvatarPopoverDemo />
+</ComponentPreview>
+
+The same button composition works with Dropdown, Dialog, or Drawer. Those overlays are not BoringAvatar dependencies and must be installed separately.
+
+## Behavior and Accessibility
+
+`alt` defaults to `""`, making the avatar decorative when a name is already visible beside it. Provide an accessible label for a standalone avatar. The generated SVG uses that label rather than exposing the seed as a title. A photo uses the same alternative text.
+
+Native span attributes, handlers, styles, and React 19 refs target the outer span. Children and Base UI's `render` prop are not exposed. The avatar itself is not interactive, focusable, or a status indicator. Announce presence and other meaningful states separately in text. All artwork is static, including under reduced motion.
+
+SVG generation requires no remote request or `data:` image permission. Profile URLs still need allowed CSP origins; the example's inline photo requires `data:` in `img-src`. Custom palettes must remain legible in both themes.
+
+## Portable Storybook Stories
+
+Install BoringAvatar first, then optionally install its stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/boring-avatar-stories.json
+```
+
+Stories import the colocated `./boring-avatar`. The stories item does not reinstall the component, install Storybook packages, or change `.storybook/`. Use matching Storybook React packages in your existing setup (types checked against `@storybook/react` 10.6.1), React 19, Tailwind CSS 4, and your consumer theme. Include `**/*.stories.tsx` under your configured UI directory in your stories glob. No extra CSS or optional addons are required.
+
+Ordinary installation includes neither stories nor Storybook dependencies. Storybook UI is not verified here because this project has no Storybook server.

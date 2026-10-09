@@ -489,6 +489,28 @@
       ]
     },
     {
+      "name": "boring-avatar",
+      "type": "registry:ui",
+      "title": "BoringAvatar",
+      "description": "Local Boring Avatars artwork with six variants, profile photo fallback, and no extra wrapper background.",
+      "dependencies": ["@base-ui/react@^1.8.0", "boring-avatars@^2.0.4", "cn"],
+      "files": [
+        { "path": "registry/new-york/boring-avatar.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "boring-avatar-stories",
+      "type": "registry:item",
+      "title": "BoringAvatar Stories",
+      "description": "Optional portable BoringAvatar stories. Install BoringAvatar first; no component or Storybook configuration is overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/boring-avatar.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "blobatar",
       "type": "registry:ui",
       "title": "Blobatar",
