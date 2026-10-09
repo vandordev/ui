@@ -3,6 +3,23 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Item-based panels and router-native navigation with smooth Motion indicators and three variants.",
+      "dependencies": ["@base-ui/react@^1.8.0", "cn@^0.4.0", "motion@^12.38.0"],
+      "files": [{ "path": "registry/new-york/tabs.tsx", "type": "registry:ui" }]
+    },
+    {
+      "name": "tabs-stories",
+      "type": "registry:item",
+      "title": "Tabs Stories",
+      "description": "Optional portable stories. Install Tabs first and use your existing matching Storybook React packages.",
+      "files": [
+        { "path": "registry/new-york/tabs.stories.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
       "name": "autocomplete",
       "type": "registry:ui",
       "title": "Autocomplete",

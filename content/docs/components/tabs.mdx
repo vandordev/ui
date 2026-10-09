@@ -1,0 +1,134 @@
+---
+title: Tabs
+description: Declare panels once, or pass your router links directly. Three variants with smooth Motion indicators.
+component: tabs
+credits:
+  - name: Base UI
+    url: https://base-ui.com/react/components/tabs
+    contribution: Accessible panel selection and keyboard behavior. Vandor UI supplies the item-based API, navigation composition, styling, and Motion indicators.
+  - name: Motion
+    url: https://motion.dev/docs/react-layout-animations
+    contribution: Shared-layout indicators and panel fades.
+---
+
+import { TabsDemo } from "@/examples/tabs-demo";
+import { TabsLinksDemo } from "@/examples/tabs-links-demo";
+import { TabsControlledDemo } from "@/examples/tabs-controlled-demo";
+
+## Usage
+
+Declare each panel once. Labels, triggers, panels, and accessible relationships are generated internally.
+
+```tsx
+import { Tabs } from "@/components/ui/tabs";
+
+export function ProjectTabs() {
+  return (
+    <Tabs
+      aria-label="Project sections"
+      items={[
+        {
+          value: "overview",
+          label: "Overview",
+          content: <p>Project overview.</p>,
+        },
+        {
+          value: "activity",
+          label: "Activity",
+          content: <p>Recent activity.</p>,
+        },
+      ]}
+    />
+  );
+}
+```
+
+Use your configured UI alias if it differs. Labels and content accept React nodes. Give panels unique, stable string values; do not put interactive controls inside a tab label. Empty collections render nothing, so asynchronously loaded navigation does not invent a tablist before its links arrive.
+
+## Examples
+
+<ComponentPreview name="tabs-demo" title="tabs-demo.tsx">
+  <TabsDemo />
+</ComponentPreview>
+
+### Variants and Orientation
+
+`underline` is the default, with a thin active rule. `pill` adds a rounded accent highlight without a track. `segmented` uses a muted track with a bordered active surface. All support `orientation="vertical"`; panel mode places content beside the list. Horizontal lists scroll inside their container instead of wrapping labels.
+
+### Router Links, No Adapter
+
+Use a homogeneous collection of `link` items instead of panels. Put the label inside the link once. Native anchors, Next.js `Link`, and TanStack Router `Link` keep their own destination and router-specific props. Tabs does not inspect `href` or `to`.
+
+The runnable example intercepts clicks and updates demo-owned active state. It does not navigate to real pages.
+
+<ComponentPreview name="tabs-links-demo" title="tabs-links-demo.tsx">
+  <TabsLinksDemo />
+</ComponentPreview>
+
+For TanStack Start, derive `active` from the router. This illustrative fragment belongs in a client module; `Link` destinations must exist in your generated route tree:
+
+```tsx
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Tabs } from "@/components/ui/tabs";
+
+export function ProjectNavigation() {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  return (
+    <Tabs
+      aria-label="Project navigation"
+      items={[
+        {
+          link: <Link to="/overview">Overview</Link>,
+          active: pathname === "/overview",
+        },
+        {
+          link: <Link to="/activity">Activity</Link>,
+          active: pathname === "/activity",
+        },
+      ]}
+    />
+  );
+}
+```
+
+For Next.js, use `Link` from `next/link`, `href` on each element, and `usePathname()` for route matching. For plain anchors, pass `<a href="...">Label</a>`. No router package is installed by Tabs.
+
+Mark at most one link item active. Active state is controlled exclusively by your application, so canceled navigation, loading routes, and browser Back/Forward do not get a separate optimistic selection. Match nested routes and query parameters according to your product. For dynamic/reordered link collections, provide a stable item `key` or a keyed link element.
+
+Links must forward received `className`, ARIA attributes, event handlers, and ref to a single anchor. Existing handlers and refs are composed using Base UI `useRender`. Ordinary, modified, and middle clicks remain native link behavior. Tabs does not make links disabled; hide unavailable routes or implement that policy in your application. Do not mix link items and panel items; TypeScript rejects that collection.
+
+### Controlled State and Drafts
+
+Use `value` and `onValueChange` for controlled panels. Omit `defaultValue` to start at the first enabled panel; `null` explicitly selects none. In uncontrolled mode, Base UI falls back when the selected item is removed or disabled; callbacks receive the next value (possibly `null`) and event details. Call `details.cancel()` to reject a user-initiated change, not an automatic fallback.
+
+<ComponentPreview name="tabs-controlled-demo" title="tabs-controlled-demo.tsx">
+  <TabsControlledDemo />
+</ComponentPreview>
+
+Inactive panels unmount by default, resetting local state when revisited. `keepMounted` preserves all panel DOM and local state; inactive panels remain hidden and unavailable for interaction. Account for effects and data fetching in mounted content. Controlled selection must reference an enabled item; Tabs does not silently rewrite application-owned state.
+
+### Consumer Setup and Optional Stories
+
+Requires React 19, Tailwind CSS 4 with shadcn theme tokens (`background`, `foreground`, `muted`, `muted-foreground`, `accent`, `border`, `ring`), `@base-ui/react@^1.8.0`, `cn@^0.4.0`, and `motion@^12.38.0`. The component includes its client boundary and no website-only imports or extra CSS. A Server Component can import it; callbacks and state must originate in a client module. React elements passed from a server still follow your framework's serialization rules.
+
+The registry follows your configured UI alias. Review overwrite prompts if you already have a customized `tabs.tsx`; the Vandor item-based API differs from shadcn's compound Tabs API.
+
+Install Tabs first, then optionally add its separate stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/tabs-stories.json
+```
+
+Use your existing matching `@storybook/react` packages (typed and composed with 10.6.1), discover `**/*.stories.tsx` in your UI directory, and load your global Tailwind/theme stylesheet. Stories use relative imports, need no addons, and do not reinstall Tabs or modify Storybook configuration. This project has no Storybook server; Storybook UI verification is not performed.
+
+## Behavior & Accessibility
+
+- Panel mode uses Base UI tablist/tab/tabpanel semantics, unique IDs, visible focus, and label relationships. Name the list using `aria-label` or `aria-labelledby`.
+- Manual activation is the default: arrows and Home/End move focus; Enter/Space selects. `activationMode="automatic"` selects on focus, best for instantly available content. Vertical lists use Up/Down; horizontal lists use Left/Right and preserve normal Up/Down page scrolling.
+- Disabled panel items cannot be selected, but Base UI keeps them keyboard-focusable so they can be discovered.
+- Link mode renders a labeled `nav` with actual links and `aria-current="page"`, without invented panel relationships or tab keyboard semantics.
+- Each instance owns its Motion layout namespace. The active indicator moves over 240ms with an ease-out curve, without bounce; panels fade in over 160ms without delaying selection or retaining outgoing interactive panels. Initial active content is visible without a first-paint fade.
+- `animated={false}` or a reduced-motion preference makes indicator movement and panel fades immediate.
+- `className` styles the root, `listClassName` the bar, and `contentClassName` each panel. Component-specific item props are documented above; arbitrary trigger/panel props and children overrides are not public APIs.

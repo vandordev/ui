@@ -23,6 +23,7 @@ import { PropsReference } from "@/components/props-reference";
 import { SelectPlayground } from "@/components/select-playground";
 import { StatsCardPlayground } from "@/components/stats-card-playground";
 import { SwitchPlayground } from "@/components/switch-playground";
+import { TabsPlayground } from "@/components/tabs-playground";
 import { ToastPlayground } from "@/components/toast-playground";
 import { TooltipPlayground } from "@/components/tooltip-playground";
 import { componentDocDefinitions } from "@/lib/component-docs";
@@ -60,6 +61,7 @@ const playgrounds: Record<string, () => ReactNode> = {
   select: SelectPlayground,
   "stats-card": StatsCardPlayground,
   switch: SwitchPlayground,
+  tabs: TabsPlayground,
   textarea: () => <InputFamilyPlayground component="textarea" />,
   toast: ToastPlayground,
   tooltip: TooltipPlayground,

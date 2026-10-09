@@ -100,6 +100,7 @@ import {
   getSwitchCode,
   getSwitchDefaults,
 } from "@/lib/switch-playground";
+import { tabsProps, getTabsCode, getTabsDefaults } from "@/lib/tabs-playground";
 import {
   getToastCode,
   getToastDefaults,
@@ -214,6 +215,12 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
       "Switch forwards Base UI Root props, handlers, state-aware className/style and React 19 refs. Children are reserved for the thumb. The default root is a span with switch semantics and a native input; use an enclosing label or Base UI Field.",
     playground: { code: getSwitchCode(getSwitchDefaults()) },
     props: switchProps,
+  },
+  tabs: {
+    nativePropsDescription:
+      "Tabs forwards native div attributes/ref to the panel root, or nav attributes/ref to the navigation root, except children. aria-label/aria-labelledby labels the tablist in panel mode and the nav in link mode. Root state/layout, generated children and navigation semantics are managed internally; link elements must forward DOM props and refs to their anchor.",
+    playground: { code: getTabsCode(getTabsDefaults()) },
+    props: tabsProps,
   },
   toast: {
     playground: { code: getToastCode(getToastDefaults()) },
