@@ -25,6 +25,12 @@ The preview contrasts floating and static labels while keeping each field native
   <InputDemo />
 </ComponentPreview>
 
+### Optional Storybook Stories
+
+Install Input first, then run `npx shadcn@latest add https://vandor-ui.vercel.app/r/input-stories.json`. The stories use relative imports and install beside the component under your configured UI alias. They cover label styles, icons, controlled state, and disabled/read-only/invalid fields.
+
+Use existing, matching `@storybook/react` packages (verified with 10.6.1), discover `**/*.stories.tsx` in your UI directory, and load your global Tailwind/theme stylesheet. No addons, extra packages, core overwrites, or Storybook config edits are required. Default-value Controls remount uncontrolled examples; controlled examples manage local demo state. Storybook UI is not verified because this project has no Storybook server.
+
 ## Behavior & Accessibility
 
 Labels remain associated with the native field. Floating fields are 40px tall: labels rise to a notch in the top border while focused, autofilled, or nonempty. The decorative `fieldset`/`legend` opens the border without an opaque background patch or a second accessible label. Their horizontal position stays fixed when values are cleared, including fields with icons. Use `aria-invalid` and `aria-describedby` to connect validation feedback. Native disabled and read-only behavior is preserved.

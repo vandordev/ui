@@ -82,6 +82,12 @@ Use `className` for wrapper layout and inherited color. Use `variantProps.classN
 <Loading variant="pulsating-dots" variantProps={{ duration: 1.5 }} />
 ```
 
+## Optional Storybook Stories
+
+Install Loading first, then run `npx shadcn@latest add https://vandor-ui.vercel.app/r/loading-stories.json`. Stories cover all 47 variants, text, CSS sizes, variant-specific options, and an accessible busy region. The Playground variant control is the lowest-cost way to inspect one animation at a time; AllVariants runs the whole catalog. Change your OS/browser reduced-motion preference to inspect the static fallback, which is not a component prop.
+
+Stories install beside Loading under your configured UI alias and use relative imports. Keep Loading's installed animation snapshot and license. Use your existing matching `@storybook/react` packages (verified with 10.6.1), discover `**/*.stories.tsx`, and load your global Tailwind/theme stylesheet. No addons, extra packages, core overwrites, or Storybook config edits are required. Storybook UI is not verified because no server exists here.
+
 ## Accessibility
 
 The wrapper is a `div` with `role="status"` and the default accessible name `Loading`. Native div props and its ref are forwarded to the wrapper. All animated visuals are hidden from assistive technology to avoid duplicate announcements.

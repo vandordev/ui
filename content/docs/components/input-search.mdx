@@ -25,6 +25,12 @@ This uncontrolled example starts populated so the clear action and focus restora
   <InputSearchDemo />
 </ComponentPreview>
 
+### Optional Storybook Stories
+
+Install Input Search first, then run `npx shadcn@latest add https://vandor-ui.vercel.app/r/input-search-stories.json`. Stories cover clearable and empty queries, controlled search, label styles, and disabled/read-only/invalid states. Search stays local; no data service is required.
+
+Stories install beside Input Search under your configured UI alias and use relative imports. Use your existing matching `@storybook/react` packages (verified with 10.6.1), discover `**/*.stories.tsx`, and load your global Tailwind/theme stylesheet. No addons, extra packages, core overwrites, or Storybook config edits are required. Default-value Controls remount uncontrolled examples; Controlled owns local state. Storybook UI is not verified because no server exists here.
+
 ## Behavior & Accessibility
 
 The clear button is available only for a nonempty editable value, clears the field, and restores focus to it. Search debouncing and requests remain the caller's responsibility.

@@ -25,6 +25,12 @@ The example sets a native row count and preserves the multiline input semantics.
   <TextAreaDemo />
 </ComponentPreview>
 
+### Optional Storybook Stories
+
+Install TextArea first, then run `npx shadcn@latest add https://vandor-ui.vercel.app/r/textarea-stories.json`. Stories cover rows, controlled character counts, and disabled/read-only/invalid fields.
+
+Stories install beside TextArea under your configured UI alias and use relative imports. Use your existing matching `@storybook/react` packages (verified with 10.6.1), discover `**/*.stories.tsx`, and load your global Tailwind/theme stylesheet. No addons, extra packages, core overwrites, or Storybook config edits are required. Default-value Controls remount uncontrolled examples; CharacterCount owns local state. Storybook UI is not verified because no server exists here.
+
 ## Behavior & Accessibility
 
 The optional static label is associated with the textarea. `aria-invalid` and `aria-describedby` can expose validation state and supporting text. Disabled and read-only states follow native semantics.

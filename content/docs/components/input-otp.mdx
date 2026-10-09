@@ -25,6 +25,12 @@ Completion feedback reports that the code is ready without printing the code its
   <InputOTPDemo />
 </ComponentPreview>
 
+### Optional Storybook Stories
+
+Install Input OTP first, then run `npx shadcn@latest add https://vandor-ui.vercel.app/r/input-otp-stories.json`. Stories cover numeric/alphanumeric and partial/complete codes, configurable length, controlled completion feedback, and disabled/read-only/invalid states. The Complete story starts filled; `onComplete` fires for user changes, not initial values. Codes are demo-only and are not submitted to a service.
+
+Stories install beside Input OTP under your configured UI alias and use relative imports. Use your existing matching `@storybook/react` packages (verified with 10.6.1), discover `**/*.stories.tsx`, and load your global Tailwind/theme stylesheet. No addons, extra packages, core overwrites, or Storybook config edits are required. Length, type, and default-value Controls remount uncontrolled examples; ControlledCompletion owns local state. Storybook UI is not verified because no server exists here.
+
 ## Behavior & Accessibility
 
 The visual cells are decorative; one native input supports keyboard editing, paste, and one-time-code autofill. `onComplete` runs only when a user edit changes the value to a complete code. Give the control an accessible name.

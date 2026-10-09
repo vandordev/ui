@@ -32,6 +32,12 @@ The controlled output shows the application value: international digits without 
   <InputPhoneDemo />
 </ComponentPreview>
 
+### Optional Storybook Stories
+
+Install Input Phone first, then run `npx shadcn@latest add https://vandor-ui.vercel.app/r/input-phone-stories.json`. Stories cover country selection, localized labels, international digits returned to controlled state, and disabled/read-only/invalid states. Controls remount uncontrolled examples when the initial country or number changes.
+
+Stories install beside Input Phone under your configured UI alias and use relative imports. Use your existing matching `@storybook/react` packages (verified with 10.6.1), discover `**/*.stories.tsx`, and load your global Tailwind/theme stylesheet. No addons, extra packages, core overwrites, or Storybook config edits are required. Controlled owns local state and uses an empty string for an empty controlled field. Storybook UI is not verified because no server exists here.
+
 ## Behavior & Accessibility
 
 Country names follow `locale`; the calling-code picker has an accessible name. Partial numbers remain editable and preserve the draft. Formatting does not validate that a number exists, is reachable, or satisfies application rules. Empty input emits `undefined`.

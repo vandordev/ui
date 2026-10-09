@@ -32,6 +32,12 @@ The value readout is the exact raw decimal string, not the localized display tex
   <InputAmountDemo />
 </ComponentPreview>
 
+### Optional Storybook Stories
+
+Install Input Amount first, then run `npx shadcn@latest add https://vandor-ui.vercel.app/r/input-amount-stories.json`. Stories cover decimal-comma formatting, integer and negative amounts, controlled decimal-string output, and disabled/read-only/invalid states. Controls offer a space or no thousands separator, avoiding a collision when you change the decimal separator.
+
+Stories install beside Input Amount under your configured UI alias and use relative imports. Use your existing matching `@storybook/react` packages (verified with 10.6.1), discover `**/*.stories.tsx`, and load your global Tailwind/theme stylesheet. No addons, extra packages, core overwrites, or Storybook config edits are required. Default-value Controls remount uncontrolled examples; Controlled owns local state. Storybook UI is not verified because no server exists here.
+
 ## Behavior & Accessibility
 
 Formatting preserves normal caret and paste editing. Values are never converted to floating-point numbers. `onValueChange` receives raw decimal text with `.` as the decimal separator, or `""` when cleared. The formatted display is not a substitute for caller-owned form serialization.

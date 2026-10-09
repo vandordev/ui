@@ -37,6 +37,12 @@ The addon is decorative; the editable field keeps its own accessible name.
   <InputGroupDemo />
 </ComponentPreview>
 
+### Optional Storybook Stories
+
+Install Input Group first, then run `npx shadcn@latest add https://vandor-ui.vercel.app/r/input-group-stories.json`. Stories cover all four addon positions, a local search action, textarea composition, and disabled/read-only/invalid states. Controls configure the child input and addon, not the group div. The action example makes no network request.
+
+Stories install beside Input Group under your configured UI alias and use relative imports. Use your existing matching `@storybook/react` packages (verified with 10.6.1), discover `**/*.stories.tsx`, and load your global Tailwind/theme stylesheet. No addons, extra packages, core overwrites, or Storybook config edits are required. Default-value Controls remount uncontrolled examples; WithAction owns local state. Storybook UI is not verified because no server exists here.
+
 ## Behavior & Accessibility
 
 The editable child remains a native input or textarea. Give it its own accessible name; decorative addons do not add tab stops. Group focus and invalid styles follow the contained control.

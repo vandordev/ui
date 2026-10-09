@@ -3,6 +3,123 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "loading-stories",
+      "type": "registry:item",
+      "title": "Loading Stories",
+      "description": "Optional portable Loading stories. Install Loading first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/loading.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input-stories",
+      "type": "registry:item",
+      "title": "Input Stories",
+      "description": "Optional portable Input stories. Install Input first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        { "path": "registry/new-york/input.stories.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "textarea-stories",
+      "type": "registry:item",
+      "title": "TextArea Stories",
+      "description": "Optional portable TextArea stories. Install TextArea first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/textarea.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input-group-stories",
+      "type": "registry:item",
+      "title": "Input Group Stories",
+      "description": "Optional portable Input Group stories. Install Input Group first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/input-group.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input-password-stories",
+      "type": "registry:item",
+      "title": "Input Password Stories",
+      "description": "Optional portable Input Password stories. Install Input Password first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/input-password.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input-search-stories",
+      "type": "registry:item",
+      "title": "Input Search Stories",
+      "description": "Optional portable Input Search stories. Install Input Search first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/input-search.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input-amount-stories",
+      "type": "registry:item",
+      "title": "Input Amount Stories",
+      "description": "Optional portable Input Amount stories. Install Input Amount first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/input-amount.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input-phone-stories",
+      "type": "registry:item",
+      "title": "Input Phone Stories",
+      "description": "Optional portable Input Phone stories. Install Input Phone first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/input-phone.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input-otp-stories",
+      "type": "registry:item",
+      "title": "Input OTP Stories",
+      "description": "Optional portable Input OTP stories. Install Input OTP first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/input-otp.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "input-secret-stories",
+      "type": "registry:item",
+      "title": "Input Secret Stories",
+      "description": "Optional portable Input Secret stories. Install Input Secret first; no component, packages, or Storybook configuration are overwritten.",
+      "files": [
+        {
+          "path": "registry/new-york/input-secret.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "tabs",
       "type": "registry:ui",
       "title": "Tabs",
