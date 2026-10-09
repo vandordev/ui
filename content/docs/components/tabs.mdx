@@ -8,7 +8,7 @@ credits:
     contribution: Accessible panel selection and keyboard behavior. Vandor UI supplies the item-based API, navigation composition, styling, and Motion indicators.
   - name: Motion
     url: https://motion.dev/docs/react-layout-animations
-    contribution: Shared-layout indicators and panel fades.
+    contribution: Local-coordinate indicator transitions and panel fades.
 ---
 
 import { TabsDemo } from "@/examples/tabs-demo";
@@ -129,6 +129,6 @@ Use your existing matching `@storybook/react` packages (typed and composed with 
 - Manual activation is the default: arrows and Home/End move focus; Enter/Space selects. `activationMode="automatic"` selects on focus, best for instantly available content. Vertical lists use Up/Down; horizontal lists use Left/Right and preserve normal Up/Down page scrolling.
 - Disabled panel items cannot be selected, but Base UI keeps them keyboard-focusable so they can be discovered.
 - Link mode renders a labeled `nav` with actual links and `aria-current="page"`, without invented panel relationships or tab keyboard semantics.
-- Each instance owns its Motion layout namespace. The active indicator moves over 240ms with an ease-out curve, without bounce; panels fade in over 160ms without delaying selection or retaining outgoing interactive panels. Initial active content is visible without a first-paint fade.
+- Each instance keeps one indicator canvas anchored to its own tab bar. Motion animates the active surface in local coordinates over 240ms with an ease-out curve, without bounce or a vertical detour when panel height changes. The canvas cannot enlarge the scrollable area; the bar scrolls horizontally only. Panels fade in over 160ms without delaying selection or retaining outgoing interactive panels. Initial active content is visible without a first-paint fade.
 - `animated={false}` or a reduced-motion preference makes indicator movement and panel fades immediate.
 - `className` styles the root, `listClassName` the bar, and `contentClassName` each panel. Component-specific item props are documented above; arbitrary trigger/panel props and children overrides are not public APIs.

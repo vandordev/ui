@@ -3,8 +3,8 @@
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs";
 import { useRender } from "@base-ui/react/use-render";
 import { cn } from "cn";
-import { LayoutGroup, motion, useReducedMotion } from "motion/react";
-import { useEffect, useId, useRef } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { ComponentProps, ReactElement, ReactNode, RefObject } from "react";
 
 type TabsVariant = "underline" | "pill" | "segmented";
@@ -72,7 +72,7 @@ const transition = { duration: 0.24, ease: [0.22, 1, 0.36, 1] as const };
 
 const listClasses = (variant: TabsVariant, vertical: boolean) =>
   cn(
-    "isolate flex w-fit max-w-full items-center",
+    "relative isolate flex w-max items-center",
     vertical ? "flex-col items-stretch" : "min-w-0",
     variant === "underline" &&
       (vertical
@@ -99,61 +99,147 @@ const Indicator = ({
 }) => {
   const reduceMotion = useReducedMotion();
   const enabled = animated && !reduceMotion;
+  // A single local canvas never projects between trigger parents. Moving a
+  // centered preview or resizing its panel cannot add a viewport-space detour.
+  const ref = useRef<SVGSVGElement>(null);
+  const [box, setBox] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
+  useLayoutEffect(() => {
+    const list = ref.current?.parentElement;
+    if (!list) {
+      return;
+    }
+    const win = list.ownerDocument.defaultView;
+    if (!win) {
+      return;
+    }
+    const measure = () => {
+      const active = list.querySelector<HTMLElement>(
+        '[data-slot="tabs-trigger"][aria-selected="true"], [data-slot="tabs-link"][aria-current="page"]'
+      );
+      if (!active) {
+        setBox(null);
+        return;
+      }
+      const bounds = list.getBoundingClientRect();
+      const tab = active.getBoundingClientRect();
+      const scaleX =
+        list.offsetWidth && bounds.width ? bounds.width / list.offsetWidth : 1;
+      const scaleY =
+        list.offsetHeight && bounds.height
+          ? bounds.height / list.offsetHeight
+          : 1;
+      let width = tab.width / scaleX;
+      let height = tab.height / scaleY;
+      let x =
+        (tab.left - bounds.left) / scaleX - list.clientLeft + list.scrollLeft;
+      let y = (tab.top - bounds.top) / scaleY - list.clientTop + list.scrollTop;
+      const underline = variant === "underline";
+      if (underline) {
+        if (vertical) {
+          x =
+            win.getComputedStyle(list).direction === "rtl"
+              ? (list.clientWidth || bounds.width / scaleX) - 2
+              : 0;
+          y += 8;
+          width = 2;
+          height = Math.max(0, height - 16);
+        } else {
+          y = (list.clientHeight || bounds.height / scaleY) - 2;
+          height = 2;
+        }
+      }
+      const next = {
+        height,
+        width,
+        x,
+        y,
+      };
+      setBox((previous) =>
+        previous &&
+        previous.x === next.x &&
+        previous.y === next.y &&
+        previous.width === next.width &&
+        previous.height === next.height
+          ? previous
+          : next
+      );
+    };
+    const resize = new win.ResizeObserver(measure);
+    const observeSize = () => {
+      resize.disconnect();
+      resize.observe(list);
+      for (const tab of list.querySelectorAll(
+        '[data-slot="tabs-trigger"], [data-slot="tabs-link"]'
+      )) {
+        resize.observe(tab);
+      }
+      measure();
+    };
+    const mutations = new win.MutationObserver(observeSize);
+    mutations.observe(list, {
+      attributeFilter: ["aria-selected", "aria-current", "dir"],
+      attributes: true,
+      characterData: true,
+      childList: true,
+      subtree: true,
+    });
+    observeSize();
+    win.addEventListener("resize", measure);
+    return () => {
+      mutations.disconnect();
+      resize.disconnect();
+      win.removeEventListener("resize", measure);
+    };
+  }, [variant, vertical]);
   return (
-    <motion.span
+    <svg
+      ref={ref}
       aria-hidden="true"
+      focusable="false"
       data-slot="tabs-indicator"
-      layoutId={enabled ? "active-indicator" : undefined}
-      initial={false}
-      transition={enabled ? transition : { duration: 0 }}
-      className={cn(
-        "pointer-events-none absolute",
-        variant === "underline"
-          ? cn(
-              "bg-foreground",
-              vertical
-                ? "inset-y-2 -start-px w-0.5"
-                : "inset-x-0 -bottom-px h-0.5"
-            )
-          : "inset-0 rounded-md",
-        variant === "pill" && "bg-accent",
-        variant === "segmented" && "border border-border bg-background"
+      className="pointer-events-none absolute inset-0 h-full w-full overflow-hidden"
+    >
+      {box && box.width > 0 && box.height > 0 && (
+        <motion.rect
+          initial={false}
+          animate={{
+            attrX: box.x,
+            attrY: box.y,
+            height: box.height,
+            width: box.width,
+          }}
+          transition={enabled ? transition : { duration: 0 }}
+          rx={variant === "underline" ? 0 : 6}
+          className={cn(
+            variant === "underline" && "fill-foreground",
+            variant === "pill" && "fill-accent",
+            variant === "segmented" && "fill-background stroke-border"
+          )}
+          vectorEffect="non-scaling-stroke"
+        />
       )}
-      style={variant === "underline" ? undefined : { borderRadius: 6 }}
-    />
+    </svg>
   );
 };
 
 const TabButton = ({
   nativeProps,
-  active,
-  variant,
-  vertical,
-  animated,
 }: {
   nativeProps: ComponentProps<"button">;
-  active: boolean;
-  variant: TabsVariant;
-  vertical: boolean;
-  animated: boolean;
 }) =>
   useRender({
     defaultTagName: "button",
     props: {
       ...nativeProps,
       children: (
-        <>
-          {active && (
-            <Indicator
-              variant={variant}
-              vertical={vertical}
-              animated={animated}
-            />
-          )}
-          <span className="relative z-10 inline-flex items-center gap-2">
-            {nativeProps.children}
-          </span>
-        </>
+        <span className="relative z-10 inline-flex items-center gap-2">
+          {nativeProps.children}
+        </span>
       ),
     },
     ref: nativeProps.ref,
@@ -162,13 +248,9 @@ const TabButton = ({
 const NavigationItem = ({
   item,
   variant,
-  vertical,
-  animated,
 }: {
   item: TabsLinkItem;
   variant: TabsVariant;
-  vertical: boolean;
-  animated: boolean;
 }) => {
   const link = useRender({
     defaultTagName: "a",
@@ -180,14 +262,7 @@ const NavigationItem = ({
     },
     render: item.link,
   });
-  return (
-    <div className="relative shrink-0">
-      {item.active && (
-        <Indicator variant={variant} vertical={vertical} animated={animated} />
-      )}
-      {link}
-    </div>
-  );
+  return <div className="relative shrink-0">{link}</div>;
 };
 
 const PanelBody = ({
@@ -243,35 +318,39 @@ const Tabs = <Value extends string = string>(props: TabsProps<Value>) => {
       ...nativeProps
     } = props;
     return (
-      <LayoutGroup id={id}>
-        <nav
-          {...nativeProps}
-          data-slot="tabs"
-          data-variant={variant}
-          data-orientation={orientation}
-          className={cn("max-w-full", className)}
+      <nav
+        {...nativeProps}
+        data-slot="tabs"
+        data-variant={variant}
+        data-orientation={orientation}
+        className={cn("max-w-full", className)}
+      >
+        <div
+          className="max-w-full overflow-x-auto overflow-y-hidden p-1"
+          style={{ overflowY: "hidden" }}
         >
-          <motion.div layoutScroll className="max-w-full overflow-x-auto p-1">
-            <div
-              data-slot="tabs-list"
-              className={cn(
-                listClasses(variant, orientation === "vertical"),
-                listClassName
-              )}
-            >
-              {items.map((item, index) => (
-                <NavigationItem
-                  key={item.key ?? item.link.key ?? index}
-                  item={item}
-                  variant={variant}
-                  vertical={orientation === "vertical"}
-                  animated={animated}
-                />
-              ))}
-            </div>
-          </motion.div>
-        </nav>
-      </LayoutGroup>
+          <div
+            data-slot="tabs-list"
+            className={cn(
+              listClasses(variant, orientation === "vertical"),
+              listClassName
+            )}
+          >
+            {items.map((item, index) => (
+              <NavigationItem
+                key={item.key ?? item.link.key ?? index}
+                item={item}
+                variant={variant}
+              />
+            ))}
+            <Indicator
+              variant={variant}
+              vertical={orientation === "vertical"}
+              animated={animated}
+            />
+          </div>
+        </div>
+      </nav>
     );
   }
 
@@ -291,95 +370,94 @@ const Tabs = <Value extends string = string>(props: TabsProps<Value>) => {
     ...rootProps
   } = props as TabsPanelProps<Value>;
   return (
-    <LayoutGroup id={id}>
-      <TabsPrimitive.Root
-        {...rootProps}
-        defaultValue={
-          defaultValue === undefined
-            ? (items.find((item) => !item.disabled)?.value ?? null)
-            : defaultValue
-        }
-        orientation={orientation}
-        data-slot="tabs"
-        data-variant={variant}
-        className={cn(
-          "flex min-w-0 gap-4",
-          orientation === "vertical" ? "flex-row" : "flex-col",
-          className
-        )}
+    <TabsPrimitive.Root
+      {...rootProps}
+      defaultValue={
+        defaultValue === undefined
+          ? (items.find((item) => !item.disabled)?.value ?? null)
+          : defaultValue
+      }
+      orientation={orientation}
+      data-slot="tabs"
+      data-variant={variant}
+      className={cn(
+        "flex min-w-0 gap-4",
+        orientation === "vertical" ? "flex-row" : "flex-col",
+        className
+      )}
+    >
+      <div
+        className="max-w-full shrink-0 overflow-x-auto overflow-y-hidden p-1"
+        style={{ overflowY: "hidden" }}
       >
-        <motion.div
-          layoutScroll
-          className="max-w-full shrink-0 overflow-x-auto p-1"
+        <TabsPrimitive.List
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          activateOnFocus={activationMode === "automatic"}
+          data-slot="tabs-list"
+          className={cn(
+            listClasses(variant, orientation === "vertical"),
+            listClassName
+          )}
         >
-          <TabsPrimitive.List
-            aria-label={ariaLabel}
-            aria-labelledby={ariaLabelledBy}
-            activateOnFocus={activationMode === "automatic"}
-            data-slot="tabs-list"
-            className={cn(
-              listClasses(variant, orientation === "vertical"),
-              listClassName
-            )}
-          >
-            {items.map((item) => (
-              <TabsPrimitive.Tab
-                key={item.value}
-                value={item.value}
-                id={`${id}-tab-${encodeURIComponent(item.value)}`}
-                disabled={item.disabled}
-                data-slot="tabs-trigger"
-                className={triggerClasses(variant)}
-                render={(nativeProps, state) => (
-                  <TabButton
-                    nativeProps={{
-                      ...nativeProps,
-                      "aria-controls":
-                        state.active || keepMounted
-                          ? `${id}-panel-${encodeURIComponent(item.value)}`
-                          : undefined,
-                    }}
-                    active={state.active}
-                    variant={variant}
-                    vertical={orientation === "vertical"}
-                    animated={animated}
-                  />
-                )}
+          {items.map((item) => (
+            <TabsPrimitive.Tab
+              key={item.value}
+              value={item.value}
+              id={`${id}-tab-${encodeURIComponent(item.value)}`}
+              disabled={item.disabled}
+              data-slot="tabs-trigger"
+              className={triggerClasses(variant)}
+              render={(nativeProps, state) => (
+                <TabButton
+                  nativeProps={{
+                    ...nativeProps,
+                    "aria-controls":
+                      state.active || keepMounted
+                        ? `${id}-panel-${encodeURIComponent(item.value)}`
+                        : undefined,
+                  }}
+                />
+              )}
+            >
+              {item.label}
+            </TabsPrimitive.Tab>
+          ))}
+          <Indicator
+            variant={variant}
+            vertical={orientation === "vertical"}
+            animated={animated}
+          />
+        </TabsPrimitive.List>
+      </div>
+      {items.map((item) => (
+        <TabsPrimitive.Panel
+          key={item.value}
+          value={item.value}
+          id={`${id}-panel-${encodeURIComponent(item.value)}`}
+          aria-labelledby={`${id}-tab-${encodeURIComponent(item.value)}`}
+          keepMounted={keepMounted}
+          data-slot="tabs-content"
+          className={cn(
+            "min-w-0 flex-1 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+            contentClassName
+          )}
+          render={(nativeProps, state) => (
+            <div {...nativeProps}>
+              <PanelBody
+                hidden={state.hidden}
+                animated={animated}
+                hydrated={hydrated}
               >
-                {item.label}
-              </TabsPrimitive.Tab>
-            ))}
-          </TabsPrimitive.List>
-        </motion.div>
-        {items.map((item) => (
-          <TabsPrimitive.Panel
-            key={item.value}
-            value={item.value}
-            id={`${id}-panel-${encodeURIComponent(item.value)}`}
-            aria-labelledby={`${id}-tab-${encodeURIComponent(item.value)}`}
-            keepMounted={keepMounted}
-            data-slot="tabs-content"
-            className={cn(
-              "min-w-0 flex-1 text-sm outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
-              contentClassName
-            )}
-            render={(nativeProps, state) => (
-              <div {...nativeProps}>
-                <PanelBody
-                  hidden={state.hidden}
-                  animated={animated}
-                  hydrated={hydrated}
-                >
-                  {nativeProps.children}
-                </PanelBody>
-              </div>
-            )}
-          >
-            {item.content}
-          </TabsPrimitive.Panel>
-        ))}
-      </TabsPrimitive.Root>
-    </LayoutGroup>
+                {nativeProps.children}
+              </PanelBody>
+            </div>
+          )}
+        >
+          {item.content}
+        </TabsPrimitive.Panel>
+      ))}
+    </TabsPrimitive.Root>
   );
 };
 

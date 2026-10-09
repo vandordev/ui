@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const { after, afterEach, test } = require("node:test");
 const { existsSync } = require("node:fs");
 const { createJiti } = require("jiti");
+const { setTimeout: delay } = require("node:timers/promises");
 let React, Tabs, createRoot, dom, host, root;
 const ready = (async () => {
   const { Window } = await import("happy-dom");
@@ -71,6 +72,156 @@ afterEach(async () => {
 after(async () => {
   await ready;
   await dom.happyDOM.abort();
+});
+// Happy DOM has no layout engine. Supply only the geometry boundary; Motion,
+// selection and observer updates remain real. This does not verify browser paint.
+const provideTabGeometry = (list, { top = 100, left = 20 } = {}) => {
+  list.getBoundingClientRect = () => ({ height: 40, left, top, width: 300 });
+  for (const [index, tab] of [
+    ...list.querySelectorAll(
+      '[data-slot="tabs-trigger"], [data-slot="tabs-link"]'
+    ),
+  ].entries()) {
+    tab.getBoundingClientRect = () => ({
+      height: 40,
+      left: left + index * 100,
+      top,
+      width: 90,
+    });
+  }
+};
+
+test("Tabs animated horizontal indicator keeps its vertical coordinate throughout a centered-container move", async () => {
+  await ready;
+  await mount({ animated: true, items: panelItems() });
+  const list = host.querySelector('[data-slot="tabs-list"]');
+  provideTabGeometry(list);
+  await React.act(async () => window.dispatchEvent(new dom.Event("resize")));
+  const surface = host.querySelector('[data-slot="tabs-indicator"] rect');
+  provideTabGeometry(list, { top: 60 });
+  await React.act(async () => list.querySelectorAll('[role="tab"]')[2].click());
+  for (let frame = 0; frame < 20; frame += 1) {
+    await React.act(async () => delay(20));
+    assert.equal(
+      Number(surface.getAttribute("y")),
+      38,
+      "Horizontal motion must not inherit the parent viewport displacement"
+    );
+  }
+  assert.equal(Number(surface.getAttribute("x")), 200);
+});
+
+test("Tabs local indicator updates vertical and RTL geometry and disappears for unselected controlled panels", async () => {
+  await ready;
+  await mount({
+    dir: "rtl",
+    items: panelItems(),
+    orientation: "vertical",
+    value: "activity",
+  });
+  const list = host.querySelector('[data-slot="tabs-list"]');
+  list.getBoundingClientRect = () => ({
+    height: 140,
+    left: 20,
+    top: 100,
+    width: 90,
+  });
+  for (const [index, tab] of [
+    ...list.querySelectorAll('[role="tab"]'),
+  ].entries()) {
+    tab.getBoundingClientRect = () => ({
+      height: 40,
+      left: 20,
+      top: 100 + index * 50,
+      width: 90,
+    });
+  }
+  // Happy DOM does not inherit direction without a stylesheet/layout engine.
+  list.style.direction = "rtl";
+  await React.act(async () => window.dispatchEvent(new dom.Event("resize")));
+  const surface = host.querySelector('[data-slot="tabs-indicator"] rect');
+  assert.equal(Number(surface.getAttribute("x")), 88);
+  assert.equal(Number(surface.getAttribute("y")), 108);
+  assert.equal(Number.parseFloat(surface.getAttribute("width")), 2);
+  assert.equal(Number.parseFloat(surface.getAttribute("height")), 24);
+  await React.act(async () =>
+    root.render(
+      React.createElement(Tabs, {
+        animated: false,
+        "aria-label": "Sections",
+        items: panelItems(),
+        orientation: "vertical",
+        value: null,
+      })
+    )
+  );
+  assert.ok(
+    host.querySelector('[data-slot="tabs-indicator"] rect') === null,
+    "No selection must not retain an active surface"
+  );
+});
+
+test("Tabs indicator retains local horizontal coordinates when panel selection moves the entire list", async () => {
+  await ready;
+  await mount({ items: panelItems() });
+  const list = host.querySelector('[data-slot="tabs-list"]');
+  const indicator = host.querySelector('[data-slot="tabs-indicator"]');
+  provideTabGeometry(list);
+  await React.act(async () => window.dispatchEvent(new dom.Event("resize")));
+  const surface = indicator.firstElementChild;
+  assert.equal(surface.getAttribute("y"), "38");
+  // Moving the whole list must not become a vertical indicator animation.
+  provideTabGeometry(list, { top: 70 });
+  await React.act(async () => list.querySelectorAll('[role="tab"]')[2].click());
+  assert.ok(
+    indicator === host.querySelector('[data-slot="tabs-indicator"]'),
+    "Selection must retain one indicator instead of projecting between different parents"
+  );
+  assert.ok(
+    indicator.parentElement === list,
+    "Indicator must be anchored to the list"
+  );
+  assert.equal(Number.parseFloat(surface.getAttribute("width")), 90);
+  assert.equal(surface.getAttribute("x"), "200");
+  assert.equal(surface.getAttribute("y"), "38");
+  const scrollport = list.parentElement;
+  assert.equal(getComputedStyle(scrollport).overflowY, "hidden");
+});
+
+test("Tabs navigation uses the same persistent local indicator when route-owned active state changes", async () => {
+  await ready;
+  const items = (active) =>
+    ["overview", "activity"].map((value) => ({
+      active: value === active,
+      key: value,
+      link: React.createElement("a", { href: `/${value}` }, value),
+    }));
+  await mount({ items: items("overview") });
+  const list = host.querySelector('[data-slot="tabs-list"]');
+  const indicator = host.querySelector('[data-slot="tabs-indicator"]');
+  provideTabGeometry(list);
+  await React.act(async () => window.dispatchEvent(new dom.Event("resize")));
+  provideTabGeometry(list, { left: 40, top: 80 });
+  await React.act(async () =>
+    root.render(
+      React.createElement(Tabs, {
+        animated: false,
+        "aria-label": "Sections",
+        items: items("activity"),
+      })
+    )
+  );
+  assert.ok(
+    indicator === host.querySelector('[data-slot="tabs-indicator"]'),
+    "Route changes must retain the local indicator"
+  );
+  assert.ok(
+    indicator.parentElement === list,
+    "Navigation indicator must be anchored to the list"
+  );
+  assert.equal(indicator.firstElementChild.getAttribute("x"), "100");
+  assert.equal(indicator.firstElementChild.getAttribute("y"), "38");
+  assert.equal(getComputedStyle(list.parentElement).overflowY, "hidden");
 });
 const panelItems = () => [
   {
