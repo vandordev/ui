@@ -1,0 +1,150 @@
+---
+title: AppShell
+description: A responsive application shell with an animated icon rail, contextual navigation, and a mobile drawer.
+component: app-shell
+credits:
+  - name: 7ovr
+    url: https://7ovr.com/
+    contribution: Original app-shell-3 icon-rail layout inspiration, adapted through Universe. The free upstream block is published under MIT-0.
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { AppShellDemo, AppShellCollapsedDemo } from "@/examples/app-shell-demo";
+import { AppShellWorkspaceDemo } from "@/examples/app-shell-workspace-demo";
+import { AppShellHierarchyDemo } from "@/examples/app-shell-hierarchy-demo";
+
+## Usage
+
+```tsx
+"use client";
+
+import { useState } from "react";
+import { AppShell } from "@/components/ui/app-shell";
+
+export default function WorkspaceLayout() {
+  const [active, setActive] = useState("overview");
+
+  return (
+    <AppShell
+      brand={{ name: "Acme" }}
+      navigation={[
+        {
+          id: "overview",
+          label: "Overview",
+          active: active === "overview",
+          onClick: () => setActive("overview"),
+        },
+        {
+          id: "projects",
+          label: "Projects",
+          active: active === "projects",
+          onClick: () => setActive("projects"),
+        },
+      ]}
+    >
+      <h1>{active === "overview" ? "Overview" : "Projects"}</h1>
+    </AppShell>
+  );
+}
+```
+
+AppShell owns the layout and navigation presentation. Your application owns routes, active destinations, resource data, search UI, and account actions. These previews demonstrate local state, not real routing or authentication. AppShell uses states and runnable examples rather than a props playground.
+
+## States
+
+### Expanded
+
+<ComponentPreview name="app-shell-demo" title="app-shell-demo.tsx">
+  <AppShellDemo />
+</ComponentPreview>
+
+Desktop navigation is 15rem wide. Its middle section scrolls independently while the sidebar header and footer stay in place. The top header is sticky in a real application.
+
+### Collapsed icon rail
+
+<ComponentPreview name="app-shell-demo" title="app-shell-demo.tsx">
+  <AppShellCollapsedDemo />
+</ComponentPreview>
+
+The desktop toggle animates the sidebar to 4rem and fades the labels. Standard items retain accessible names and show tooltips in the icon rail. An item without an icon uses the first character of its label. Custom controls must provide their own compact presentation and accessible names.
+
+### Mobile drawer
+
+Below the default Tailwind `md` breakpoint (768px), the desktop sidebar is hidden and the header's menu button opens a left-side Drawer. Try either preview at a mobile viewport. Navigation is always expanded inside the drawer, even when the desktop icon rail is collapsed. Standard destination selection closes the drawer; Escape and the close button also dismiss it. Changing to a desktop viewport closes the mobile drawer.
+
+The preview height overrides are only for embedding examples. Breakpoints follow the viewport, not the preview width; a narrow preview on a desktop viewport does not automatically activate mobile navigation.
+
+## Examples
+
+### Workspace and account controls
+
+<ComponentPreview
+  name="app-shell-workspace-demo"
+  title="app-shell-workspace-demo.tsx"
+>
+  <AppShellWorkspaceDemo />
+</ComponentPreview>
+
+Install [Dropdown](/docs/components/dropdown) separately to run this example. `sidebarHeader` replaces the default brand row and receives `{ collapsed, closeNavigation }`; `sidebarFooter` receives `{ collapsed }`. Both receive `collapsed: false` on mobile. Slots are rendered separately on desktop and mobile: keep shared selection state in the consuming application, not inside a slot-local component.
+
+### Hierarchy and controlled collapse
+
+<ComponentPreview
+  name="app-shell-hierarchy-demo"
+  title="app-shell-hierarchy-demo.tsx"
+>
+  <AppShellHierarchyDemo />
+</ComponentPreview>
+
+Open an agent to replace the middle navigation with a return action, agent switcher, and detail destinations. Return with **All agents**. The brand row and footer are outside the transitioning panel. This example also installs Dropdown separately and controls `collapsed` through `onCollapsedChange`.
+
+`navigationContext={{ key, depth }}` is presentation metadata, not a router or navigation stack. Keep a stable key for each panel and a consistent depth for that key. Changing the key triggers a 220ms slide and fade; increasing depth moves forward and decreasing depth moves back. A different key at the same depth moves forward. Active-item changes and switching resources within the same panel keep the key unchanged and do not replay the hierarchy transition. Without `navigationContext`, navigation updates without panel transitions.
+
+The hierarchy can have more than two levels. Your application supplies each panel's items, return actions, and state. AppShell does not fetch resources, remember history, or manage browser back navigation.
+
+### Navigation item contract
+
+| Property        | Behavior                                                                                                                          |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `id`, `label`   | Required unique identity and accessible label for a standard item.                                                                |
+| `icon`          | Optional decorative React node; the first label character is the fallback.                                                        |
+| `href`          | Uses a native anchor unless disabled. Use `renderControl` for router-specific Link components.                                    |
+| `onClick`       | Called synchronously on selection; mobile navigation closes immediately, without awaiting async work.                             |
+| `active`        | Adds selected styling and `aria-current="page"`; the application determines the active item.                                      |
+| `disabled`      | Standard item becomes a disabled button, including when it has an href.                                                           |
+| `dividerAfter`  | Adds a separator after a standard or custom item.                                                                                 |
+| `renderControl` | Replaces the entire standard control, receives `{ collapsed, closeNavigation }`, and adds no button wrapper or automatic tooltip. |
+
+With `renderControl`, the consumer owns the label, icon, active/disabled behavior, click callback, and mobile closing. The item-level `href`, `onClick`, `active`, and `disabled` do not apply automatically. `id` and `dividerAfter` still apply. Use `closeNavigation()` after a custom selection when dismissal is appropriate.
+
+### Optional search
+
+Supplying `onSearch` enables the search button and a document-level Cmd/Ctrl+K callback. AppShell does not render a search dialog or query results. With no callback, there is no search UI or global listener. Prevented, repeated, and Alt-modified key events are ignored; the shortcut also runs while editing an input. Mount only one search-enabled shell per document to avoid duplicate handlers.
+
+### Consumer setup and optional stories
+
+Requires React 19, Tailwind CSS 4, `motion`, `cn`, and `lucide-react`, together with the Vandor Button, Drawer, and Tooltip registry items. Their transitive registry/package dependencies are installed by the CLI. Use your global Tailwind stylesheet and semantic `background`, `foreground`, `border`, `muted`, `muted-foreground`, `accent`, `accent-foreground`, `ring`, and underlying Button/Drawer theme tokens. Keep the standard Tailwind `md` breakpoint at 768px to match the drawer's desktop media query.
+
+AppShell is a client component and can be imported from a Next.js Server Component. Functions such as navigation callbacks and render slots must be supplied inside a client boundary, not passed from a Server Component as serialized props. Installation uses the configured UI alias in `components.json`, with no fixed target directory. Review CLI overwrite prompts for shared dependencies before replacing customized primitives.
+
+Copying the Source block alone is insufficient: it imports Button, Drawer, and Tooltip. Prefer CLI installation; for manual setup install their Vandor registry items and declared packages first, then copy AppShell into the same UI directory. Examples are not distributed with the component.
+
+Install AppShell first, then optionally install its portable stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/app-shell-stories.json
+```
+
+Use your existing `@storybook/react` with matching Storybook package versions (type/composition checked with 10.6.1), discover `**/*.stories.tsx` in the configured UI directory, and load the global Tailwind/theme stylesheet. The stories import colocated AppShell and Button. No additional providers or addons are required; the stories-only item does not reinstall core files, force-install Storybook packages, or modify Storybook configuration. Use the consumer's viewport and reduced-motion settings for those stories. This project has no Storybook server, so Storybook UI is not verified here.
+
+## Behavior & Accessibility
+
+The shell renders a sidebar `aside`, a named navigation `nav`, a top `header`, and one `main`. Do not put another `main` in children. The skip link targets the main content, and the desktop toggle exposes `aria-expanded` and `aria-controls`. Navigation supports normal Tab and native link/button keyboard behavior, not treeview arrow-key navigation.
+
+Desktop collapsed state is uncontrolled by default; `defaultCollapsed` is read only on mount. With `collapsed`, your application must update that prop in `onCollapsedChange`. The callback reports a toggle request synchronously, not animation completion. Mobile open state is separate and internal. Neither state is persisted automatically.
+
+Hierarchy transitions use Motion's `AnimatePresence`. Outgoing panels are `inert` and hidden from assistive technology. If focus is inside a retiring panel, it moves to the incoming panel; otherwise the shell does not steal focus. The drawer provides modal focus management and opener focus restoration. Custom dropdowns/router links must preserve their own focus and dismissal contracts.
+
+Sidebar width and label transitions are 220ms and 140ms respectively. Hierarchy panels travel 28px with a 220ms slide/fade. All respect `prefers-reduced-motion`; the existing Drawer handles its own reduced-motion styles. AppShell adds no page-enter animation, search implementation, audio, or haptics.
+
+Standard navigation labels truncate visually but remain available through accessible names and collapsed tooltips. Keep header actions compact and give arbitrary slot content its own responsive layout. The shell accepts only its documented props; it does not forward native root attributes or refs.

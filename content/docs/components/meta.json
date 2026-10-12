@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "accordion",
+    "app-shell",
     "autocomplete",
     "badge",
     "blobatar",

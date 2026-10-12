@@ -13,6 +13,7 @@ const path = require("node:path");
 const { test } = require("node:test");
 
 const names = [
+  "app-shell",
   "loading",
   "input",
   "textarea",

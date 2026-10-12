@@ -113,6 +113,15 @@ new component.
 
 ## 5. A real playground, not only a demo
 
+### Approved AppShell exception
+
+AppShell remains in Components but uses interactive states and runnable examples
+instead of a props playground. Deliver expanded, collapsed and mobile states,
+workspace/account and hierarchy examples, API/installation/source guidance, and
+portable stories. Preserve this exception in the docs generator: do not synthesize
+a placeholder playground. Its default story may be named Default rather than
+Playground. Other components retain the standard playground requirements below.
+
 Use `components/component-playground.tsx` as the standard shell. Each component
 must provide a typed preview adapter, metadata/defaults, and code generator using
 the established `lib/*-playground.ts` pattern. Shared family infrastructure is

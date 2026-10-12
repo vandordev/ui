@@ -3,6 +3,33 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "app-shell",
+      "type": "registry:ui",
+      "title": "AppShell",
+      "description": "Responsive application layout with animated icon-rail collapse, contextual navigation transitions and a mobile drawer.",
+      "dependencies": ["cn@^0.4.0", "lucide-react", "motion@^12.38.0"],
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/button.json",
+        "https://vandor-ui.vercel.app/r/drawer.json",
+        "https://vandor-ui.vercel.app/r/tooltip.json"
+      ],
+      "files": [
+        { "path": "registry/new-york/app-shell.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "app-shell-stories",
+      "type": "registry:item",
+      "title": "AppShell Stories",
+      "description": "Optional portable AppShell stories. Install AppShell first and use your existing matching Storybook React packages.",
+      "files": [
+        {
+          "path": "registry/new-york/app-shell.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "loading-stories",
       "type": "registry:item",
       "title": "Loading Stories",

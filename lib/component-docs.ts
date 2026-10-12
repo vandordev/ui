@@ -5,6 +5,7 @@ import {
   getAccordionCode,
   getAccordionDefaults,
 } from "@/lib/accordion-playground";
+import { appShellProps } from "@/lib/app-shell-props";
 import {
   autocompleteProps,
   getAutocompleteCode,
@@ -125,6 +126,11 @@ interface ComponentDocDefinition {
 }
 
 export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
+  "app-shell": {
+    nativePropsDescription:
+      "AppShell uses a deliberately restricted props API; it does not forward arbitrary native attributes, refs or event handlers. Rendered slots and renderControl own their elements and native props. Navigation items with href use links unless disabled; without href they use buttons.",
+    props: appShellProps,
+  },
   autocomplete: {
     nativePropsDescription:
       "Autocomplete owns its managed value/query/form state. inputProps forwards input attributes, handlers, ARIA descriptions and ref except managed state, form, disabled/readOnly/required, type and size. contentProps forwards popup attributes and listed positioning/collision options, excluding children/render. Compound parts use the same root contract; chips require multiple.",
