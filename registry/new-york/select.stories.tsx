@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 
+import { Button } from "./button";
+import { Drawer, DrawerBody } from "./drawer";
 import { Select } from "./select";
 
 const data = [
@@ -116,4 +118,23 @@ const ControlledExample = () => {
 export const Controlled: Story = {
   parameters: { controls: { disable: true } },
   render: () => <ControlledExample />,
+};
+
+const DrawerExample = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="min-h-[200vh]">
+      <Button onClick={() => setOpen(true)}>Open selection drawer</Button>
+      <Drawer title="Choose fruit" open={open} onOpenChange={setOpen}>
+        <DrawerBody>
+          <ControlledExample />
+        </DrawerBody>
+      </Drawer>
+    </div>
+  );
+};
+
+export const InsideDrawer: Story = {
+  parameters: { controls: { disable: true } },
+  render: () => <DrawerExample />,
 };

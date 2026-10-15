@@ -118,14 +118,16 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
 
     const options = React.useMemo(() => {
       const names = new Intl.DisplayNames([locale], { type: "region" });
-      return countries
-        .map((country) => ({
-          country,
-          label: `${names.of(country) ?? country} (+${getCountryCallingCode(country)})`,
-        }))
-        .toSorted((left, right) =>
-          left.label.localeCompare(right.label, locale)
-        );
+      return (
+        countries
+          .map((country) => ({
+            country,
+            label: `${names.of(country) ?? country} (+${getCountryCallingCode(country)})`,
+          }))
+          // ES2022 consumers lack toSorted; map already created a new array.
+          // oxlint-disable-next-line unicorn/no-array-sort
+          .sort((left, right) => left.label.localeCompare(right.label, locale))
+      );
     }, [locale]);
 
     const update = (draft: string, country: CountryCode) => {
@@ -138,7 +140,7 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
         let seen = 0;
         let nextCaret = parsed.draft.length;
         for (let index = 0; index < parsed.draft.length; index += 1) {
-          if (/\d/.test(parsed.draft[index])) {
+          if (/\d/.test(parsed.draft.charAt(index))) {
             seen += 1;
           }
           if (seen >= digitCount) {

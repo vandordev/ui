@@ -79,6 +79,18 @@ after(async () => {
   await dom.happyDOM.abort();
 });
 
+test("Select positions its menu fixed above modal layers", async () => {
+  await mount({ data: [{ label: "Apple", value: "apple" }] });
+  const popup = document.querySelector('[data-slot="select-content"]');
+  assert.ok(popup, "Open Select must render a popup");
+  const positioner = popup.parentElement;
+  assert.equal(positioner.style.position, "fixed");
+  assert.ok(
+    positioner.classList.contains("z-50"),
+    "Menu must share the modal layer"
+  );
+});
+
 test("mixed data renders ordered options, accessible group headings and disabled items", async () => {
   await mount({
     contentProps: { "aria-label": "Fruit options" },
@@ -151,12 +163,18 @@ test("custom trigger element retains its content, ref, events and combobox seman
   const trigger = document.querySelector('[role="combobox"]');
   assert.equal(trigger.textContent, "Choose fruit");
   assert.equal(trigger.tagName, "BUTTON");
-  assert.equal(trigger.querySelector("button"), null);
-  assert.equal(trigger.querySelector("svg"), null);
+  assert.ok(
+    trigger.querySelector("button") === null,
+    "Trigger must not nest buttons"
+  );
+  assert.ok(
+    trigger.querySelector("svg") === null,
+    "Custom trigger must not add icons"
+  );
   assert.equal(trigger.className, "custom-trigger");
   assert.equal(trigger.getAttribute("aria-label"), "Fruit");
   assert.equal(trigger.getAttribute("aria-describedby"), "help");
-  assert.equal(ref.current, trigger);
+  assert.ok(ref.current === trigger, "Ref must resolve to the trigger");
   await React.act(async () => trigger.click());
   assert.deepEqual(clicks, ["click"]);
 });
@@ -184,7 +202,10 @@ test("trigger callback follows uncontrolled selection without overriding the cal
     document.querySelector('[role="combobox"]').textContent,
     "Pick a number"
   );
-  assert.equal(ref.current, document.querySelector('[role="combobox"]'));
+  assert.ok(
+    ref.current === document.querySelector('[role="combobox"]'),
+    "Ref must resolve to the trigger"
+  );
   const option = [...document.querySelectorAll('[role="option"]')].find(
     (node) => node.textContent === "Zero"
   );

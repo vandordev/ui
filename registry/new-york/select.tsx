@@ -152,12 +152,13 @@ const SelectContent = ({
     // the portal out of flex/grid flow.
     <SelectPrimitive.Portal style={{ left: 0, position: "absolute", top: 0 }}>
       <SelectPrimitive.Positioner
+        positionMethod="fixed"
         side={side}
         sideOffset={sideOffset}
         align={align}
         alignOffset={alignOffset}
         alignItemWithTrigger={alignItemWithTrigger}
-        className="isolate"
+        className="isolate z-50"
       >
         <SelectPrimitive.Popup
           data-slot="select-content"
@@ -452,29 +453,32 @@ const Select = <
         />
       )}
       <SelectContent {...contentProps} animated={animated}>
-        {groups.map((group) => (
-          <SelectGroup
-            key={
-              group.label === undefined
-                ? `options:${typeof group.items[0].value}:${group.items[0].value}`
-                : `group:${group.label}`
-            }
-          >
-            {group.label !== undefined && (
-              <SelectLabel>{group.label}</SelectLabel>
-            )}
-            {group.items.map((item) => (
-              <SelectItem
-                key={`${typeof item.value}:${item.value}`}
-                value={item.value}
-                label={item.label}
-                disabled={item.disabled}
-              >
-                {renderItem ? renderItem(item) : item.label}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        ))}
+        {groups.map((group, groupIndex) => {
+          const [firstOption] = group.items;
+          let key = `empty:${groupIndex}`;
+          if (group.label !== undefined) {
+            key = `group:${group.label}`;
+          } else if (firstOption) {
+            key = `options:${typeof firstOption.value}:${firstOption.value}`;
+          }
+          return (
+            <SelectGroup key={key}>
+              {group.label !== undefined && (
+                <SelectLabel>{group.label}</SelectLabel>
+              )}
+              {group.items.map((item) => (
+                <SelectItem
+                  key={`${typeof item.value}:${item.value}`}
+                  value={item.value}
+                  label={item.label}
+                  disabled={item.disabled}
+                >
+                  {renderItem ? renderItem(item) : item.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          );
+        })}
       </SelectContent>
     </SelectRoot>
   );

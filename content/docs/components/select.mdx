@@ -12,6 +12,7 @@ import {
   SelectCustomTriggerDemo,
   SelectDemo,
   SelectGroupedDemo,
+  SelectInsideDrawerDemo,
 } from "@/examples/select-demo";
 
 ## Usage
@@ -115,6 +116,16 @@ Use your project's configured UI alias if it differs from `@/components/ui`. The
 <ComponentPreview name="select-demo" title="select-demo.tsx">
   <SelectDemo />
 </ComponentPreview>
+
+### Inside a Drawer
+
+Install Drawer as well as Select to use this example. The menu uses fixed positioning and the modal overlay layer so options remain interactive without moving the page behind the Drawer. Try pointer and keyboard selection while the documentation page is scrolled.
+
+<ComponentPreview src="examples/select-demo.tsx" title="select-demo.tsx">
+  <SelectInsideDrawerDemo />
+</ComponentPreview>
+
+The optional `select-stories` item also includes an `InsideDrawer` fixture. Install Button and Drawer before using that stories file; stories-only installation deliberately does not install or overwrite those components.
 
 ### Sizes and Disabled Options
 

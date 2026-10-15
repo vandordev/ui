@@ -186,7 +186,7 @@ export function normalizeDataGridColumnVisibility(
       column.enableHiding === false
         ? [[column.id, true]]
         : column.id in saved
-          ? [[column.id, saved[column.id]]]
+          ? [[column.id, saved[column.id] as boolean]]
           : []
     )
   );

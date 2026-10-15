@@ -1,8 +1,10 @@
 "use client";
 
 import { ChevronDownIcon } from "lucide-react";
+import { useState } from "react";
 
 import { Button } from "@/registry/new-york/button";
+import { Drawer, DrawerBody } from "@/registry/new-york/drawer";
 import { Select } from "@/registry/new-york/select";
 
 const items = [
@@ -19,6 +21,28 @@ export const SelectDemo = () => (
     placeholder="Select a fruit"
   />
 );
+
+export const SelectInsideDrawerDemo = () => {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState<string | null>(null);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Choose fruit in drawer</Button>
+      <Drawer title="Choose fruit" open={open} onOpenChange={setOpen}>
+        <DrawerBody className="flex flex-col gap-3">
+          <Select
+            data={items}
+            value={value}
+            onValueChange={setValue}
+            aria-label="Drawer fruit"
+            placeholder="Select a fruit"
+          />
+          <output>Selected: {value ?? "None"}</output>
+        </DrawerBody>
+      </Drawer>
+    </>
+  );
+};
 
 export const SelectGroupedDemo = () => (
   <Select

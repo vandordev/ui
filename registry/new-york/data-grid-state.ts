@@ -30,7 +30,9 @@ export function serializeDataGridValue(value: unknown): string {
       const record = item as Record<string, unknown>;
       return Object.fromEntries(
         Object.keys(record)
-          .toSorted()
+          // Object.keys creates a new array; keep ES2022 consumer compatibility.
+          // oxlint-disable-next-line unicorn/no-array-sort
+          .sort()
           .filter((key) => record[key] !== undefined)
           .map((key) => [key, normalize(record[key])])
       );

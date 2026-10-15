@@ -11,6 +11,32 @@ const jiti = createJiti(__filename, {
 });
 const el = React.createElement;
 
+test("Select portable stories compose the controlled field and Drawer fixture", async () => {
+  const { composeStories } = await import("@storybook/react");
+  const stories = composeStories(
+    jiti("../registry/new-york/select.stories.tsx")
+  );
+  const controlled = renderToStaticMarkup(el(stories.Controlled));
+  assert.match(controlled, /aria-label="Fruit"/);
+  assert.match(controlled, /Selected: None/);
+  const drawer = renderToStaticMarkup(el(stories.InsideDrawer));
+  assert.match(drawer, /Open selection drawer/);
+});
+
+test("Select tolerates empty unlabeled groups from untyped consumers during SSR", () => {
+  const { Select } = jiti("../registry/new-york/select.tsx");
+  for (const data of [
+    [{ items: [] }],
+    [{ items: [] }, { items: [] }, { label: "Apple", value: "apple" }],
+  ]) {
+    const html = renderToStaticMarkup(
+      el(Select, { "aria-label": "Fruit", data, placeholder: "Choose fruit" })
+    );
+    assert.match(html, /role="combobox"/);
+    assert.match(html, /Choose fruit/);
+  }
+});
+
 test("Select resolves flat and grouped labels without leaking wrapper props to the trigger", () => {
   const { Select } = jiti("../registry/new-york/select.tsx");
   assert.equal(typeof Select, "function");

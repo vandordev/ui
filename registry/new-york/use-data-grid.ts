@@ -516,7 +516,11 @@ export function useDataGrid<
         value: request.pagination.pageIndex - 1,
       });
     } else {
-      transition({ type: "cursor", value: previousCursor.cursor });
+      // Availability guarantees an existing entry (including the first null cursor).
+      transition({
+        type: "cursor",
+        value: previousCursor.cursor as string | null,
+      });
     }
   }
   const status = placeholder
