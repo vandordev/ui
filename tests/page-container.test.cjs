@@ -61,6 +61,18 @@ test("PageContainer controls generate the same markup as the typed preview and r
   assert.equal(getPageContainerDefaults().size, "lg");
 });
 
+test("PageContainer defaults to equal responsive padding and full size removes only the width cap", () => {
+  const { PageContainer } = jiti("../registry/new-york/page-container.tsx");
+  for (const size of [undefined, "full"]) {
+    const element = PageContainer({ size });
+    const classes = element.props.className.split(/\s+/);
+    for (const name of ["mx-auto", "p-4", "sm:p-6", "lg:p-8"]) {
+      assert.ok(classes.includes(name), `Missing layout class: ${name}`);
+    }
+    assert.ok(classes.includes(size === "full" ? "max-w-none" : "max-w-6xl"));
+  }
+});
+
 test("PageContainer preserves native props and ref and lets callers override layout classes", () => {
   const { PageContainer } = jiti("../registry/new-york/page-container.tsx");
   const ref = React.createRef();
@@ -70,7 +82,7 @@ test("PageContainer preserves native props and ref and lets callers override lay
   };
   const element = PageContainer({
     children: "Content",
-    className: "max-w-none px-0 sm:px-0 lg:px-0",
+    className: "max-w-none p-0 sm:p-0 lg:p-0",
     id: "content",
     onClick,
     ref,
@@ -87,7 +99,7 @@ test("PageContainer preserves native props and ref and lets callers override lay
   assert.match(element.props.className, /max-w-none/);
   assert.doesNotMatch(
     element.props.className,
-    /max-w-6xl|\bpx-4\b|sm:px-6|lg:px-8/
+    /max-w-6xl|\bp-4\b|sm:p-6|lg:p-8/
   );
 });
 

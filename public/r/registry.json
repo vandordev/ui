@@ -468,7 +468,7 @@
       "name": "page-container",
       "type": "registry:ui",
       "title": "PageContainer",
-      "description": "Centered page content with a maximum width and responsive horizontal gutters.",
+      "description": "Centered page content with a maximum width and equal responsive padding on every side.",
       "dependencies": ["cn"],
       "files": [
         {

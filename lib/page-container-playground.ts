@@ -15,7 +15,7 @@ export const pageContainerProps = {
   className: {
     defaultValue: "Not set",
     description:
-      "Merged layout classes. Override gutters at each breakpoint when needed, such as px-0 sm:px-0 lg:px-0.",
+      "Merged layout classes. Override padding at each breakpoint when needed, such as p-0 sm:p-0 lg:p-0.",
     type: "string",
   },
   ref: {

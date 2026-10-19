@@ -28,6 +28,6 @@ export const PageContainerPlayground = () => (
     initialValues={getPageContainerDefaults()}
     getCode={getPageContainerCode}
     renderPreview={(values) => <PageContainerPreview values={values} />}
-    hint="Widths are capped by the preview area. Larger sizes can look identical here; the muted content area shows the horizontal gutters, not a built-in surface."
+    hint="Padding is equal on every side. Capped sizes can add extra horizontal space from centering; use full for equal edge insets. The muted content area is not a built-in surface."
   />
 );
