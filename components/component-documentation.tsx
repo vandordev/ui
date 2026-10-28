@@ -16,6 +16,7 @@ import { DrawerPlayground } from "@/components/drawer-playground";
 import { DropdownPlayground } from "@/components/dropdown-playground";
 import { EmptyPlayground } from "@/components/empty-playground";
 import { ErrorStatePlayground } from "@/components/error-state-playground";
+import { FramePlayground } from "@/components/frame-playground";
 import { InputFamilyPlayground } from "@/components/input-family-playground";
 import { LoadingPlayground } from "@/components/loading-playground";
 import { PageContainerPlayground } from "@/components/page-container-playground";
@@ -50,6 +51,7 @@ const playgrounds: Record<string, () => ReactNode> = {
   dropdown: DropdownPlayground,
   empty: EmptyPlayground,
   "error-state": ErrorStatePlayground,
+  frame: FramePlayground,
   input: () => <InputFamilyPlayground component="input" />,
   "input-amount": () => <InputFamilyPlayground component="input-amount" />,
   "input-group": () => <InputFamilyPlayground component="input-group" />,

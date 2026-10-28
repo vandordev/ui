@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "frame-stories",
+  "title": "Frame Stories",
+  "description": "Optional portable Frame stories. Install Frame first and use your existing matching Storybook React packages.",
+  "files": [
+    {
+      "path": "registry/new-york/frame.stories.tsx",
+      "content": "import type { Meta, StoryObj } from \"@storybook/react\";\n\nimport {\n  Frame,\n  FrameDescription,\n  FrameFooter,\n  FrameHeader,\n  FramePanel,\n  FrameTitle,\n} from \"./frame\";\n\nconst meta = {\n  argTypes: {\n    children: { control: false },\n    dense: { control: \"boolean\" },\n    ref: { control: false },\n    spacing: { control: \"select\", options: [\"sm\", \"default\", \"lg\"] },\n    stacked: { control: \"boolean\" },\n    variant: { control: \"select\", options: [\"default\", \"ghost\"] },\n  },\n  args: {\n    dense: false,\n    spacing: \"default\",\n    stacked: false,\n    variant: \"default\",\n  },\n  component: Frame,\n  render: (args) => (\n    <Frame {...args} className=\"w-full max-w-md\">\n      <FrameHeader>\n        <FrameTitle>Workspace</FrameTitle>\n        <FrameDescription>\n          Manage your deployment environments.\n        </FrameDescription>\n      </FrameHeader>\n      <FramePanel>Production is up to date.</FramePanel>\n      <FramePanel>Preview is ready for review.</FramePanel>\n      <FrameFooter>Last synced just now</FrameFooter>\n    </Frame>\n  ),\n  tags: [\"autodocs\"],\n  title: \"Vandor UI/Frame\",\n} satisfies Meta<typeof Frame>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\n\nexport const Playground: Story = {};\nexport const Separated: Story = {};\nexport const Stacked: Story = { args: { stacked: true } };\nexport const Dense: Story = {\n  args: { dense: true, spacing: \"sm\", stacked: true },\n};\nexport const Ghost: Story = { args: { variant: \"ghost\" } };\nexport const FitPanels: Story = {\n  render: (args) => (\n    <Frame {...args} className=\"min-h-80 w-full max-w-md\">\n      <FrameHeader>\n        <FrameTitle>Content-sized panels</FrameTitle>\n      </FrameHeader>\n      <FramePanel fit>This panel does not grow.</FramePanel>\n      <FramePanel>The remaining height belongs to this panel.</FramePanel>\n    </Frame>\n  ),\n};\nexport const LongContent: Story = {\n  render: (args) => (\n    <Frame {...args} className=\"w-full max-w-xs\">\n      <FrameHeader>\n        <FrameTitle>\n          A workspace with a long descriptive name that wraps naturally\n        </FrameTitle>\n      </FrameHeader>\n      <FramePanel>\n        deployment-preview-with-a-very-long-unbroken-identifier.example.invalid\n      </FramePanel>\n    </Frame>\n  ),\n};\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:item"
+}

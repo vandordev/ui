@@ -1,0 +1,89 @@
+---
+title: Frame
+description: Group related content in separated or connected panels with a shared header and footer.
+component: frame
+credits:
+  - name: ReUI Frame
+    url: https://reui.io/docs/components/base/frame
+    contribution: API and composition inspiration. Independent Vandor implementation using native React elements and theme tokens, without copying ReUI source.
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { FrameDemo } from "@/examples/frame-demo";
+import { FrameStackedDemo } from "@/examples/frame-stacked-demo";
+import { FrameGhostDemo } from "@/examples/frame-ghost-demo";
+
+## Usage
+
+```tsx
+import {
+  Frame,
+  FrameHeader,
+  FrameTitle,
+  FrameDescription,
+  FramePanel,
+  FrameFooter,
+} from "@/components/ui/frame";
+
+<Frame>
+  <FrameHeader>
+    <FrameTitle>Workspace</FrameTitle>
+    <FrameDescription>Your deployment environments.</FrameDescription>
+  </FrameHeader>
+  <FramePanel>Production is up to date.</FramePanel>
+  <FramePanel>Preview is ready for review.</FramePanel>
+  <FrameFooter>Updated just now</FrameFooter>
+</Frame>;
+```
+
+Use Frame for related settings, status sections, or activity rows sharing one outer surface. It is layout only, not an accordion, app shell, or interactive card. Parts are optional; a Frame can contain a single panel or header/content/footer inside one panel.
+
+## Examples
+
+### Separated panels
+
+<ComponentPreview name="frame-demo" title="frame-demo.tsx">
+  <FrameDemo />
+</ComponentPreview>
+
+The muted outer container groups card-colored panels. `spacing="sm" | "default" | "lg"` sets panel padding and header/footer horizontal padding to 12/16/24px, with an outer inset and gap of 2/4/8px. Header and footer vertical padding stays 12px. Each panel grows into spare height by default.
+
+### Stacked and dense
+
+<ComponentPreview name="frame-stacked-demo" title="frame-stacked-demo.tsx">
+  <FrameStackedDemo />
+</ComponentPreview>
+
+`stacked` joins adjacent **direct** FramePanel siblings with a shared border and square inner corners. Wrapping a panel or placing another element between panels interrupts joining. `dense` removes outer padding and gaps but preserves panel content padding. Use both for a flush connected list; dense alone does not merge panel seams. Neither option clips overflow or changes keyboard behavior.
+
+### Ghost, custom radius and content-sized panels
+
+<ComponentPreview name="frame-ghost-demo" title="frame-ghost-demo.tsx">
+  <FrameGhostDemo />
+</ComponentPreview>
+
+`variant="ghost"` removes only the outer border. `FramePanel fit` disables that panel's flex growth; this is visible only when the frame has spare height. It does not force a fixed height or truncate content.
+
+Set `className="[--frame-radius:var(--radius-lg)]"` on Frame to customize its outer radius. The default is `var(--radius-xl)`. Inner corners derive from the outer radius minus the inset and border, clamped to zero; dense panels use the outer radius. `--frame-panel-radius` can override the derived radius when necessary. These are CSS variables, not React props. Use classes on individual parts to override their padding or surfaces.
+
+### Consumer setup and optional stories
+
+Requires React 19, Tailwind CSS 4 with preflight, `cn`, and shadcn-compatible `muted`, `foreground`, `card`, `card-foreground`, `border`, `muted-foreground`, and radius tokens. No provider, Base UI runtime, animation stylesheet, or client directive is needed. Frame can be imported from a Next.js Server Component. The CLI uses your configured UI alias; review overwrite prompts before replacing an existing file. For manual setup, install `cn` and copy the single Source file into your UI directory. Website demos and playgrounds are not distributed.
+
+Install Frame first, then optionally install its portable stories:
+
+```bash
+npx shadcn@latest add https://vandor-ui.vercel.app/r/frame-stories.json
+```
+
+Use your existing `@storybook/react` with matching Storybook package versions (types and composition checked with 10.6.1). Discover `**/*.stories.tsx` in your UI directory and import your global Tailwind/theme stylesheet in the preview. No addons or providers are required. Stories install separately without reinstalling Frame, adding Storybook packages, or changing `.storybook/`. This project has no Storybook server; Storybook UI is not verified here.
+
+## Behavior & Accessibility
+
+Frame and FramePanel render `div`; FrameHeader renders `header`, FrameTitle `h3`, FrameDescription `p`, and FrameFooter `footer`. Each forwards its corresponding native attributes, handlers, and React 19 ref. FrameTitle's `h3` must fit your page hierarchy; use another native heading inside FrameHeader when a different level is needed. Headers and footers inside sectioning contexts follow native landmark rules, so use an appropriate surrounding section rather than assuming automatic ARIA labeling.
+
+There is no managed state, focus behavior, disabled state, live region, or motion. Add accessible labels and keyboard behavior to any controls you place inside panels. Titles and descriptions are not automatically associated with a region; supply application-owned IDs and ARIA attributes when needed. Panels wrap long text, but wide tables and code blocks should own horizontal scrolling. Focus rings and overflow are not clipped by Frame.
+
+The playground controls configure the same markup as its runnable generated code. Reset restores all configuration; the demo has no transient interaction state. Copy includes all imports and safely serialized title/description content.
+
+Compared with ReUI, FrameTitle is a native heading, and the supported spacing choices are `sm`, `default`, and `lg`. This is an independently implemented API, not a drop-in copy of every ReUI variant or CSS variable.

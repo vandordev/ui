@@ -3,6 +3,25 @@
   "homepage": "https://vandor-ui.vercel.app",
   "items": [
     {
+      "name": "frame",
+      "type": "registry:ui",
+      "title": "Frame",
+      "description": "A structured container with separated or stacked panels, compact spacing and composable chrome.",
+      "dependencies": ["cn@^0.4.0"],
+      "files": [
+        { "path": "registry/new-york/frame.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "frame-stories",
+      "type": "registry:item",
+      "title": "Frame Stories",
+      "description": "Optional portable Frame stories. Install Frame first and use your existing matching Storybook React packages.",
+      "files": [
+        { "path": "registry/new-york/frame.stories.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
       "name": "app-shell",
       "type": "registry:ui",
       "title": "AppShell",

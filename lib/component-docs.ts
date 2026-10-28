@@ -72,6 +72,11 @@ import {
   getErrorStateDefaults,
 } from "@/lib/error-state-playground";
 import {
+  frameProps,
+  getFrameCode,
+  getFrameDefaults,
+} from "@/lib/frame-playground";
+import {
   inputComponentProps,
   inputPlaygroundCode,
 } from "@/lib/input-component-props";
@@ -209,6 +214,12 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
   "error-state": {
     playground: { code: getErrorStateCode(getErrorStateDefaults()) },
     props: errorStateProps,
+  },
+  frame: {
+    nativePropsDescription:
+      "Frame and FramePanel forward native div attributes, handlers and React 19 refs. FrameHeader uses header, FrameTitle h3, FrameDescription p and FrameFooter footer. Title and description playground controls configure children, not root props. No implicit ARIA relationships or interactive behavior are added.",
+    playground: { code: getFrameCode(getFrameDefaults()) },
+    props: frameProps,
   },
   loading: {
     playground: { code: getLoadingCode(getLoadingDefaults()) },
