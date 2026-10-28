@@ -9,11 +9,13 @@ const meta = {
     "aria-invalid": { control: "boolean" },
     defaultValue: { control: "text" },
     disabled: { control: "boolean" },
+    hidePasswordLabel: { control: "text" },
     label: { control: "text" },
     labelStyle: { control: "select", options: ["floating", "static"] },
     onChange: { control: false },
     placeholder: { control: "text" },
     readOnly: { control: "boolean" },
+    showPasswordLabel: { control: "text" },
     value: { control: false },
   },
   args: {
@@ -54,6 +56,13 @@ export const Empty: Story = { args: { defaultValue: "" } };
 export const StaticLabel: Story = { args: { labelStyle: "static" } };
 export const Disabled: Story = { args: { disabled: true } };
 export const ReadOnly: Story = { args: { readOnly: true } };
+export const IndonesianLabels: Story = {
+  args: {
+    hidePasswordLabel: "Sembunyikan kata sandi",
+    label: "Kata sandi",
+    showPasswordLabel: "Tampilkan kata sandi",
+  },
+};
 export const Invalid: Story = {
   args: { "aria-describedby": "password-error", "aria-invalid": true },
   render: (args) => (

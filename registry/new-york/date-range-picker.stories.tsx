@@ -3,7 +3,10 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import type { DateRange } from "react-day-picker";
 
-import { DateRangePicker } from "./date-range-picker";
+import {
+  DateRangePicker,
+  dateRangeIndonesianLocale,
+} from "./date-range-picker";
 
 const meta = {
   argTypes: {
@@ -43,6 +46,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Playground: Story = {};
+export const IndonesianLocale: Story = {
+  args: {
+    locale: dateRangeIndonesianLocale,
+    label: "Periode laporan",
+    placeholder: "Pilih tanggal",
+    applyLabel: "Terapkan",
+    cancelLabel: "Batal",
+    clearLabel: "Hapus",
+    features: [],
+  },
+};
 export const Populated: Story = {
   args: {
     defaultValue: { from: new Date(2026, 9, 5), to: new Date(2026, 9, 12) },

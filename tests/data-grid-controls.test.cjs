@@ -1,29 +1,51 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
+const { setTimeout: delay } = require("node:timers/promises");
 const { createFixture } = require("./data-grid-ui-fixture.cjs");
+
+for (const pageSizes of [[], [25], [10, 25, 50]]) {
+  test(`DataGrid pagination preserves navigation with ${pageSizes.length} page-size choices`, async () => {
+    const f = await createFixture();
+    try {
+      await f.mount({
+        children: (grid, { ui }) =>
+          f.React.createElement(ui.DataGridPagination, { pageSizes }),
+      });
+      assert.equal(
+        f.host.querySelector('[role="combobox"]') !== null,
+        pageSizes.length > 1
+      );
+      assert.ok(f.host.textContent.includes("1–25 of 60 results"));
+      await f.click(f.button("Next page"));
+      assert.equal(f.grid.request.pagination.pageIndex, 1);
+    } finally {
+      await f.dispose();
+    }
+  });
+}
 
 test("real search clear edits Apply draft and retains invalid correction", async () => {
   const f = await createFixture();
   try {
     const h = f.React.createElement;
     await f.mount({
-      options: { filterMode: "apply" },
       children: (grid, { ui }) =>
         h(
           "form",
           { onSubmit: (event) => event.preventDefault() },
           h(ui.DataGridSearch, {
-            grid,
-            field: "search",
-            clearable: true,
             "aria-label": "User search",
+            clearable: true,
+            field: "search",
+            grid,
           }),
           h(ui.DataGridApplyFilters),
           h(ui.DataGridResetFilters),
-          h(ui.DataGridTable, { grid, "aria-label": "Users" })
+          h(ui.DataGridTable, { "aria-label": "Users", grid })
         ),
+      options: { filterMode: "apply" },
     });
-    await f.React.act(async () =>
+    await f.React.act(() =>
       f.grid.setFilter("search", "Ada", { debounce: 50 })
     );
     assert.equal(f.host.querySelector("input").value, "Ada");
@@ -33,12 +55,12 @@ test("real search clear edits Apply draft and retains invalid correction", async
     await f.click(f.host.querySelector('[aria-label="Clear search"]'));
     assert.equal(f.grid.filterDraft.search, "");
     assert.equal(f.grid.request.filters.search, "Ada");
-    await f.React.act(async () => f.grid.setFilter("active", "invalid"));
+    await f.React.act(() => f.grid.setFilter("active", "invalid"));
     await f.click(f.button("Apply filters"));
     assert.equal(f.requests.length, 2);
     assert.equal(typeof f.grid.filterErrors.active, "string");
     await f.click(f.button("Reset filters"));
-    assert.deepEqual(f.grid.filterDraft, { search: "", active: true });
+    assert.deepEqual(f.grid.filterDraft, { active: true, search: "" });
     assert.deepEqual(f.grid.filterErrors, {});
     assert.equal(f.button("Apply filters").getAttribute("type"), "button");
   } finally {
@@ -56,13 +78,13 @@ test("real page-size Select resets page atomically and search reset cancels pend
           f.React.Fragment,
           null,
           h(ui.DataGridSearch, {
-            grid,
-            field: "search",
-            clearable: true,
             "aria-label": "User search",
+            clearable: true,
+            field: "search",
+            grid,
           }),
           h(ui.DataGridResetFilters),
-          h(ui.DataGridTable, { grid, "aria-label": "Users" }),
+          h(ui.DataGridTable, { "aria-label": "Users", grid }),
           h(ui.DataGridPagination)
         ),
     });
@@ -73,13 +95,11 @@ test("real page-size Select resets page atomically and search reset cancels pend
     );
     await f.click(fifty);
     assert.deepEqual(f.grid.request.pagination, { pageIndex: 0, pageSize: 50 });
-    await f.React.act(async () =>
+    await f.React.act(() =>
       f.grid.setFilter("search", "pending", { debounce: 80 })
     );
     await f.click(f.button("Reset filters"));
-    await f.React.act(
-      async () => new Promise((resolve) => setTimeout(resolve, 100))
-    );
+    await f.React.act(() => delay(100));
     assert.equal(f.grid.request.filters.search, "");
     assert.equal(
       f.host.querySelector('input[aria-label="User search"]').value,
@@ -94,35 +114,36 @@ test("cursor controls never show totals or arbitrary first and last actions", as
   const f = await createFixture();
   try {
     const contract = f.schemas.createDataGridContract({
+      filters: f.z.object({ search: f.z.string().default("") }),
       pagination: "cursor",
       row: f.z.object({ id: f.z.string(), name: f.z.string() }),
-      filters: f.z.object({ search: f.z.string().default("") }),
       sortBy: f.z.literal("name"),
     });
     const column = f.columnApi.createDataGridColumnHelper(contract);
     const h = f.React.createElement;
     await f.mount({
-      options: {
-        contract,
-        columns: [column.accessor("name", { header: "Name" })],
-        selectionMode: "allMatching",
-        queryOptions: (input) =>
-          f.query.queryOptions({
-            queryKey: ["cursor-ui", input],
-            queryFn: async () => ({
-              rows: [{ id: input.pagination.cursor ?? "a", name: "Ada" }],
-              nextCursor: input.pagination.cursor === null ? "next" : null,
-            }),
-          }),
-      },
       children: (grid, { ui }) =>
         h(
           f.React.Fragment,
           null,
           h(ui.DataGridSelectionBar),
-          h(ui.DataGridTable, { grid, "aria-label": "Users" }),
+          h(ui.DataGridTable, { "aria-label": "Users", grid }),
           h(ui.DataGridPagination)
         ),
+      options: {
+        columns: [column.accessor("name", { header: "Name" })],
+        contract,
+        queryOptions: (input) =>
+          f.query.queryOptions({
+            queryFn: () =>
+              Promise.resolve({
+                nextCursor: input.pagination.cursor === null ? "next" : null,
+                rows: [{ id: input.pagination.cursor ?? "a", name: "Ada" }],
+              }),
+            queryKey: ["cursor-ui", input],
+          }),
+        selectionMode: "allMatching",
+      },
     });
     assert.ok(
       f.button("First page") === undefined,
@@ -149,14 +170,14 @@ test("real checkboxes expose mixed state and all-matching exclusions without off
   try {
     const h = f.React.createElement;
     await f.mount({
-      options: { selectionMode: "allMatching" },
       children: (grid, { ui }) =>
         h(
           f.React.Fragment,
           null,
           h(ui.DataGridSelectionBar),
-          h(ui.DataGridTable, { grid, "aria-label": "Users" })
+          h(ui.DataGridTable, { "aria-label": "Users", grid })
         ),
+      options: { selectionMode: "allMatching" },
     });
     await f.click(f.host.querySelector('[aria-label="Select row a"]'));
     assert.equal(
@@ -188,7 +209,7 @@ test("native page controls and real visibility menu honor non-hideable columns",
           f.React.Fragment,
           null,
           h(ui.DataGridColumnVisibility),
-          h(ui.DataGridTable, { grid, "aria-label": "Users" }),
+          h(ui.DataGridTable, { "aria-label": "Users", grid }),
           h(ui.DataGridPagination)
         ),
     });

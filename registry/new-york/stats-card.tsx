@@ -15,6 +15,7 @@ import type { ReactNode } from "react";
 
 import { StatsCardBadge } from "./stats-card-badge";
 import type { StatsCardBadgeVariant } from "./stats-card-badge";
+import { getStatsCardLayout } from "./stats-card-layout";
 
 export type StatsCardValue =
   | {
@@ -111,8 +112,9 @@ const StatsValue = ({ value }: { value: StatsCardValue }) =>
   );
 
 export const StatsCard = ({ ariaLabel, items, className }: StatsCardProps) => {
-  const columns = Math.max(1, Math.min(items.length, 4));
-  const smallColumns = columns === 3 ? 3 : Math.min(columns, 2);
+  const tabletColumns = items.length === 3 ? 3 : 2;
+  const tablet = getStatsCardLayout(items.length, tabletColumns);
+  const desktop = getStatsCardLayout(items.length, 4);
   return (
     <div
       data-slot="stats-card"
@@ -123,34 +125,42 @@ export const StatsCard = ({ ariaLabel, items, className }: StatsCardProps) => {
         className
       )}
     >
-      <dl
-        className={cn(
-          "grid grid-cols-1",
-          columns === 3 ? "sm:grid-cols-3" : columns > 1 && "sm:grid-cols-2",
-          columns === 4 && "lg:grid-cols-4"
-        )}
-      >
+      <dl className={cn("grid grid-cols-12")}>
         {items.map((item, index) => {
           const Icon = item.icon;
           const hasCaption =
             item.caption !== null && item.caption !== undefined;
-          const lastRow = (size: number) =>
-            index >= Math.floor((items.length - 1) / size) * size;
+          const tabletCell = tablet[index];
+          const desktopCell = desktop[index];
+          const spanClass: Record<number, string> = {
+            1: "sm:col-span-1",
+            12: "sm:col-span-12",
+            2: "sm:col-span-2",
+            3: "sm:col-span-3",
+            4: "sm:col-span-4",
+            6: "sm:col-span-6",
+          };
+          const desktopSpanClass: Record<number, string> = {
+            12: "lg:col-span-12",
+            3: "lg:col-span-3",
+            4: "lg:col-span-4",
+            6: "lg:col-span-6",
+          };
           return (
             <div
               key={item.key}
               data-slot="stats-card-item"
+              data-tablet-columns={tabletCell?.columns}
+              data-desktop-columns={desktopCell?.columns}
               className={cn(
-                "min-w-0 border-border",
+                "col-span-12 min-w-0 border-border",
+                tabletCell && spanClass[tabletCell.columns],
+                desktopCell && desktopSpanClass[desktopCell.columns],
                 index < items.length - 1 && "border-b",
-                lastRow(smallColumns) ? "sm:border-b-0" : "sm:border-b",
-                (index + 1) % smallColumns !== 0 && index < items.length - 1
-                  ? "sm:border-e"
-                  : "sm:border-e-0",
-                lastRow(columns) ? "lg:border-b-0" : "lg:border-b",
-                (index + 1) % columns !== 0 && index < items.length - 1
-                  ? "lg:border-e"
-                  : "lg:border-e-0"
+                tabletCell?.lastRow ? "sm:border-b-0" : "sm:border-b",
+                tabletCell?.lastColumn ? "sm:border-e-0" : "sm:border-e",
+                desktopCell?.lastRow ? "lg:border-b-0" : "lg:border-b",
+                desktopCell?.lastColumn ? "lg:border-e-0" : "lg:border-e"
               )}
             >
               <div className="flex h-full items-start justify-between gap-4 p-5">

@@ -72,7 +72,7 @@ test("every StatsCard playground control matches runnable generated code", () =>
   } = jiti("../lib/stats-card-playground.ts");
   const defaults = getStatsCardDefaults();
   assert.equal(getStatsCardPreviewProps(defaults).items.length, 2);
-  assert.equal(statsCardPlaygroundDefinitions.count.control.max, 2);
+  assert.equal(statsCardPlaygroundDefinitions.count.control.max, 7);
   const changes = {
     ariaLabel: 'Summary "quoted" <now>\nnext',
     badgeVariant: "destructive",
@@ -91,7 +91,7 @@ test("every StatsCard playground control matches runnable generated code", () =>
       [key]: value,
     })),
     { ...defaults, ...changes },
-    ...[1, 2].map((count) => ({ ...defaults, count })),
+    ...[1, 2, 3, 4, 5, 6, 7].map((count) => ({ ...defaults, count })),
   ];
   for (const values of configs) {
     const compiled = ts.transpileModule(getStatsCardCode(values), {

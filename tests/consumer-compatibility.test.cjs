@@ -9,6 +9,7 @@ const {
   writeFileSync,
 } = require("node:fs");
 const path = require("node:path");
+const { createJiti } = require("jiti");
 const { test } = require("node:test");
 const {
   prepareFamilyArtifacts,
@@ -51,7 +52,7 @@ test("installed families and fields compile for ES2022 consumers with strict ind
           strict: true,
           target: "ES2022",
         },
-        include: ["entry.ts"],
+        include: ["entry.ts", "generated*.tsx"],
       })
     );
     const installed = new Set();
@@ -87,6 +88,11 @@ test("installed families and fields compile for ES2022 consumers with strict ind
       "autocomplete-query",
       "data-grid",
       "data-grid-schema",
+      "date-time",
+      "date-time-stories",
+      "app-shell",
+      "app-shell-stories",
+      "input-password",
     ]) {
       install(
         prepareFamilyArtifacts({
@@ -122,8 +128,77 @@ test("installed families and fields compile for ES2022 consumers with strict ind
         'export * from "~/widgets/data-grid";',
         'export * from "~/widgets/data-grid/schema";',
         'export * from "~/primitives/input-phone";',
+        'export * from "~/primitives/app-shell";',
+        'export * as AppShellStories from "~/primitives/app-shell.stories";',
+        'export * from "~/widgets/date-time";',
+        'export * as DateTimeStories from "~/widgets/date-time/date-time.stories";',
         'export * as SelectStories from "~/primitives/select.stories";',
       ].join("\n")
+    );
+    const jiti = createJiti(__filename, {
+      alias: { "@": project },
+      fsCache: false,
+      jsx: { runtime: "automatic" },
+    });
+    const select = jiti("../lib/select-playground.ts");
+    const dateTime = jiti("../lib/date-time-playground.ts");
+    const input = jiti("../lib/input-component-props.ts");
+    for (const [name, code] of [
+      [
+        "password",
+        input.getInputPlaygroundCode("input-password", {
+          ...input.getInputPlaygroundDefaults("input-password"),
+          hidePasswordLabel: "Sembunyikan",
+          showPasswordLabel: 'Tampilkan "sandi" <aman>',
+        }),
+      ],
+      [
+        "select",
+        select.getSelectCode({
+          ...select.getSelectDefaults(),
+          label: 'A "quoted" <label> {value}\nnext',
+          labelStyle: "static",
+        }),
+      ],
+      [
+        "date-time",
+        dateTime.getDateTimeCode({
+          ...dateTime.getDateTimeDefaults(),
+          display: "date",
+          locale: "id-ID",
+          timeZone: "Asia/Jakarta",
+        }),
+      ],
+    ]) {
+      writeFileSync(
+        path.join(directory, `generated-${name}.tsx`),
+        code
+          .replaceAll("@/components/ui/", "~/primitives/")
+          .replaceAll("@/components/", "~/widgets/")
+      );
+    }
+    writeFileSync(
+      path.join(directory, "generated-source.tsx"),
+      readFileSync(
+        path.join(project, "tests/data-grid-source.types.tsx"),
+        "utf-8"
+      )
+        .replaceAll(
+          "../registry/new-york/data-grid-schema",
+          "~/widgets/data-grid/schema"
+        )
+        .replaceAll(
+          "../registry/new-york/use-data-grid-source",
+          "~/widgets/data-grid"
+        )
+        .replaceAll(
+          "../registry/new-york/data-grid-index",
+          "~/widgets/data-grid"
+        )
+        .replaceAll(
+          "../registry/new-york/data-grid-context",
+          "~/widgets/data-grid/data-grid-context"
+        )
     );
     const result = spawnSync(
       "timeout",

@@ -36,6 +36,18 @@ export const numericSelect = (
   <Select data={[{ label: "Zero", value: 0 }]} value={0} />
 );
 
+export const floatingLabelSelect = <Select data={data} label="Fruit" />;
+export const staticLabelSelect = (
+  <Select data={data} label="Fruit" labelStyle="static" multiple />
+);
+export const explicitLabelSelect = (
+  <Select data={data} label="Fruit" aria-label="Preferred fruit" />
+);
+export const unsupportedLabelStyle = (
+  // @ts-expect-error Label style is deliberately limited to two modes.
+  <Select data={data} label="Fruit" labelStyle="inline" />
+);
+
 // @ts-expect-error The selected value must come from the data value type.
 export const invalidValue = <Select data={data} value="banana" />;
 export const invalidMultiple = (

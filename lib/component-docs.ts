@@ -42,6 +42,11 @@ import {
   getDataGridDefaults,
 } from "@/lib/data-grid-playground";
 import {
+  dateTimeProps,
+  getDateTimeCode,
+  getDateTimeDefaults,
+} from "@/lib/date-time-playground";
+import {
   dialogProps,
   getDialogCode,
   getDialogDefaults,
@@ -142,6 +147,12 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
       "Root/Viewport/Table/Column/Row/Cell forward their corresponding native element attributes, refs and handlers. Search forwards InputSearch props except controlled value/defaultValue. Filter is a typed render binding, not a DOM element. ColumnVisibility has no native-prop API; Pagination/SelectionBar/Toolbar forward div props. Apply/Reset forward Button props.",
     playground: { code: getDataGridCode(getDataGridDefaults()) },
     props: dataGridProps,
+  },
+  "date-time": {
+    nativePropsDescription:
+      "DateTime forwards native time element attributes and refs, excluding children and dateTime. Inputs are strict timezone-qualified instants or epoch milliseconds.",
+    playground: { code: getDateTimeCode(getDateTimeDefaults()) },
+    props: dateTimeProps,
   },
   ...Object.fromEntries(
     Object.entries(inputComponentProps).map(([name, props]) => [
@@ -348,7 +359,9 @@ export const buildComponentDocSections = (
       "Initialize shadcn in your React project, then install this component from the Vandor UI registry:"
     ),
     code(
-      /^(autocomplete|data-grid)(-query|-schema|-stories)?$/.test(name)
+      /^(autocomplete(-query|-schema|-stories)?|data-grid(-query|-schema|-stories)?|date-time(-stories)?)$/.test(
+        name
+      )
         ? `# From the Vandor UI checkout, after initializing shadcn in the consumer:\npnpm registry:build\nnode scripts/install-component-family.cjs ${name} /absolute/path/to/consumer`
         : `npx shadcn@latest add ${registry.homepage}/r/${name}.json`,
       "bash"

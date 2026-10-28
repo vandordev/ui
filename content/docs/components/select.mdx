@@ -17,6 +17,8 @@ import {
 
 ## Usage
 
+Supply `label="Fruit"` to name the built-in trigger. Its default `labelStyle="floating"` places a transparent label in a real outline notch; `labelStyle="static"` places it above the field. Explicit trigger/root `aria-label` or `aria-labelledby` takes precedence. Unlabeled usage still needs an accessible name. A custom `trigger` owns its own label layout; these label props do not add markup around it. CLI installation includes `field-outline.tsx` in your configured UI alias; manual source copying must include this helper.
+
 Use `Select` for a ready-to-use control. It renders the trigger, popup, options, and groups automatically.
 
 ```tsx

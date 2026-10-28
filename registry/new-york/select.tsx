@@ -6,13 +6,15 @@ import { useRender } from "@base-ui/react/use-render";
 import { cn } from "cn";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
-import { createContext, useContext, useRef } from "react";
+import { createContext, useContext, useId, useRef } from "react";
 import type {
   AriaAttributes,
   ComponentProps,
   ReactElement,
   ReactNode,
 } from "react";
+
+import { FieldOutline } from "./field-outline";
 
 const PopupElement = ({
   nativeProps,
@@ -333,6 +335,8 @@ type SelectProps<
     >;
     contentProps?: Omit<SelectContentProps, "children" | "animated">;
     renderItem?: (item: Option) => ReactNode;
+    label?: string;
+    labelStyle?: "floating" | "static";
   };
 
 type SelectDataOption<Entry> = Entry extends {
@@ -357,6 +361,8 @@ const Select = <
   triggerProps,
   contentProps,
   renderItem,
+  label,
+  labelStyle = "floating",
   ...props
 }: Omit<
   SelectProps<
@@ -388,6 +394,7 @@ const Select = <
   }
   // Base UI resolves labels from a flat lookup even when data mixes groups and options.
   const items = groups.flatMap((group) => group.items);
+  const labelId = useId();
   const rootProps = { ...props };
   const ariaProps: AriaAttributes = {};
   for (const key of Object.keys(rootProps)) {
@@ -397,17 +404,51 @@ const Select = <
     }
   }
 
-  return (
-    <SelectRoot {...rootProps} items={items}>
-      {trigger === undefined ? (
+  const renderDefaultTrigger = () =>
+    label ? (
+      <FieldOutline
+        label={label}
+        labelId={labelId}
+        raised={labelStyle === "floating"}
+        staticLabel={labelStyle === "static"}
+        className="group relative w-full"
+      >
         <SelectTrigger
           {...triggerProps}
           {...ariaProps}
-          className={className}
+          aria-labelledby={
+            ariaProps["aria-labelledby"] ??
+            triggerProps?.["aria-labelledby"] ??
+            (ariaProps["aria-label"] || triggerProps?.["aria-label"]
+              ? undefined
+              : labelId)
+          }
+          className={cn(
+            "w-full",
+            labelStyle === "floating" &&
+              "border-transparent shadow-none focus-visible:ring-0",
+            className
+          )}
           size={size}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
+      </FieldOutline>
+    ) : (
+      <SelectTrigger
+        {...triggerProps}
+        {...ariaProps}
+        className={className}
+        size={size}
+      >
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+    );
+
+  return (
+    <SelectRoot {...rootProps} items={items}>
+      {trigger === undefined ? (
+        renderDefaultTrigger()
       ) : (
         <SelectPrimitive.Trigger
           {...triggerProps}

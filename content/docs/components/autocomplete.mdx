@@ -22,8 +22,11 @@ import { AutocompleteAsyncDemo } from "@/examples/autocomplete-async-demo";
 import { AutocompleteFormDemo } from "@/examples/autocomplete-form-demo";
 import { AutocompleteQueryDemo } from "@/examples/autocomplete-query-demo";
 import { AutocompleteInfiniteDemo } from "@/examples/autocomplete-infinite-demo";
+import { AutocompleteOverlayDemo } from "@/examples/autocomplete-overlay-demo";
 
 ## Usage
+
+Labels use a transparent fieldset/legend notch over the existing surface. Floating labels remain raised while focus moves between the input, clear button, trigger, or chips; static labels sit above the field. The shared `field-outline.tsx` support file installs in your configured UI directory, not inside the Autocomplete family. CLI installation includes it; copying only the Source block does not.
 
 `Autocomplete` assembles the field, suggestions, optional actions and chips. Strings need no accessors:
 
@@ -226,6 +229,17 @@ Single free text submits its string; selection submits the stable ID. Multiple v
 
 ## Behavior & Accessibility
 
+### Inside Drawer and Dialog
+
+<ComponentPreview
+  name="autocomplete-overlay-demo"
+  title="autocomplete-overlay-demo.tsx"
+>
+  <AutocompleteOverlayDemo />
+</ComponentPreview>
+
+Install Button, Drawer and Dialog separately for this example. Suggestions keep their isolated overlay layer; selecting one updates the field without dismissing the parent. Use Tab/Shift+Tab, Escape and arrow keys to inspect focus and dismissal. Popup painting and collision need a real browser; DOM tests do not establish their appearance.
+
 - Give the field a `label` or input ARIA name; placeholder alone is not a label. Static labels are default, floating labels opt in.
 - Default height is 36px, `size="sm"` is 32px. Multiple chips expand and wrap the field. Popup width follows the anchor and its list scrolls within available viewport height.
 - `className` owns the outer convenience field. `inputProps` owns native attributes, descriptions, handlers and ref; managed value/form/type/disabled/readOnly/required/size props are excluded. `contentProps` owns popup props and positioning/collision options, excluding children/render. Top-level ref targets the editable input and is merged with `inputProps.ref`.
@@ -248,4 +262,4 @@ Install Autocomplete first, then optionally install its stories:
 node scripts/install-component-family.cjs autocomplete-stories /absolute/path/to/consumer
 ```
 
-This adds only colocated `autocomplete.stories.tsx` in the configured UI directory. It never reinstalls the component, adds/upgrades Storybook packages or modifies `.storybook/`. Supply matching Storybook React packages; verified types/composition target Storybook 10.6.1. Discover `**/*.stories.tsx`, import your own Tailwind/shadcn global stylesheet and theme in the preview, and retain your existing decorators. No optional addon is required. Ordinary component installation is Storybook-free. Storybook UI not verified: this project has no Storybook server.
+This adds only colocated `autocomplete.stories.tsx` in the configured components family directory. It never reinstalls the component, adds/upgrades Storybook packages or modifies `.storybook/`. Supply matching Storybook React packages; verified types/composition target Storybook 10.6.1. Discover `**/*.stories.tsx`, import your own Tailwind/shadcn global stylesheet and theme in the preview, and retain your existing decorators. Static, floating, unlabeled and multiple-label stories are included; KeyboardSelection provides a reproducible manual keyboard flow, not simulated browser focus. No optional addon is required. Ordinary component installation is Storybook-free. Storybook UI not verified: this project has no Storybook server.

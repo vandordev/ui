@@ -81,6 +81,34 @@ after(async () => {
   await dom.happyDOM.abort();
 });
 
+test("InputPassword custom labels follow visibility state and disabled remains inert", async () => {
+  await ready;
+  const { InputPassword } = jiti("../registry/new-york/input-password.tsx");
+  await mount(
+    React.createElement(InputPassword, {
+      hidePasswordLabel: "Masquer le mot de passe",
+      name: "password",
+      showPasswordLabel: "Afficher le mot de passe",
+    })
+  );
+  const input = host.querySelector('input[name="password"]');
+  const toggle = host.querySelector("button");
+  assert.equal(input.type, "password");
+  assert.equal(toggle.getAttribute("aria-label"), "Afficher le mot de passe");
+  await React.act(() => toggle.click());
+  assert.equal(input.type, "text");
+  assert.equal(toggle.getAttribute("aria-label"), "Masquer le mot de passe");
+  assert.equal(toggle.getAttribute("aria-pressed"), "true");
+  await React.act(() =>
+    root.render(
+      React.createElement(InputPassword, { disabled: true, key: "disabled" })
+    )
+  );
+  const disabledToggle = host.querySelector("button");
+  await React.act(() => disabledToggle.click());
+  assert.equal(host.querySelector("input").type, "password");
+});
+
 test("DatePicker opens at the selected month and commits once through the new Popover", async () => {
   await ready;
   const { DatePicker } = jiti("../registry/new-york/date-picker.tsx");

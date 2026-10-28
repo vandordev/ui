@@ -5,7 +5,7 @@ export const dataGridProps = {
   columns: {
     defaultValue: "Required",
     description:
-      "useDataGrid: typed helper definitions, independent column ID/accessor/backend sort key.",
+      "Both adapters: typed helper definitions, independent column ID/accessor/backend sort key.",
     type: "readonly DataGridColumnDefinition[]",
   },
   debounce: {
@@ -39,24 +39,25 @@ export const dataGridProps = {
       options: ["immediate", "apply"],
     },
     defaultValue: '"immediate"',
-    description: "useDataGrid: validate immediately or commit the whole draft.",
+    description:
+      "Both adapters: validate immediately or commit the whole draft.",
     type: '"immediate" | "apply"',
   },
   getRowId: {
     defaultValue: "Required",
-    description: "useDataGrid: stable unique domain IDs, never page indexes.",
+    description: "Both adapters: stable unique domain IDs, never page indexes.",
     type: "(row) => string",
   },
   grid: {
     defaultValue: "Required",
     description:
-      "DataGrid and typed Table/Search/Filter overrides: controller from useDataGrid.",
+      "DataGrid and typed Table/Search/Filter overrides: controller from useDataGrid or useDataGridSource.",
     type: "Inferred controller",
   },
   initialState: {
     defaultValue: "Schema defaults",
     description:
-      "useDataGrid: captured once as the uncontrolled initialization/reset baseline.",
+      "Both adapters: captured once as the uncontrolled initialization/reset baseline.",
     type: "Partial<DataGridRawInput>",
   },
   labels: {
@@ -68,25 +69,14 @@ export const dataGridProps = {
   onStateChange: {
     defaultValue: "Not set",
     description:
-      "useDataGrid: emits the proposed value; controlled changes apply only after the parent supplies it.",
+      "Both adapters: emits the proposed value; controlled changes apply only after the parent supplies it.",
     type: "Per-slice callbacks",
   },
   pageSizes: {
     defaultValue: "[25, 50, 100]",
     description:
-      "DataGridPagination: sizes must fit contract limits. Cursor mode does not show total/first/last controls.",
+      "DataGridPagination: sizes must fit contract limits; zero/one choices hide only the size selector. Cursor mode does not show total/first/last controls.",
     type: "readonly number[]",
-  },
-  showPageNumbers: {
-    control: {
-      initialValue: true as boolean,
-      kind: "boolean",
-      label: "Page numbers",
-    },
-    defaultValue: "true",
-    description:
-      "DataGridPagination: page links with ellipses instead of First/Last. Set false for four icon controls. Cursor mode always uses Previous/Next only.",
-    type: "boolean",
   },
   pagination: {
     control: {
@@ -159,13 +149,30 @@ export const dataGridProps = {
       options: ["none", "explicit", "allMatching"],
     },
     defaultValue: '"none"',
-    description: "useDataGrid: remote ID selection policy.",
+    description: "Both adapters: remote ID selection policy.",
     type: '"none" | "explicit" | "allMatching"',
+  },
+  showPageNumbers: {
+    control: {
+      initialValue: true as boolean,
+      kind: "boolean",
+      label: "Page numbers",
+    },
+    defaultValue: "true",
+    description:
+      "DataGridPagination: page links with ellipses instead of First/Last. Set false for four icon controls. Cursor mode always uses Previous/Next only.",
+    type: "boolean",
+  },
+  source: {
+    defaultValue: "Required for useDataGridSource only",
+    description:
+      "useDataGridSource: contract output or undefined, optional error/loading/refreshing, and refetch callback. Consumer owns transport/cache and current-request correspondence. No Query provider is required; query exposes only data/error/refetch.",
+    type: "DataGridSource<C>",
   },
   state: {
     defaultValue: "Uncontrolled",
     description:
-      "useDataGrid: supplied slices are authoritative. Request contains filters/sorting/pagination atomically.",
+      "Both adapters: supplied slices are authoritative. Request contains filters/sorting/pagination atomically.",
     type: "{ request?, columnVisibility?, columnOrder?, selection? }",
   },
   stickyHeader: {
@@ -194,7 +201,7 @@ export const dataGridProps = {
 export const getDataGridDefaults = () => getPlaygroundDefaults(dataGridProps);
 export type DataGridPlaygroundValues = ReturnType<typeof getDataGridDefaults>;
 
-export function getDataGridCode(values: DataGridPlaygroundValues) {
+export const getDataGridCode = (values: DataGridPlaygroundValues) => {
   const { pagination, scenario } = values;
   return `"use client";
 
@@ -263,4 +270,4 @@ export default function UsersDemo() {
   return <QueryClientProvider client={client}><Users /></QueryClientProvider>;
 }
 `;
-}
+};

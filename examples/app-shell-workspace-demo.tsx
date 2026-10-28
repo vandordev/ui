@@ -12,6 +12,7 @@ import { useState } from "react";
 import { AppShell } from "@/registry/new-york/app-shell";
 import { Button } from "@/registry/new-york/button";
 import { Dropdown } from "@/registry/new-york/dropdown";
+import { PageContainer } from "@/registry/new-york/page-container";
 
 export const AppShellWorkspaceDemo = () => {
   const [workspace, setWorkspace] = useState("Acme");
@@ -114,10 +115,12 @@ export const AppShellWorkspaceDemo = () => {
       header={<span className="truncate text-sm font-medium">{workspace}</span>}
       className="h-96 min-h-0 w-full [&_[data-slot=app-shell-sidebar]]:h-full [&_[data-slot=app-shell-header]]:static [&_[data-slot=app-shell-main]]:overflow-y-auto"
     >
-      <h2 className="text-lg font-semibold">{active}</h2>
-      <p role="status" className="mt-2 text-sm text-muted-foreground">
-        {notice}
-      </p>
+      <PageContainer>
+        <h2 className="text-lg font-semibold">{active}</h2>
+        <p role="status" className="mt-2 text-sm text-muted-foreground">
+          {notice}
+        </p>
+      </PageContainer>
     </AppShell>
   );
 };

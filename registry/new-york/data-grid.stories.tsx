@@ -24,6 +24,7 @@ import {
 import { createDataGridColumnHelper } from "./data-grid-columns";
 import { createDataGridContract } from "./data-grid-schema";
 import { useDataGrid } from "./use-data-grid";
+import { useDataGridSource } from "./use-data-grid-source";
 
 const contract = createDataGridContract({
   filters: z.object({ search: z.string().default("") }),
@@ -58,7 +59,33 @@ interface Args {
   pagination: "page" | "cursor";
   controlled: boolean;
 }
-function StoryGrid(args: Args) {
+const waitForStoryRequest = async (
+  signal: AbortSignal,
+  milliseconds: number
+) => {
+  if (signal.aborted) {
+    throw new DOMException("Cancelled", "AbortError");
+  }
+  // eslint-disable-next-line promise/avoid-new -- Adapt the browser timer API; no portable cancellable promise timer exists.
+  await new Promise<void>((resolve, reject) => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const abort = () => {
+      for (const timer of timers) {
+        clearTimeout(timer);
+      }
+      reject(new DOMException("Cancelled", "AbortError"));
+    };
+    timers.push(
+      setTimeout(() => {
+        signal.removeEventListener("abort", abort);
+        resolve();
+      }, milliseconds)
+    );
+    signal.addEventListener("abort", abort, { once: true });
+  });
+};
+
+const StoryGrid = (args: Args) => {
   const [request, setRequest] = useState(() =>
     contract.input.parse({ filters: {} })
   );
@@ -70,30 +97,15 @@ function StoryGrid(args: Args) {
     onStateChange: args.controlled ? { request: setRequest } : undefined,
     queryOptions: (input) =>
       queryOptions({
-        queryKey: ["story-users", args.scenario, input],
-        retry: false,
         enabled: args.scenario !== "inactive",
         queryFn: async ({ signal }) => {
-          await new Promise<void>((resolve, reject) => {
-            if (signal.aborted) {
-              reject(new DOMException("Cancelled", "AbortError"));
-              return;
-            }
-            const abort = () => {
-              clearTimeout(timer);
-              reject(new DOMException("Cancelled", "AbortError"));
-            };
-            const timer = setTimeout(
-              () => {
-                signal.removeEventListener("abort", abort);
-                resolve();
-              },
-              args.scenario === "loading" ? 10000 : 80
-            );
-            signal.addEventListener("abort", abort, { once: true });
-          });
-          if (args.scenario === "error")
+          await waitForStoryRequest(
+            signal,
+            args.scenario === "loading" ? 10_000 : 80
+          );
+          if (args.scenario === "error") {
             throw new globalThis.Error("Private simulation error");
+          }
           const rows =
             args.scenario === "empty"
               ? []
@@ -102,18 +114,21 @@ function StoryGrid(args: Args) {
                     .toLowerCase()
                     .includes(input.filters.search.toLowerCase())
                 );
-          if (input.sorting.length)
+          if (input.sorting.length) {
             rows.sort(
               (a, b) =>
                 (input.sorting[0].desc ? -1 : 1) *
                   a.name.localeCompare(b.name) || Number(a.id) - Number(b.id)
             );
+          }
           const start = input.pagination.pageIndex * input.pagination.pageSize;
           return contract.output.parse({
-            rows: rows.slice(start, start + input.pagination.pageSize),
             rowCount: rows.length,
+            rows: rows.slice(start, start + input.pagination.pageSize),
           });
         },
+        queryKey: ["story-users", args.scenario, input],
+        retry: false,
       }),
     selectionMode: args.selectionMode,
     state: args.controlled ? { request } : undefined,
@@ -142,8 +157,8 @@ function StoryGrid(args: Args) {
       <DataGridPagination showPageNumbers={args.showPageNumbers} />
     </DataGrid>
   );
-}
-function CursorGrid(args: Args) {
+};
+const CursorGrid = (args: Args) => {
   const grid = useDataGrid({
     columns: cursorColumns,
     contract: cursorContract,
@@ -151,29 +166,34 @@ function CursorGrid(args: Args) {
     getRowId: (row) => row.id,
     queryOptions: (input) =>
       queryOptions({
-        queryKey: ["story-cursor", input],
-        retry: false,
-        queryFn: async () => {
+        queryFn: () => {
           const rows = records.filter((row) =>
             row.name.toLowerCase().includes(input.filters.search.toLowerCase())
           );
-          if (input.sorting.length)
+          if (input.sorting.length) {
             rows.sort(
               (a, b) =>
                 (input.sorting[0].desc ? -1 : 1) *
                   a.name.localeCompare(b.name) || Number(a.id) - Number(b.id)
             );
+          }
           const start =
             input.pagination.cursor === null
               ? 0
               : rows.findIndex((row) => row.id === input.pagination.cursor);
-          if (start < 0) throw new globalThis.Error("Invalid simulated cursor");
+          if (start < 0) {
+            throw new globalThis.Error("Invalid simulated cursor");
+          }
           const end = start + input.pagination.pageSize;
-          return cursorContract.output.parse({
-            rows: rows.slice(start, end),
-            nextCursor: rows[end]?.id ?? null,
-          });
+          return Promise.resolve(
+            cursorContract.output.parse({
+              nextCursor: rows[end]?.id ?? null,
+              rows: rows.slice(start, end),
+            })
+          );
         },
+        queryKey: ["story-cursor", input],
+        retry: false,
       }),
     selectionMode: args.selectionMode,
   });
@@ -199,8 +219,8 @@ function CursorGrid(args: Args) {
       <DataGridPagination showPageNumbers={args.showPageNumbers} />
     </DataGrid>
   );
-}
-function Example(args: Args) {
+};
+const Example = (args: Args) => {
   const [client] = useState(
     () => new QueryClient({ defaultOptions: { queries: { gcTime: Infinity } } })
   );
@@ -214,7 +234,7 @@ function Example(args: Args) {
       )}
     </QueryClientProvider>
   );
-}
+};
 const meta = {
   argTypes: {
     controlled: { control: false },
@@ -229,8 +249,8 @@ const meta = {
       control: "select",
       options: ["none", "explicit", "allMatching"],
     },
-    stickyHeader: { control: "boolean" },
     showPageNumbers: { control: "boolean" },
+    stickyHeader: { control: "boolean" },
     variant: {
       control: "select",
       options: ["default", "striped", "bordered", "plain"],
@@ -243,8 +263,8 @@ const meta = {
     pagination: "page",
     scenario: "ready",
     selectionMode: "none",
-    stickyHeader: false,
     showPageNumbers: true,
+    stickyHeader: false,
     variant: "default",
   },
   component: Example,
@@ -275,3 +295,86 @@ export const Cursor: Story = {
   args: { pagination: "cursor" },
 };
 export const Controlled: Story = { args: { controlled: true } };
+
+const SourceGrid = (args: Args) => {
+  const [recoveredScenario, setRecoveredScenario] = useState<string>();
+  const scenario =
+    recoveredScenario === args.scenario ? "ready" : args.scenario;
+  const [request, setRequest] = useState(() =>
+    contract.input.parse({ filters: {} })
+  );
+  const matching = records.filter((row) =>
+    row.name.toLowerCase().includes(request.filters.search.toLowerCase())
+  );
+  if (request.sorting.length) {
+    matching.sort(
+      (a, b) =>
+        (request.sorting[0].desc ? -1 : 1) * a.name.localeCompare(b.name)
+    );
+  }
+  const start = request.pagination.pageIndex * request.pagination.pageSize;
+  const grid = useDataGridSource({
+    columns,
+    contract,
+    filterMode: args.filterMode,
+    getRowId: (row) => row.id,
+    onStateChange: { request: setRequest },
+    selectionMode: args.selectionMode,
+    source: {
+      data:
+        scenario === "loading" ||
+        scenario === "error" ||
+        scenario === "inactive"
+          ? undefined
+          : {
+              rowCount: scenario === "empty" ? 0 : matching.length,
+              rows:
+                scenario === "empty"
+                  ? []
+                  : matching.slice(start, start + request.pagination.pageSize),
+            },
+      error:
+        scenario === "error"
+          ? new globalThis.Error("Local source error")
+          : undefined,
+      loading: scenario === "loading",
+      refetch: () => setRecoveredScenario(args.scenario),
+    },
+    state: { request },
+  });
+  return (
+    <DataGrid grid={grid} density={args.density} variant={args.variant}>
+      <DataGridToolbar>
+        <DataGridSearch
+          grid={grid}
+          field="search"
+          clearable
+          aria-label="Search source users"
+        />
+        {args.filterMode === "apply" && <DataGridApplyFilters />}
+        <DataGridResetFilters />
+      </DataGridToolbar>
+      <DataGridSelectionBar />
+      <DataGridTable
+        grid={grid}
+        aria-label="Source users"
+        stickyHeader={args.stickyHeader}
+      />
+      <DataGridPagination
+        pageSizes={[25]}
+        showPageNumbers={args.showPageNumbers}
+      />
+    </DataGrid>
+  );
+};
+export const ConsumerSource: Story = {
+  argTypes: {
+    controlled: { control: false },
+    pagination: { control: false },
+    scenario: {
+      control: "select",
+      options: ["ready", "empty", "error", "loading"],
+    },
+  },
+  render: (args) => <SourceGrid {...args} />,
+};

@@ -66,7 +66,7 @@ test("PageContainer defaults to equal responsive padding and full size removes o
   for (const size of [undefined, "full"]) {
     const element = PageContainer({ size });
     const classes = element.props.className.split(/\s+/);
-    for (const name of ["mx-auto", "p-4", "sm:p-6", "lg:p-8"]) {
+    for (const name of ["mx-auto", "p-4", "sm:p-6", "lg:p-12"]) {
       assert.ok(classes.includes(name), `Missing layout class: ${name}`);
     }
     assert.ok(classes.includes(size === "full" ? "max-w-none" : "max-w-6xl"));
@@ -99,7 +99,7 @@ test("PageContainer preserves native props and ref and lets callers override lay
   assert.match(element.props.className, /max-w-none/);
   assert.doesNotMatch(
     element.props.className,
-    /max-w-6xl|\bp-4\b|sm:p-6|lg:p-8/
+    /max-w-6xl|\bp-4\b|sm:p-6|lg:p-12/
   );
 });
 

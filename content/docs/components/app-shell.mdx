@@ -12,6 +12,8 @@ import { ComponentPreview } from "@/components/component-preview";
 import { AppShellDemo, AppShellCollapsedDemo } from "@/examples/app-shell-demo";
 import { AppShellWorkspaceDemo } from "@/examples/app-shell-workspace-demo";
 import { AppShellHierarchyDemo } from "@/examples/app-shell-hierarchy-demo";
+import { AppShellUserDemo } from "@/examples/app-shell-user-demo";
+import { AppShellFullBleedDemo } from "@/examples/app-shell-full-bleed-demo";
 
 ## Usage
 
@@ -48,7 +50,36 @@ export default function WorkspaceLayout() {
 }
 ```
 
-AppShell owns the layout and navigation presentation. Your application owns routes, active destinations, resource data, search UI, and account actions. These previews demonstrate local state, not real routing or authentication. AppShell uses states and runnable examples rather than a props playground.
+AppShell owns the layout and navigation presentation. Your application owns routes, active destinations, resource data, and search UI. These previews demonstrate local state, not real routing or authentication. AppShell uses states and runnable examples rather than a props playground.
+
+`showHeader` defaults to `true`. Set it to `false` for a headerless shell; the main surface remains edge-to-edge so the consumer can choose page spacing. `PageContainer` now defaults to `p-4 sm:p-6 lg:p-12` (16/24/48px), so add it only where that inset is wanted. This is a breaking spacing change from the previous shell padding and `lg:p-8` page container.
+
+An optional `user` config renders the built-in account menu. It is presentation only: the consumer supplies the identity and `DropdownEntry[]` actions. A provided `sidebarFooter` takes precedence, including `null`. Async action and cancellation behavior follows Dropdown's `closeOnSelect` contract. Use `labels` to localize shell navigation controls.
+
+```tsx
+import { AppShell } from "@/components/ui/app-shell";
+import { PageContainer } from "@/components/ui/page-container";
+
+export function HeaderlessLayout() {
+  return (
+    <AppShell brand={{ name: "Acme" }} navigation={[]} showHeader={false}>
+      <PageContainer>Page content</PageContainer>
+    </AppShell>
+  );
+}
+```
+
+Install PageContainer separately when using this composition. Omit it for full-bleed content. Headerless mode hides `header`, `actions`, and the search button without relocating them; the search shortcut still runs when `onSearch` is supplied. The mobile brand tab and floating menu honor safe-area insets, with initial content clearance. Its drawer opens from the right; header mode opens from the left. The sidebar uses `sidebar`/`sidebar-foreground` tokens.
+
+### Built-in identity and localized controls
+
+<ComponentPreview name="app-shell-user-demo" title="app-shell-user-demo.tsx">
+  <AppShellUserDemo />
+</ComponentPreview>
+
+`user` requires `name` and `items: readonly DropdownEntry[]`; optional `description`, `avatar`, `pending`, and `menuLabel` configure identity. Missing avatar uses initials. `pending` disables the trigger and announces busy state. The collapsed trigger has an identity tooltip. Groups, submenus, real links, cancellation, overlays and error callbacks use Dropdown's existing contract. No authentication is implemented.
+
+Accepted synchronous actions close mobile navigation. Async actions keep the drawer owner mounted until fulfillment, even when Dropdown closes its menu immediately by default. Rejected/thrown actions, canceled events, `closeOnSelect: false`, overlay activation and menu-only dismissal do not close navigation. `closeOnSelect: "success"` also keeps the menu open while pending. A late fulfillment from a dismissed/reopened menu does not close the newer navigation session.
 
 ## States
 
@@ -76,6 +107,17 @@ The preview height overrides are only for embedding examples. Breakpoints follow
 
 ## Examples
 
+### Full-bleed content
+
+<ComponentPreview
+  name="app-shell-full-bleed-demo"
+  title="app-shell-full-bleed-demo.tsx"
+>
+  <AppShellFullBleedDemo />
+</ComponentPreview>
+
+The canvas omits PageContainer and owns its own internal spacing. Other page-style examples use PageContainer exactly once.
+
 ### Workspace and account controls
 
 <ComponentPreview
@@ -85,7 +127,7 @@ The preview height overrides are only for embedding examples. Breakpoints follow
   <AppShellWorkspaceDemo />
 </ComponentPreview>
 
-Install [Dropdown](/docs/components/dropdown) separately to run this example. `sidebarHeader` replaces the default brand row and receives `{ collapsed, closeNavigation }`; `sidebarFooter` receives `{ collapsed }`. Both receive `collapsed: false` on mobile. Slots are rendered separately on desktop and mobile: keep shared selection state in the consuming application, not inside a slot-local component.
+Dropdown is included in AppShell's dependency closure. `sidebarHeader` replaces the default brand row; both it and `sidebarFooter` receive `{ collapsed, closeNavigation }`. Both receive `collapsed: false` on mobile. Slots are rendered separately on desktop and mobile: keep shared selection state in the consuming application, not inside a slot-local component.
 
 ### Hierarchy and controlled collapse
 
@@ -96,7 +138,7 @@ Install [Dropdown](/docs/components/dropdown) separately to run this example. `s
   <AppShellHierarchyDemo />
 </ComponentPreview>
 
-Open an agent to replace the middle navigation with a return action, agent switcher, and detail destinations. Return with **All agents**. The brand row and footer are outside the transitioning panel. This example also installs Dropdown separately and controls `collapsed` through `onCollapsedChange`.
+Open an agent to replace the middle navigation with a return action and detail destinations. The agent switcher uses the sidebar header slot, outside the transitioning panel, rather than returning a composite Dropdown from `renderControl`. Return with **All agents**. Dropdown is included in the shell closure; the example also installs PageContainer and controls `collapsed` through `onCollapsedChange`.
 
 `navigationContext={{ key, depth }}` is presentation metadata, not a router or navigation stack. Keep a stable key for each panel and a consistent depth for that key. Changing the key triggers a 220ms slide and fade; increasing depth moves forward and decreasing depth moves back. A different key at the same depth moves forward. Active-item changes and switching resources within the same panel keep the key unchanged and do not replay the hierarchy transition. Without `navigationContext`, navigation updates without panel transitions.
 
@@ -104,18 +146,20 @@ The hierarchy can have more than two levels. Your application supplies each pane
 
 ### Navigation item contract
 
-| Property        | Behavior                                                                                                                          |
-| --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `id`, `label`   | Required unique identity and accessible label for a standard item.                                                                |
-| `icon`          | Optional decorative React node; the first label character is the fallback.                                                        |
-| `href`          | Uses a native anchor unless disabled. Use `renderControl` for router-specific Link components.                                    |
-| `onClick`       | Called synchronously on selection; mobile navigation closes immediately, without awaiting async work.                             |
-| `active`        | Adds selected styling and `aria-current="page"`; the application determines the active item.                                      |
-| `disabled`      | Standard item becomes a disabled button, including when it has an href.                                                           |
-| `dividerAfter`  | Adds a separator after a standard or custom item.                                                                                 |
-| `renderControl` | Replaces the entire standard control, receives `{ collapsed, closeNavigation }`, and adds no button wrapper or automatic tooltip. |
+| Property        | Behavior                                                                                                                                                                     |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`, `label`   | Required unique identity and accessible label for a standard item.                                                                                                           |
+| `icon`          | Optional decorative React node; the first label character is the fallback.                                                                                                   |
+| `href`          | Uses a native anchor unless disabled. Use `renderControl` for router-specific Link components.                                                                               |
+| `onClick`       | Called synchronously on selection; mobile navigation closes immediately, without awaiting async work.                                                                        |
+| `active`        | Adds selected styling and `aria-current="page"`; the application determines the active item.                                                                                 |
+| `disabled`      | Standard item becomes a disabled button, including when it has an href.                                                                                                      |
+| `dividerAfter`  | Adds a separator after a standard or custom item.                                                                                                                            |
+| `renderControl` | Returns one ReactElement control receiving `{ collapsed, closeNavigation }`. The shell composes it as a tooltip trigger on collapsed desktop only, without a button wrapper. |
 
 With `renderControl`, the consumer owns the label, icon, active/disabled behavior, click callback, and mobile closing. The item-level `href`, `onClick`, `active`, and `disabled` do not apply automatically. `id` and `dividerAfter` still apply. Use `closeNavigation()` after a custom selection when dismissal is appropriate.
+
+The returned native element or router Link must forward received props, handlers and ref to one focusable root. Fragments, multiple roots and components dropping these props are unsupported. This replaces the previous arbitrary-node contract. Preserve native href/modifier semantics and compose caller cancellation when deciding whether to close navigation. Tooltips use hover and keyboard focus; expanded/mobile navigation has no redundant tooltip.
 
 ### Optional search
 
@@ -123,11 +167,11 @@ Supplying `onSearch` enables the search button and a document-level Cmd/Ctrl+K c
 
 ### Consumer setup and optional stories
 
-Requires React 19, Tailwind CSS 4, `motion`, `cn`, and `lucide-react`, together with the Vandor Button, Drawer, and Tooltip registry items. Their transitive registry/package dependencies are installed by the CLI. Use your global Tailwind stylesheet and semantic `background`, `foreground`, `border`, `muted`, `muted-foreground`, `accent`, `accent-foreground`, `ring`, and underlying Button/Drawer theme tokens. Keep the standard Tailwind `md` breakpoint at 768px to match the drawer's desktop media query.
+Requires React 19, Tailwind CSS 4, `motion`, `cn`, and `lucide-react`, together with the Vandor Button, Drawer, Dropdown, and Tooltip registry items. Their transitive registry/package dependencies are installed by the CLI. Use your global Tailwind stylesheet and semantic `background`, `foreground`, `sidebar`, `sidebar-foreground`, `border`, `muted`, `muted-foreground`, `accent`, `accent-foreground`, `ring`, and underlying Button/Drawer theme tokens. Keep the standard Tailwind `md` breakpoint at 768px to match the drawer's desktop media query.
 
 AppShell is a client component and can be imported from a Next.js Server Component. Functions such as navigation callbacks and render slots must be supplied inside a client boundary, not passed from a Server Component as serialized props. Installation uses the configured UI alias in `components.json`, with no fixed target directory. Review CLI overwrite prompts for shared dependencies before replacing customized primitives.
 
-Copying the Source block alone is insufficient: it imports Button, Drawer, and Tooltip. Prefer CLI installation; for manual setup install their Vandor registry items and declared packages first, then copy AppShell into the same UI directory. Examples are not distributed with the component.
+Copying the Source block alone is insufficient: AppShell requires its colocated `app-shell-user.tsx` helper plus Button, Drawer, Dropdown and Tooltip. Prefer CLI installation; for manual setup install these Vandor items and declared packages first, then copy both shell modules into the same UI directory. Examples are not distributed with the component.
 
 Install AppShell first, then optionally install its portable stories:
 

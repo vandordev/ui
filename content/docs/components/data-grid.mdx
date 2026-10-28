@@ -11,6 +11,7 @@ import { DataGridFiltersDemo } from "@/examples/data-grid-filters-demo";
 import { DataGridSelectionDemo } from "@/examples/data-grid-selection-demo";
 import { DataGridControlledDemo } from "@/examples/data-grid-controlled-demo";
 import { DataGridRenderingDemo } from "@/examples/data-grid-rendering-demo";
+import { DataGridSourceDemo } from "@/examples/data-grid-source-demo";
 
 ## Usage
 
@@ -22,6 +23,23 @@ Supply an existing `QueryClientProvider`. Define the domain once with Zod, deriv
 
 Examples use an asynchronous in-memory backend simulation, not a database. It processes filters, deterministic sorting, and only the requested page. Replace the service with an authorized transport. Query owns remote data, cancellation, retries, and cache freshness; DataGrid never copies rows into another cache or replaces your `select`, keys, `enabled`, or placeholder policy.
 
+### Consumer-owned data without a Query provider
+
+<ComponentPreview
+  name="data-grid-source-demo"
+  title="data-grid-source-demo.tsx"
+>
+  <DataGridSourceDemo />
+</ComponentPreview>
+
+Import `useDataGridSource` from the installed `@/components/data-grid` entry. It shares the request, filter, table, pagination and selection controller with `useDataGrid`. Pass the same `contract`, `columns`, `getRowId`, and optional controller state/callbacks, plus `source: { data, error?, loading?, refreshing?, refetch }`. `data` is the contract output or `undefined`; `refetch` is required. No fetch, cache, or QueryClient provider is created by this adapter. Existing package installation dependencies remain unchanged.
+
+The example owns a controlled request and slices deterministic local records. Use **Complete request** or **Fail request** to finish the initial load, then **Refresh source** to retain rows during refresh; **Try again** calls the source's refetch callback. **Restart demo** restores the initial request and selection. These are explicit local transitions, not network requests or a transport implementation.
+
+For a remote source, the consumer owns authorization, caching, cancellation, and correspondence between data and the current request, including stale-response arbitration. Do not pass another request's cached rows as current data. With no data, `loading` means initial loading, an error means error, and no activity means inactive. With data, `refreshing`/`loading` retains rows with refreshing feedback, error retains rows with background-error feedback, and zero rows means empty. Cursor history commits successful current output only. `grid.query` on this path exposes only `data`, `error`, and `refetch`, not a fabricated native Query result.
+
+`useDataGrid` continues to expose the real native Query result and preserve `select` inference. Both adapters keep selection across pagination/sorting and clear it when effective filters change. The `pageSizes` selector is hidden for zero or one choice, without hiding range announcements or navigation.
+
 ### Consumer setup
 
 Requires React 19-compatible Vandor primitives, Tailwind v4, Vandor/shadcn theme tokens (`background`, `foreground`, `muted`, `accent`, `border`, `ring`, `destructive`), and the existing primitives' animation setup. Verified integration uses Table 9.2.6, Query 5.104.1, and Zod 4.3.6. Backend-only schema installation has no React runtime imports:
@@ -30,7 +48,7 @@ Requires React 19-compatible Vandor primitives, Tailwind v4, Vandor/shadcn theme
 npx shadcn@latest add https://vandor-ui.vercel.app/r/data-grid-schema.json
 ```
 
-Use CLI installation for the complete UI. Copying the Source block alone is insufficient: DataGrid also needs `data-grid-columns`, `data-grid-context`, `data-grid-controls`, `data-grid-feedback`, `data-grid-labels`, `data-grid-selection`, `data-grid-state`, `use-data-grid`, `data-grid-schema`, and the shared `error-state-base` module, plus Button, Checkbox, Select, Dropdown, InputSearch, Empty and their dependencies. Review overwrite prompts for existing customized primitives. Supporting files share identical content with their owning registry items.
+Use CLI installation for the complete UI. Copying the Source block alone is insufficient: DataGrid also needs `data-grid-columns`, `data-grid-context`, `data-grid-controls`, `data-grid-controller`, `data-grid-feedback`, `data-grid-labels`, `data-grid-selection`, `data-grid-state`, `use-data-grid`, `use-data-grid-source`, `data-grid-schema`, and the shared `error-state-base` module, plus Button, Checkbox, Select, Dropdown, InputSearch, Empty and their dependencies. Review overwrite prompts for existing customized primitives. Supporting files share identical content with their owning registry items.
 
 ### Backend reuse
 
@@ -144,7 +162,9 @@ Root owns variant/density/labels. Column, Row, and Cell are native `th`/`tr`/`td
 Install DataGrid first, then add stories separately:
 
 ```bash
-npx shadcn@latest add https://vandor-ui.vercel.app/r/data-grid-stories.json
+# From the Vandor UI checkout, with shadcn initialized in the consumer:
+pnpm registry:build
+node scripts/install-component-family.cjs data-grid-stories /absolute/path/to/consumer
 ```
 
-Stories do not reinstall core or modify `.storybook`. Use an existing React Storybook with matching package versions, `@storybook/react` types, and a story glob covering your configured UI directory (`**/*.stories.tsx`). Types target the installed 10.6.1 version; use matching versions in your setup. Inherit your global Tailwind/theme CSS and decorators. Stories include their own QueryClientProvider and simulated service, with no website imports or extra addon requirement. Storybook UI is not verified: this project has no Storybook server.
+The wrapper resolves the consumer's configured components alias; stock shadcn 4.5.0 does not support every nested alias. Stories do not reinstall core or modify `.storybook`. Use an existing React Storybook with matching package versions, `@storybook/react` types, and a story glob covering your configured components directory (`**/*.stories.tsx`). Types target the installed 10.6.1 version; use matching versions in your setup. Inherit your global Tailwind/theme CSS and decorators. Query-backed stories include their own QueryClientProvider and simulated service; ConsumerSource needs no provider and supports Retry recovery. There are no website imports or extra addon requirements. Storybook UI is not verified: this project has no Storybook server.

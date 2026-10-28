@@ -15,11 +15,15 @@ const StorySelect = ({
   disabled,
   animated,
   placeholder,
+  label,
+  labelStyle,
 }: {
   size: "sm" | "default";
   disabled: boolean;
   animated: boolean;
   placeholder: string;
+  label: string;
+  labelStyle: "floating" | "static";
 }) => (
   <Select
     data={data}
@@ -27,7 +31,9 @@ const StorySelect = ({
     disabled={disabled}
     animated={animated}
     placeholder={placeholder}
-    aria-label="Fruit"
+    label={label}
+    labelStyle={labelStyle}
+    aria-label={label ? undefined : "Fruit"}
     className="w-56"
   />
 );
@@ -35,12 +41,16 @@ const meta = {
   argTypes: {
     animated: { control: "boolean" },
     disabled: { control: "boolean" },
+    label: { control: "text" },
+    labelStyle: { control: "select", options: ["floating", "static"] },
     placeholder: { control: "text" },
     size: { control: "select", options: ["sm", "default"] },
   },
   args: {
     animated: true,
     disabled: false,
+    label: "Fruit",
+    labelStyle: "floating",
     placeholder: "Choose a fruit",
     size: "default",
   },
@@ -52,6 +62,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Playground: Story = {};
+export const StaticLabel: Story = { args: { labelStyle: "static" } };
+export const Unlabeled: Story = { args: { label: "" } };
 export const Small: Story = { args: { size: "sm" } };
 export const Disabled: Story = { args: { disabled: true } };
 export const WithoutMotion: Story = { args: { animated: false } };

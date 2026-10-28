@@ -155,6 +155,574 @@ test("AppShell collapse supports uncontrolled and controlled ownership", async (
   assert.ok(host.querySelector('[aria-label="Expand sidebar"]'));
 });
 
+test("AppShell supports headerless content and localized shell labels", async () => {
+  await setup();
+  await render({
+    labels: {
+      collapseSidebar: "Réduire la barre latérale",
+      openNavigation: "Ouvrir la navigation",
+      sidebar: "Navigation latérale",
+      skipToContent: "Aller au contenu",
+    },
+    showHeader: false,
+  });
+  assert.ok(
+    host.querySelector('[data-slot="app-shell-header"]') === null,
+    "Headerless shell omits topbar"
+  );
+  assert.ok(host.querySelector('[data-slot="app-shell-main"]'));
+  assert.equal(
+    host.querySelector('[aria-label="Navigation latérale"]')?.tagName,
+    "ASIDE"
+  );
+  assert.ok(
+    host.querySelector('a[href^="#"]')?.textContent.includes("Aller au contenu")
+  );
+  assert.ok(
+    host.querySelector('[aria-label="Ouvrir la navigation"]') !== null,
+    "Headerless mobile trigger remains available"
+  );
+  await render({ labels: { collapseSidebar: "Réduire" } });
+  assert.ok(host.querySelector('[aria-label="Réduire"]'));
+});
+
+test("AppShell built-in user footer is optional and custom footer takes precedence", async () => {
+  await setup();
+  await render({
+    user: { description: "Workspace owner", items: [], name: "Avery Cole" },
+  });
+  assert.ok(host.querySelector('[aria-label="Avery Cole account menu"]'));
+  assert.ok(host.textContent.includes("AC"));
+  assert.ok(host.textContent.includes("Workspace owner"));
+  await render({
+    sidebarFooter: null,
+    user: { items: [], name: "Avery Cole" },
+  });
+  assert.ok(
+    host.querySelector('[aria-label="Avery Cole account menu"]') === null,
+    "Explicit null footer suppresses built-in user"
+  );
+  await render({
+    sidebarFooter: "Custom footer",
+    user: { items: [], name: "Avery Cole" },
+  });
+  assert.ok(host.textContent.includes("Custom footer"));
+  assert.ok(
+    host.querySelector('[aria-label="Avery Cole account menu"]') === null,
+    "Custom footer replaces built-in user"
+  );
+});
+
+test("AppShell compact user exposes identity tooltip and caller pending disables the native menu trigger", async () => {
+  await setup();
+  const user = {
+    description: "Workspace owner",
+    items: [],
+    menuLabel: "Menu akun Avery",
+    name: "Avery Cole",
+  };
+  await render({ collapsed: true, user });
+  const trigger = host.querySelector('[aria-label="Menu akun Avery"]');
+  assert.equal(trigger.tagName, "BUTTON");
+  assert.equal(trigger.textContent, "AC");
+  await React.act(() => {
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", { bubbles: true, key: "Tab" })
+    );
+    trigger.focus();
+    trigger.dispatchEvent(
+      new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" })
+    );
+    trigger.dispatchEvent(new MouseEvent("mousemove", { bubbles: true }));
+  });
+  await settle();
+  assert.equal(
+    document.querySelector('[data-slot="tooltip-content"]')?.textContent,
+    "Avery Cole"
+  );
+  await render({ collapsed: true, user: { ...user, pending: true } });
+  const pending = host.querySelector('[aria-label="Menu akun Avery"]');
+  assert.equal(pending.disabled, true);
+  assert.equal(pending.getAttribute("aria-busy"), "true");
+  await render({ collapsed: false, user });
+  const expanded = host.querySelector('[aria-label="Menu akun Avery"]');
+  assert.equal(expanded.dataset.slot, "dropdown-trigger");
+  assert.ok(expanded.textContent.includes("Workspace owner"));
+});
+
+test("AppShell headerless retains rail controls and localized right mobile navigation", async () => {
+  await setup();
+  await render({
+    labels: { closeNavigation: "Tutup navigasi" },
+    showHeader: false,
+    sidebarFooter: ({ closeNavigation }) =>
+      React.createElement("button", { onClick: closeNavigation }, "Done"),
+  });
+  await click(host.querySelector('[aria-label="Collapse sidebar"]'));
+  assert.equal(
+    host.querySelector('[data-slot="app-shell"]').dataset.collapsed,
+    "true"
+  );
+  dom.happyDOM.setWindowSize({ height: 844, width: 390 });
+  const trigger = host.querySelector('[aria-label="Open navigation"]');
+  await click(trigger);
+  await settle();
+  assert.ok(
+    document.querySelector('[role="dialog"]') !== null,
+    "Headerless drawer opens"
+  );
+  assert.ok(
+    document.querySelector('[aria-label="Tutup navigasi"]') !== null,
+    "Close control is translated"
+  );
+  await click(
+    [...document.querySelectorAll('[role="dialog"] button')].find(
+      (button) => button.textContent === "Done"
+    )
+  );
+  await settle();
+  assert.ok(
+    document.querySelector('[role="dialog"]') === null,
+    "Footer receives closeNavigation"
+  );
+  assert.ok(
+    document.activeElement === trigger,
+    "Focus returns to headerless trigger"
+  );
+});
+
+test("AppShell custom compact links keep native semantics and Tooltip trigger identity", async () => {
+  await setup();
+  const ref = React.createRef();
+  let clicks = 0;
+  const navigation = [
+    {
+      id: "reports",
+      label: "Reports",
+      renderControl: ({ closeNavigation }) =>
+        React.createElement(
+          "a",
+          {
+            "aria-current": "page",
+            href: "/reports",
+            onClick: () => {
+              clicks += 1;
+              closeNavigation();
+            },
+            ref,
+          },
+          "R"
+        ),
+    },
+  ];
+  await render({ defaultCollapsed: true, navigation });
+  const link = host.querySelector('a[href="/reports"]');
+  assert.equal(link?.getAttribute("aria-current"), "page");
+  assert.ok(ref.current === link, "Consumer ref remains on the custom anchor");
+  await React.act(async () => {
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", { bubbles: true, key: "Tab" })
+    );
+    link.focus();
+    link.dispatchEvent(
+      new PointerEvent("pointerenter", { bubbles: true, pointerType: "mouse" })
+    );
+    link.dispatchEvent(
+      new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" })
+    );
+    link.dispatchEvent(new MouseEvent("mouseenter"));
+    link.dispatchEvent(new MouseEvent("mousemove", { bubbles: true }));
+  });
+  await settle();
+  assert.equal(link.dataset.slot, "tooltip-trigger");
+  assert.equal(
+    document.querySelector('[data-slot="tooltip-content"]')?.textContent,
+    "Reports",
+    "Custom link exposes its collapsed label on keyboard focus/hover"
+  );
+  assert.equal(
+    host.querySelectorAll('a[href="/reports"]').length,
+    1,
+    "Tooltip composition keeps one link root"
+  );
+  await click(link);
+  assert.equal(clicks, 1);
+  await render({ collapsed: false, navigation });
+  await React.act(() => {
+    const expanded = host.querySelector('a[href="/reports"]');
+    expanded.focus();
+    expanded.dispatchEvent(
+      new PointerEvent("pointerover", { bubbles: true, pointerType: "mouse" })
+    );
+    expanded.dispatchEvent(new MouseEvent("mousemove", { bubbles: true }));
+  });
+  await settle();
+  assert.ok(
+    document.querySelector('[data-slot="tooltip-content"]') === null,
+    "Expanded custom navigation does not open a redundant tooltip"
+  );
+  dom.happyDOM.setWindowSize({ height: 844, width: 390 });
+  await render({ collapsed: true, navigation });
+  await click(host.querySelector('[aria-label="Open navigation"]'));
+  await settle();
+  const mobile = document.querySelector(
+    '[data-slot="drawer-popup"] a[href="/reports"]'
+  );
+  assert.ok(Boolean(mobile), "Mobile custom destination exists");
+  await React.act(() => mobile.focus());
+  await settle();
+  assert.ok(
+    document.querySelector('[data-slot="tooltip-content"]') === null,
+    "Mobile custom navigation does not open a redundant tooltip"
+  );
+});
+
+test("AppShell user action closes mobile navigation only after successful selection", async () => {
+  await setup();
+  dom.happyDOM.setWindowSize({ height: 844, width: 390 });
+  const { promise: result, resolve: resolveAction } = Promise.withResolvers();
+  await render({
+    user: {
+      items: [
+        {
+          closeOnSelect: "success",
+          id: "save",
+          label: "Save",
+          onSelect: () => result,
+        },
+      ],
+      name: "Avery Cole",
+    },
+  });
+  await click(host.querySelector('[aria-label="Open navigation"]'));
+  await settle();
+  const dialog = document.querySelector('[role="dialog"]');
+  assert.ok(dialog, "Mobile navigation is open");
+  await click(dialog.querySelector('[aria-label="Avery Cole account menu"]'));
+  await settle();
+  const save = document.querySelector('[role="menuitem"]');
+  assert.ok(save, "User action is rendered");
+  await click(save);
+  assert.ok(
+    document.querySelector('[role="dialog"]'),
+    "Pending success-only selection keeps the drawer mounted"
+  );
+  await React.act(async () => resolveAction("saved"));
+  await settle();
+  assert.ok(
+    document.querySelector('[role="dialog"]') === null,
+    "Successful selection closes mobile navigation"
+  );
+});
+
+test("AppShell user default async action preserves mobile owner until rejection is handled", async () => {
+  await setup();
+  dom.happyDOM.setWindowSize({ height: 844, width: 390 });
+  let errors = 0;
+  const { promise: result, reject: rejectAction } = Promise.withResolvers();
+  await render({
+    user: {
+      items: [
+        {
+          id: "save",
+          label: "Save",
+          onSelect: () => result,
+          onSelectError: () => {
+            errors += 1;
+          },
+        },
+      ],
+      name: "Avery Cole",
+    },
+  });
+  await click(host.querySelector('[aria-label="Open navigation"]'));
+  await settle();
+  await click(
+    document.querySelector(
+      '[role="dialog"] [aria-label="Avery Cole account menu"]'
+    )
+  );
+  await settle();
+  await click(document.querySelector('[role="menuitem"]'));
+  await settle();
+  assert.ok(
+    document.querySelector('[role="dialog"]') !== null,
+    "Pending action must not unmount its Dropdown owner"
+  );
+  await React.act(async () => rejectAction(new Error("Expected rejection")));
+  await settle();
+  assert.equal(errors, 1, "Dropdown handles the rejection while mounted");
+  assert.ok(
+    document.querySelector('[role="dialog"]') !== null,
+    "Rejected action keeps navigation available"
+  );
+});
+
+const registerGroupedUserCase = (scenario) => {
+  test(`AppShell grouped user selection respects ${scenario} lifecycle`, async () => {
+    await setup();
+    dom.happyDOM.setWindowSize({ height: 844, width: 390 });
+    let finish;
+    let calls = 0;
+    let errors = 0;
+    const action = {
+      closeOnSelect: scenario === "keep" ? false : "success",
+      id: "action",
+      label: "Run action",
+      onSelect: (event) => {
+        calls += 1;
+        if (scenario === "cancel") {
+          event.preventDefault();
+        }
+        if (scenario === "base-cancel") {
+          event.preventBaseUIHandler();
+        }
+        if (scenario === "throw") {
+          throw new Error("Expected action failure");
+        }
+        if (scenario === "reject" || scenario === "late") {
+          const deferred = Promise.withResolvers();
+          finish = scenario === "reject" ? deferred.reject : deferred.resolve;
+          return deferred.promise;
+        }
+      },
+      onSelectError: () => {
+        errors += 1;
+      },
+    };
+    await render({
+      user: {
+        items: [
+          { id: "account", items: [action], label: "Account", type: "group" },
+        ],
+        name: "Avery",
+      },
+    });
+    await click(host.querySelector('[aria-label="Open navigation"]'));
+    await settle();
+    const trigger = document.querySelector(
+      '[role="dialog"] [aria-label="Avery account menu"]'
+    );
+    await click(trigger);
+    await settle();
+    await click(document.querySelector('[role="menuitem"]'));
+    if (scenario === "reject" || scenario === "late") {
+      await click(document.querySelector('[role="menuitem"]'));
+      assert.equal(calls, 1, "Pending action locks repeat selection");
+      if (scenario === "late") {
+        await click(trigger);
+        await click(trigger);
+      }
+      await React.act(async () => finish(new Error("Expected rejection")));
+    }
+    await settle();
+    assert.equal(calls, 1);
+    assert.equal(errors, scenario === "throw" || scenario === "reject" ? 1 : 0);
+    assert.equal(
+      document.querySelector('[role="dialog"]') !== null,
+      scenario !== "sync",
+      "Only an accepted current-session success closes navigation"
+    );
+  });
+};
+
+for (const scenario of [
+  "sync",
+  "cancel",
+  "base-cancel",
+  "throw",
+  "keep",
+  "reject",
+  "late",
+]) {
+  registerGroupedUserCase(scenario);
+}
+
+const registerUserLinkCase = (scenario) => {
+  test(`AppShell user ${scenario} preserves native navigation lifecycle`, async () => {
+    await setup();
+    dom.happyDOM.setWindowSize({ height: 844, width: 390 });
+    let clicks = 0;
+    const ref = React.createRef();
+    await render({
+      user: {
+        items: [
+          {
+            closeOnSelect: scenario !== "persistent-link",
+            id: "profile",
+            label: "Profile",
+            link: React.createElement("a", {
+              href: "#profile",
+              onClick: (event) => {
+                clicks += 1;
+                if (scenario === "canceled-link") {
+                  event.preventDefault();
+                }
+              },
+              ref,
+            }),
+          },
+        ],
+        name: "Avery",
+      },
+    });
+    await click(host.querySelector('[aria-label="Open navigation"]'));
+    await settle();
+    await click(
+      document.querySelector(
+        '[role="dialog"] [aria-label="Avery account menu"]'
+      )
+    );
+    await settle();
+    const link = document.querySelector('[role="menuitem"][href="#profile"]');
+    assert.ok(ref.current === link, "Link ref reaches one native anchor");
+    await React.act(async () =>
+      link.dispatchEvent(
+        new MouseEvent("click", {
+          bubbles: true,
+          button: 0,
+          cancelable: true,
+          ctrlKey: scenario === "modified-link",
+        })
+      )
+    );
+    await settle();
+    assert.equal(clicks, 1);
+    assert.equal(
+      document.querySelector('[role="dialog"]') !== null,
+      scenario !== "link"
+    );
+  });
+};
+
+for (const scenario of [
+  "link",
+  "canceled-link",
+  "modified-link",
+  "persistent-link",
+]) {
+  registerUserLinkCase(scenario);
+}
+
+test("AppShell user overlay and menu dismissal leave mobile navigation mounted", async () => {
+  await setup();
+  const { Dialog } = jiti("../registry/new-york/dialog.tsx");
+  dom.happyDOM.setWindowSize({ height: 844, width: 390 });
+  await render({
+    user: {
+      items: [
+        {
+          id: "details",
+          label: "Details",
+          renderOverlay: ({ finalFocus, ...props }) =>
+            React.createElement(
+              Dialog,
+              {
+                ...props,
+                contentProps: { finalFocus },
+                title: "Account details",
+              },
+              "Local account details"
+            ),
+        },
+      ],
+      name: "Avery",
+    },
+  });
+  await click(host.querySelector('[aria-label="Open navigation"]'));
+  await settle();
+  const trigger = document.querySelector(
+    '[role="dialog"] [aria-label="Avery account menu"]'
+  );
+  await click(trigger);
+  await settle();
+  await React.act(async () =>
+    document
+      .querySelector('[role="menuitem"]')
+      .dispatchEvent(
+        new KeyboardEvent("keydown", { bubbles: true, key: "Escape" })
+      )
+  );
+  await settle();
+  assert.equal(
+    document.querySelectorAll('[role="dialog"]').length,
+    1,
+    "Menu Escape does not close drawer"
+  );
+  await click(trigger);
+  await settle();
+  await click(document.querySelector('[role="menuitem"]'));
+  await settle();
+  assert.equal(
+    document.querySelectorAll('[role="dialog"]').length,
+    2,
+    "Overlay activation preserves drawer owner"
+  );
+  await click(document.querySelector('[data-slot="dialog-close-button"]'));
+  await settle();
+  assert.equal(
+    document.querySelectorAll('[role="dialog"]').length,
+    1,
+    "Closing overlay preserves navigation"
+  );
+  assert.ok(
+    document.activeElement === trigger,
+    "Overlay returns focus to surviving user trigger"
+  );
+});
+
+test("AppShell user submenu success closes mobile navigation", async () => {
+  await setup();
+  dom.happyDOM.setWindowSize({ height: 844, width: 390 });
+  let calls = 0;
+  await render({
+    user: {
+      items: [
+        {
+          id: "settings",
+          items: [
+            {
+              id: "save",
+              label: "Save",
+              onSelect: () => {
+                calls += 1;
+              },
+            },
+          ],
+          label: "Settings",
+          type: "submenu",
+        },
+      ],
+      name: "Avery",
+    },
+  });
+  await click(host.querySelector('[aria-label="Open navigation"]'));
+  await settle();
+  await click(
+    document.querySelector('[role="dialog"] [aria-label="Avery account menu"]')
+  );
+  await settle();
+  const sub = document.querySelector('[data-slot="dropdown-sub-trigger"]');
+  await React.act(async () => {
+    sub.focus();
+    sub.dispatchEvent(
+      new KeyboardEvent("keydown", { bubbles: true, key: "ArrowRight" })
+    );
+  });
+  await settle();
+  await click(
+    [...document.querySelectorAll('[role="menuitem"]')].find(
+      (item) => item.textContent === "Save"
+    )
+  );
+  await settle();
+  assert.equal(calls, 1);
+  assert.ok(
+    document.querySelector('[role="dialog"]') === null,
+    "Nested success closes navigation"
+  );
+});
+
 test("AppShell renders links, disabled actions, custom controls and separators without extra buttons", async () => {
   await setup();
   let selected = 0;

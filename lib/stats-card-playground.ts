@@ -100,13 +100,13 @@ export const statsCardPlaygroundDefinitions = {
       initialValue: 2 as number,
       kind: "range",
       label: "Metrics",
-      max: 2,
+      max: 7,
       min: 1,
       step: 1,
     },
     defaultValue: "2",
     description:
-      "Documentation demo item count (one or two), not a component limit.",
+      "Documentation demo item count (one to seven), not a component limit.",
     type: "number",
   },
   showBadge: {
@@ -175,6 +175,7 @@ const titles = [
   "Needs attention",
   "Queued",
   "Retried",
+  "Archived",
 ];
 
 const getDemoValue = (
@@ -187,7 +188,9 @@ const getDemoValue = (
   if (values.valueMode === "missing") {
     return { target: null };
   }
-  return { target: index === 0 ? values.target : [0, 438, 2, 3, 12, 7][index] };
+  return {
+    target: index === 0 ? values.target : [0, 438, 2, 3, 12, 7, 18][index],
+  };
 };
 
 export const getStatsCardPreviewProps = (

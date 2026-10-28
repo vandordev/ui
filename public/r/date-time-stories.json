@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-time-stories",
+  "title": "DateTime Stories",
+  "description": "Optional portable DateTime stories. Install DateTime first and use existing compatible Storybook packages.",
+  "files": [
+    {
+      "path": "registry/new-york/date-time.stories.tsx",
+      "content": "import type { Meta, StoryObj } from \"@storybook/react\";\nimport { useState } from \"react\";\n\nimport { DateTime } from \"./date-time\";\n\nconst meta = {\n  argTypes: {\n    fallback: { control: \"text\" },\n    locale: { control: \"text\" },\n    timeZone: { control: \"text\" },\n    value: { control: \"text\" },\n  },\n  args: {\n    fallback: \"—\",\n    locale: \"en-US\",\n    timeZone: \"UTC\",\n    value: \"2026-10-24T08:00:00Z\",\n  },\n  component: DateTime,\n  title: \"Vandor UI/DateTime\",\n} satisfies Meta<typeof DateTime>;\nexport default meta;\ntype Story = StoryObj<typeof meta>;\nexport const Default: Story = {};\nexport const Localized: Story = {\n  args: { locale: \"id-ID\", timeZone: \"Asia/Jakarta\" },\n};\nexport const DateOnly: Story = { args: { format: { dateStyle: \"long\" } } };\nexport const TimeOnly: Story = {\n  args: { format: { hour: \"numeric\", minute: \"2-digit\" } },\n};\nexport const Invalid: Story = {\n  args: { fallback: \"Invalid timestamp\", value: \"2026-02-30T08:00:00Z\" },\n};\nexport const NativeProps: Story = {\n  args: { id: \"created-at\", title: \"Created at\" },\n};\nexport const ChangingValue: Story = {\n  render: function Changing() {\n    const [value, setValue] = useState(\"2026-10-24T08:00:00Z\");\n    return (\n      <div className=\"grid gap-2\">\n        <DateTime value={value} />\n        <button type=\"button\" onClick={() => setValue(\"2026-10-25T08:00:00Z\")}>\n          Next day\n        </button>\n      </div>\n    );\n  },\n};\n",
+      "type": "registry:component",
+      "target": "components/date-time/date-time.stories.tsx"
+    }
+  ],
+  "type": "registry:item"
+}

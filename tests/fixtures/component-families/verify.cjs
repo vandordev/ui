@@ -40,7 +40,7 @@ const run = (cwd, command, args, seconds = 180, heap = 512) => {
         NODE_OPTIONS: `--max-old-space-size=${heap}`,
         UV_THREADPOOL_SIZE: "1",
       },
-      maxBuffer: 16000,
+      maxBuffer: 16_000,
     }
   );
   if (result.status !== 0) {
@@ -54,18 +54,24 @@ const hash = (file) =>
 try {
   for (const layout of [
     {
-      name: "default",
       components: "components",
-      ui: "components/ui",
+      name: "default",
       src: false,
+      ui: "components/ui",
     },
     {
-      name: "src-divergent",
       components: "shared",
+      name: "divergent",
+      src: false,
       ui: "primitives",
-      src: true,
     },
-    { name: "schema-only", components: "shared", ui: "primitives", src: false },
+    {
+      components: "shared",
+      name: "src-divergent",
+      src: true,
+      ui: "primitives",
+    },
+    { components: "shared", name: "schema-only", src: false, ui: "primitives" },
   ]) {
     if (
       process.env.FAMILY_VERIFY_LAYOUT &&
@@ -81,10 +87,10 @@ try {
     const schemaOnly = layout.name === "schema-only";
     const packageJson = schemaOnly
       ? {
-          name: layout.name,
-          private: true,
           dependencies: { zod: "^4.3.6" },
           devDependencies: { typescript: "6.0.3" },
+          name: layout.name,
+          private: true,
         }
       : JSON.parse(
           readFileSync(
@@ -100,39 +106,39 @@ try {
       path.join(cwd, "tsconfig.json"),
       JSON.stringify({
         compilerOptions: {
-          strict: true,
-          skipLibCheck: true,
-          noEmit: true,
           jsx: "react-jsx",
           module: "esnext",
           moduleResolution: "bundler",
-          target: "es2023",
+          noEmit: true,
           paths: { "@/*": [`./${source}*`] },
+          skipLibCheck: true,
+          strict: true,
+          target: "es2023",
         },
-        include: [`${source}**/*.ts`, `${source}**/*.tsx`],
         exclude: ["node_modules"],
+        include: [`${source}**/*.ts`, `${source}**/*.tsx`],
       })
     );
     writeFileSync(path.join(cwd, `${source}app/globals.css`), "");
     writeFileSync(
       path.join(cwd, "components.json"),
       JSON.stringify({
-        style: "new-york",
-        rsc: true,
-        tsx: true,
-        tailwind: {
-          config: "",
-          css: `${source}app/globals.css`,
-          baseColor: "neutral",
-          cssVariables: true,
-        },
         aliases: {
           components: `@/${layout.components}`,
+          hooks: "@/hooks",
+          lib: "@/lib",
           ui: `@/${layout.ui}`,
           utils: "@/lib/utils",
-          lib: "@/lib",
-          hooks: "@/hooks",
         },
+        rsc: true,
+        style: "new-york",
+        tailwind: {
+          baseColor: "neutral",
+          config: "",
+          css: `${source}app/globals.css`,
+          cssVariables: true,
+        },
+        tsx: true,
       })
     );
     run(
@@ -189,6 +195,21 @@ try {
       );
       continue;
     }
+    add("date-time");
+    writeFileSync(
+      path.join(cwd, `${source}date-time.tsx`),
+      `import { DateTime, formatDate } from "@/${layout.components}/date-time"; export const Instant = () => <DateTime value="2026-10-24T08:00:00Z" />; export const formatted = formatDate(0);`
+    );
+    assert.throws(
+      () => require.resolve("@tanstack/react-query", { paths: [cwd] }),
+      { code: "MODULE_NOT_FOUND" }
+    );
+    compile();
+    add("app-shell");
+    writeFileSync(
+      path.join(cwd, `${source}shell.tsx`),
+      `import { AppShell } from "@/${layout.ui}/app-shell"; export const Shell = () => <AppShell brand={{ name: "Consumer" }} navigation={[]} showHeader={false} user={{ name: "Avery", items: [] }}>Content</AppShell>;`
+    );
     add("autocomplete");
     writeFileSync(
       path.join(cwd, `${source}core.tsx`),
@@ -222,8 +243,31 @@ try {
       path.join(cwd, `${source}grid.tsx`),
       `import * as grid from "@/${layout.components}/data-grid"; import * as schema from "@/${layout.components}/data-grid/schema"; export const InstalledGrid = grid; export const InstalledSchema = schema;`
     );
+    writeFileSync(
+      path.join(cwd, `${source}source-types.tsx`),
+      readFileSync(
+        path.join(repository, "tests/data-grid-source.types.tsx"),
+        "utf-8"
+      )
+        .replaceAll(
+          "../registry/new-york/data-grid-schema",
+          `@/${layout.components}/data-grid/schema`
+        )
+        .replaceAll(
+          "../registry/new-york/use-data-grid-source",
+          `@/${layout.components}/data-grid`
+        )
+        .replaceAll(
+          "../registry/new-york/data-grid-index",
+          `@/${layout.components}/data-grid`
+        )
+        .replaceAll(
+          "../registry/new-york/data-grid-context",
+          `@/${layout.components}/data-grid/data-grid-context`
+        )
+    );
     compile();
-    for (const family of ["autocomplete", "data-grid"]) {
+    for (const family of ["date-time", "autocomplete", "data-grid"]) {
       const directory = path.join(cwd, source, layout.components, family);
       const entry = path.join(directory, "index.ts");
       writeFileSync(
@@ -245,9 +289,21 @@ try {
         );
       }
     }
+    const shellCore = path.join(cwd, source, layout.ui, "app-shell.tsx");
+    writeFileSync(
+      shellCore,
+      `${readFileSync(shellCore, "utf-8")}\n// Consumer customization\n`
+    );
+    const shellHash = hash(shellCore);
+    add("app-shell-stories");
+    assert.equal(
+      hash(shellCore),
+      shellHash,
+      "AppShell stories preserve customized core"
+    );
     compile();
     console.log(
-      `${layout.name}: PASS — Query-free UI, optional Query selected-page types, DataGrid/schema entries, actual stories types and customized-core checksums`
+      `${layout.name}: PASS — Query-free DateTime/UI, AppShell closure, Query selected-page types, DataGrid source/schema entries, actual stories types and customized-core checksums`
     );
   }
   console.log(

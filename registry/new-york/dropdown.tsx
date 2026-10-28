@@ -382,6 +382,7 @@ const DropdownItems = ({
   pending,
   select,
   openOverlay,
+  completeSelection,
 }: {
   items: readonly DropdownEntry[];
   animated: boolean;
@@ -393,6 +394,7 @@ const DropdownItems = ({
     event: Parameters<NonNullable<Primitive.Item.Props["onClick"]>>[0]
   ) => void;
   openOverlay: (key: string) => void;
+  completeSelection: () => void;
 }) => (
   <DropdownGroup>
     {items.map((item) => {
@@ -414,6 +416,7 @@ const DropdownItems = ({
               pending={pending}
               select={select}
               openOverlay={openOverlay}
+              completeSelection={completeSelection}
             />
           </DropdownGroup>
         );
@@ -452,6 +455,7 @@ const DropdownItems = ({
                 pending={pending}
                 select={select}
                 openOverlay={openOverlay}
+                completeSelection={completeSelection}
               />
             </DropdownSubContent>
           </DropdownSub>
@@ -473,6 +477,26 @@ const DropdownItems = ({
             label={item.label}
             render={item.link}
             closeOnClick={item.closeOnSelect ?? true}
+            onClick={(event) => {
+              if (item.closeOnSelect === false) {
+                return;
+              }
+              // The rendered link's handler and Base UI must finish first so
+              // router cancellation and native modifier navigation survive.
+              queueMicrotask(() => {
+                if (
+                  !event.defaultPrevented &&
+                  !event.baseUIHandlerPrevented &&
+                  !event.metaKey &&
+                  !event.ctrlKey &&
+                  !event.shiftKey &&
+                  !event.altKey &&
+                  event.button === 0
+                ) {
+                  completeSelection();
+                }
+              });
+            }}
           >
             {label}
             {item.shortcut && (
@@ -516,7 +540,18 @@ export type DropdownProps = Omit<Primitive.Root.Props, "children"> & {
     "children" | "render"
   >;
   contentProps?: Omit<DropdownContentProps, "children" | "animated">;
+  /** Accepted action/link completion, never dismissal or overlay activation.
+   * Async actions notify after fulfillment, while their owner is still mounted.
+   */
+  onSelectionComplete?: () => void;
 };
+
+const OverlayRenderer = ({
+  item,
+  ...props
+}: DropdownOverlayProps & { item: DropdownOverlay }) => (
+  <>{item.renderOverlay(props)}</>
+);
 
 export const Dropdown = ({
   trigger,
@@ -527,6 +562,7 @@ export const Dropdown = ({
   actionsRef,
   onOpenChange,
   onOpenChangeComplete,
+  onSelectionComplete,
   ...props
 }: DropdownProps) => {
   const localActions = useRef<Primitive.Root.Actions | null>(null);
@@ -535,8 +571,8 @@ export const Dropdown = ({
   const { ref: consumerRef, ...nativeTriggerProps } = triggerProps ?? {};
   const renderedTrigger = useRender({
     defaultTagName: "button",
-    render: trigger,
     ref: [triggerRef, consumerRef ?? null],
+    render: trigger,
   });
   const [pending, setPending] = useState<string | null>(null);
   const pendingRef = useRef<string | null>(null);
@@ -583,7 +619,6 @@ export const Dropdown = ({
     if (pendingRef.current !== null || item.disabled) {
       return;
     }
-    const startedIn = session.current;
     let result: unknown;
     try {
       result = item.onSelect?.(event);
@@ -608,16 +643,20 @@ export const Dropdown = ({
       ) {
         close();
       }
+      const completionSession = session.current;
       const settle = async () => {
         try {
           await result;
           if (
             mounted.current &&
-            item.closeOnSelect === "success" &&
+            item.closeOnSelect !== false &&
             shouldClose &&
-            session.current === startedIn
+            session.current === completionSession
           ) {
-            close();
+            if (item.closeOnSelect === "success") {
+              close();
+            }
+            onSelectionComplete?.();
           }
         } catch (error) {
           reportError(item, error);
@@ -632,6 +671,7 @@ export const Dropdown = ({
       void settle();
     } else if (item.closeOnSelect !== false && shouldClose) {
       close();
+      onSelectionComplete?.();
     }
   };
   const overlays: { key: string; item: DropdownOverlay }[] = [];
@@ -644,7 +684,7 @@ export const Dropdown = ({
       if (item.type === "group" || item.type === "submenu") {
         collect(item.items, itemPath);
       } else if ("renderOverlay" in item && item.renderOverlay) {
-        overlays.push({ key: JSON.stringify(itemPath), item });
+        overlays.push({ item, key: JSON.stringify(itemPath) });
       }
     }
   };
@@ -691,6 +731,11 @@ export const Dropdown = ({
               queuedOverlay.current = key;
               close();
             }}
+            completeSelection={() => {
+              if (mounted.current) {
+                onSelectionComplete?.();
+              }
+            }}
           />
         </DropdownContent>
       </DropdownRoot>
@@ -701,19 +746,15 @@ export const Dropdown = ({
           open={activeOverlay === key}
           finalFocus={triggerRef}
           onOpenChange={(open) => {
-            setActiveOverlay((current) =>
-              open ? key : current === key ? null : current
-            );
+            setActiveOverlay((current) => {
+              if (open) {
+                return key;
+              }
+              return current === key ? null : current;
+            });
           }}
         />
       ))}
     </>
   );
 };
-
-const OverlayRenderer = ({
-  item,
-  ...props
-}: DropdownOverlayProps & { item: DropdownOverlay }) => (
-  <>{item.renderOverlay(props)}</>
-);

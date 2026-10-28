@@ -25,6 +25,26 @@ test("picker generated code preserves explicit motion opt-out", () => {
   }
 });
 
+test("Indonesian range locale is the real DayPicker export and localizes the displayed dates", () => {
+  const { dateRangeIndonesianLocale, DateRangePicker } = jiti(
+    "../registry/new-york/date-range-picker.tsx"
+  );
+  const { id } = jiti("react-day-picker/locale");
+  assert.ok(
+    dateRangeIndonesianLocale === id,
+    "Use upstream locale data without a copied locale object"
+  );
+  const html = renderToStaticMarkup(
+    React.createElement(DateRangePicker, {
+      defaultValue: { from: new Date(2026, 9, 1), to: new Date(2026, 9, 7) },
+      label: "Periode laporan",
+      locale: dateRangeIndonesianLocale,
+    })
+  );
+  assert.match(html, /Okt/);
+  assert.match(html, /Periode laporan/);
+});
+
 test("date picker portable stories compose and Controls affect public props", async () => {
   const { composeStories } = await import("@storybook/react");
   for (const name of ["date-picker", "date-range-picker"]) {

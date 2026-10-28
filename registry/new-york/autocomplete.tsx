@@ -22,6 +22,7 @@ import type {
   AutocompleteProps,
 } from "./autocomplete-types";
 import { groupAutocompleteItems } from "./autocomplete-utils";
+import { FieldOutline } from "./field-outline";
 
 const surface =
   "bg-background bg-linear-to-b from-white/10 to-black/10 dark:bg-input/30";
@@ -203,7 +204,7 @@ export const AutocompleteContent = ({
         alignOffset={alignOffset}
         collisionBoundary={collisionBoundary}
         collisionPadding={collisionPadding}
-        className="isolate"
+        className="isolate z-50"
       >
         <Combobox.Popup
           {...props}
@@ -252,7 +253,7 @@ export const AutocompleteList = ({
     <Combobox.List
       {...props}
       data-slot="autocomplete-list"
-      onScroll={(event) => {
+      onScroll={async (event) => {
         props.onScroll?.(event);
         const page = a.config.pagination;
         const list = event.currentTarget;
@@ -263,7 +264,11 @@ export const AutocompleteList = ({
           list.scrollHeight > list.clientHeight &&
           list.scrollHeight - list.clientHeight - list.scrollTop <= 48
         ) {
-          void a.loadPage().catch(() => undefined);
+          try {
+            await a.loadPage();
+          } catch {
+            // The source controller exposes the failure for inline retry.
+          }
         }
       }}
       className={cn(
@@ -509,23 +514,6 @@ const Assembly = <Item,>({ props }: { props: AutocompleteProps<Item> }) => {
   const [focused, setFocused] = useState(false);
   const floating = props.label && props.labelStyle === "floating";
   const raised = focused || a.text.length > 0 || a.selected.length > 0;
-  const label = props.label ? (
-    <label
-      htmlFor={id}
-      data-floating={raised}
-      className={cn(
-        "text-sm font-medium",
-        floating &&
-          "pointer-events-none absolute left-3 z-10 max-w-[calc(100%-1.5rem)] truncate bg-background px-1 font-normal text-muted-foreground transition-[top,transform] duration-150 motion-reduce:transition-none",
-        floating &&
-          (raised
-            ? "top-0 -translate-y-1/2 text-xs"
-            : "top-1/2 -translate-y-1/2")
-      )}
-    >
-      {props.label}
-    </label>
-  ) : null;
   const editable = (
     <AutocompleteInput
       id={id}
@@ -533,8 +521,6 @@ const Assembly = <Item,>({ props }: { props: AutocompleteProps<Item> }) => {
         "h-7 min-h-7 min-w-16 flex-1 rounded-none border-0 bg-transparent bg-none px-0 shadow-none focus-within:ring-0 dark:bg-transparent",
         floating && !raised && "placeholder:text-transparent"
       )}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
     />
   );
   const groups = groupAutocompleteItems(
@@ -548,8 +534,13 @@ const Assembly = <Item,>({ props }: { props: AutocompleteProps<Item> }) => {
       data-slot="autocomplete-field"
       className={cn("relative grid min-w-0 gap-1.5", props.className)}
     >
-      {!floating && label}
-      <div className="relative min-w-0">
+      <FieldOutline
+        label={props.label ?? ""}
+        labelId={`${id}-label`}
+        htmlFor={id}
+        raised={raised}
+        staticLabel={!floating}
+      >
         <Combobox.InputGroup
           data-slot="autocomplete-control"
           data-disabled={props.disabled || undefined}
@@ -558,8 +549,18 @@ const Assembly = <Item,>({ props }: { props: AutocompleteProps<Item> }) => {
             control,
             surface,
             "flex items-center gap-1",
+            floating && "border-transparent focus-within:border-transparent",
             props.size === "sm" && "min-h-8"
           )}
+          onFocus={() => {
+            setFocused(true);
+          }}
+          onBlur={(event) => {
+            const next = event.relatedTarget;
+            if (!next || !event.currentTarget.contains(next as Node)) {
+              setFocused(false);
+            }
+          }}
         >
           {a.multiple ? (
             <AutocompleteChips>
@@ -577,8 +578,7 @@ const Assembly = <Item,>({ props }: { props: AutocompleteProps<Item> }) => {
           {props.clearable && <AutocompleteClear />}
           {(props.showTrigger ?? a.selection) && <AutocompleteTrigger />}
         </Combobox.InputGroup>
-        {floating && label}
-      </div>
+      </FieldOutline>
       <AutocompleteContent {...props.contentProps}>
         <AutocompleteFeedback />
         <AutocompleteList>

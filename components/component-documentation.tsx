@@ -10,6 +10,7 @@ import { CheckboxPlayground } from "@/components/checkbox-playground";
 import { CodeCollapsibleWrapper } from "@/components/code-collapsible-wrapper";
 import { ComponentDependencies } from "@/components/component-dependencies";
 import { DataGridPlayground } from "@/components/data-grid-playground";
+import { DateTimePlayground } from "@/components/date-time-playground";
 import { DialogPlayground } from "@/components/dialog-playground";
 import { DrawerPlayground } from "@/components/drawer-playground";
 import { DropdownPlayground } from "@/components/dropdown-playground";
@@ -43,6 +44,7 @@ const playgrounds: Record<string, () => ReactNode> = {
   "date-range-picker": () => (
     <InputFamilyPlayground component="date-range-picker" />
   ),
+  "date-time": DateTimePlayground,
   dialog: DialogPlayground,
   drawer: DrawerPlayground,
   dropdown: DropdownPlayground,

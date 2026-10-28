@@ -641,6 +641,18 @@ export const inputComponentProps: Record<
       "false",
       "InputPassword: prevents editing but keeps focus and visibility controls."
     ),
+    showPasswordLabel: p(
+      "string",
+      '"Show password"',
+      "Accessible name while the password is hidden.",
+      text("Show password label", "Show password")
+    ),
+    hidePasswordLabel: p(
+      "string",
+      '"Hide password"',
+      "Accessible name while the password is visible.",
+      text("Hide password label", "Hide password")
+    ),
     value: p(
       "string",
       "uncontrolled",
@@ -1041,7 +1053,7 @@ export const getInputPlaygroundCode = (
         'import { useState } from "react";\nimport { InputOTP } from "@/components/ui/input-otp";',
     },
     "input-password": {
-      code: `<InputPassword\n${propsBlock(values, ["label", "placeholder", "autoComplete", "disabled", "readOnly"])}\n/>`,
+      code: `<InputPassword\n${propsBlock(values, ["label", "placeholder", "autoComplete", "disabled", "readOnly", "showPasswordLabel", "hidePasswordLabel"])}\n/>`,
       imports:
         'import { InputPassword } from "@/components/ui/input-password";',
     },

@@ -15,6 +15,7 @@ import { AppShell } from "@/registry/new-york/app-shell";
 import type { AppShellNavigationItem } from "@/registry/new-york/app-shell";
 import { Button } from "@/registry/new-york/button";
 import { Dropdown } from "@/registry/new-york/dropdown";
+import { PageContainer } from "@/registry/new-york/page-container";
 
 export const AppShellHierarchyDemo = () => {
   const [context, setContext] = useState<"workspace" | "agent">("workspace");
@@ -55,10 +56,25 @@ export const AppShellHierarchyDemo = () => {
               setSection("Agents");
             },
           },
-          {
-            id: "switcher",
-            label: agent,
-            renderControl: ({ collapsed: compact, closeNavigation }) => (
+          ...["Profile", "Configure", "Versions"].map((label) => ({
+            active: section === label,
+            icon:
+              label === "Versions" ? (
+                <HistoryIcon />
+              ) : (
+                <SlidersHorizontalIcon />
+              ),
+            id: label,
+            label,
+            onClick: () => setSection(label),
+          })),
+        ];
+  return (
+    <AppShell
+      brand={{ icon: <LayoutGridIcon />, name: "Acme" }}
+      sidebarHeader={
+        context === "agent"
+          ? ({ collapsed: compact, closeNavigation }) => (
               <Dropdown
                 contentProps={{ align: "start", side: "right" }}
                 trigger={
@@ -95,24 +111,9 @@ export const AppShellHierarchyDemo = () => {
                   },
                 ]}
               />
-            ),
-          },
-          ...["Profile", "Configure", "Versions"].map((label) => ({
-            active: section === label,
-            icon:
-              label === "Versions" ? (
-                <HistoryIcon />
-              ) : (
-                <SlidersHorizontalIcon />
-              ),
-            id: label,
-            label,
-            onClick: () => setSection(label),
-          })),
-        ];
-  return (
-    <AppShell
-      brand={{ icon: <LayoutGridIcon />, name: "Acme" }}
+            )
+          : undefined
+      }
       navigation={navigation}
       navigationContext={{
         depth: context === "workspace" ? 0 : 1,
@@ -130,34 +131,36 @@ export const AppShellHierarchyDemo = () => {
       }
       className="h-[28rem] min-h-0 w-full [&_[data-slot=app-shell-sidebar]]:h-full [&_[data-slot=app-shell-header]]:static [&_[data-slot=app-shell-main]]:overflow-y-auto"
     >
-      <h2 className="text-lg font-semibold">
-        {context === "workspace" ? "Agents" : section}
-      </h2>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {context === "workspace"
-          ? "Open an agent to replace the middle navigation panel."
-          : "Return with All agents. Switching agents keeps the same navigation panel."}
-      </p>
-      {context === "workspace" && (
-        <div className="mt-6 flex flex-col items-start gap-3">
-          {agents.map((name) => (
-            <Button
-              key={name}
-              variant="outline"
-              className="max-w-full whitespace-normal text-left"
-              onClick={() => openAgent(name)}
-            >
-              <BotIcon aria-hidden="true" />
-              {name}
-            </Button>
-          ))}
-        </div>
-      )}
-      {context === "agent" && (
-        <p className="mt-6 text-sm text-muted-foreground">
-          {agent} / {section}
+      <PageContainer>
+        <h2 className="text-lg font-semibold">
+          {context === "workspace" ? "Agents" : section}
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {context === "workspace"
+            ? "Open an agent to replace the middle navigation panel."
+            : "Return with All agents. Switching agents keeps the same navigation panel."}
         </p>
-      )}
+        {context === "workspace" && (
+          <div className="mt-6 flex flex-col items-start gap-3">
+            {agents.map((name) => (
+              <Button
+                key={name}
+                variant="outline"
+                className="max-w-full whitespace-normal text-left"
+                onClick={() => openAgent(name)}
+              >
+                <BotIcon aria-hidden="true" />
+                {name}
+              </Button>
+            ))}
+          </div>
+        )}
+        {context === "agent" && (
+          <p className="mt-6 text-sm text-muted-foreground">
+            {agent} / {section}
+          </p>
+        )}
+      </PageContainer>
     </AppShell>
   );
 };

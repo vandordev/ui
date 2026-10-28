@@ -7,12 +7,17 @@ import { Button } from "./button";
 import { Input } from "./input";
 import type { InputProps } from "./input";
 
-export type InputPasswordProps = Omit<InputProps, "type" | "icon">;
+export type InputPasswordProps = Omit<InputProps, "type" | "icon"> & {
+  showPasswordLabel?: string;
+  hidePasswordLabel?: string;
+};
 
 export const InputPassword = ({
   className,
   disabled,
   readOnly,
+  showPasswordLabel = "Show password",
+  hidePasswordLabel = "Hide password",
   ...props
 }: InputPasswordProps) => {
   const [visible, setVisible] = React.useState(false);
@@ -30,7 +35,7 @@ export const InputPassword = ({
         variant="ghost"
         size="icon-sm"
         disabled={disabled}
-        aria-label={visible ? "Hide password" : "Show password"}
+        aria-label={visible ? hidePasswordLabel : showPasswordLabel}
         aria-pressed={visible}
         className="absolute top-1/2 right-1 -translate-y-1/2"
         onClick={() => setVisible((current) => !current)}

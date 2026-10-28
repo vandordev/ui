@@ -25,20 +25,18 @@ import { InputSearch } from "./input-search";
 import type { InputSearchProps } from "./input-search";
 import { Select } from "./select";
 
-export function DataGridToolbar({
+export const DataGridToolbar = ({
   className,
   ...props
-}: ComponentProps<"div">) {
-  return (
-    <div
-      {...props}
-      data-slot="data-grid-toolbar"
-      className={cn("flex min-w-0 flex-wrap items-center gap-2", className)}
-    />
-  );
-}
+}: ComponentProps<"div">) => (
+  <div
+    {...props}
+    data-slot="data-grid-toolbar"
+    className={cn("flex min-w-0 flex-wrap items-center gap-2", className)}
+  />
+);
 
-export function DataGridFilter<
+export const DataGridFilter = <
   C extends DataGridContract,
   K extends keyof DataGridFilterInput<C> & string,
 >({
@@ -54,9 +52,7 @@ export function DataGridFilter<
     reset: () => void;
     error: string | undefined;
   }) => ReactNode;
-}) {
-  return children(grid.getFilterBinding(field));
-}
+}) => children(grid.getFilterBinding(field));
 
 type StringField<C extends DataGridContract> = {
   [K in keyof DataGridFilterInput<C>]: NonNullable<
@@ -66,7 +62,7 @@ type StringField<C extends DataGridContract> = {
     : never;
 }[keyof DataGridFilterInput<C>] &
   string;
-export function DataGridSearch<
+export const DataGridSearch = <
   C extends DataGridContract,
   K extends StringField<C>,
 >({
@@ -79,7 +75,7 @@ export function DataGridSearch<
   grid: DataGridSurface<C>;
   field: K;
   debounce?: number;
-}) {
+}) => {
   const { labels } = useDataGridContext();
   const id = useId();
   const binding = grid.getFilterBinding(field);
@@ -115,13 +111,13 @@ export function DataGridSearch<
       )}
     </div>
   );
-}
+};
 
-export function DataGridApplyFilters({
+export const DataGridApplyFilters = ({
   onClick,
   children,
   ...props
-}: ComponentProps<typeof Button>) {
+}: ComponentProps<typeof Button>) => {
   const { grid, labels } = useDataGridContext();
   return (
     <Button
@@ -137,12 +133,12 @@ export function DataGridApplyFilters({
       {children ?? labels.apply}
     </Button>
   );
-}
-export function DataGridResetFilters({
+};
+export const DataGridResetFilters = ({
   onClick,
   children,
   ...props
-}: ComponentProps<typeof Button>) {
+}: ComponentProps<typeof Button>) => {
   const { grid, labels } = useDataGridContext();
   return (
     <Button
@@ -159,9 +155,9 @@ export function DataGridResetFilters({
       {children ?? labels.reset}
     </Button>
   );
-}
+};
 
-export function DataGridColumnVisibility() {
+export const DataGridColumnVisibility = () => {
   const { grid, labels } = useDataGridContext();
   return (
     <DropdownRoot>
@@ -187,7 +183,7 @@ export function DataGridColumnVisibility() {
       </DropdownContent>
     </DropdownRoot>
   );
-}
+};
 
 const DataGridPageLinks = ({
   links,
@@ -254,7 +250,7 @@ const usePaginationPresentation = (showPageNumbers: boolean) => {
   return { count, from, index, links, numbered, page, pagination, to };
 };
 
-export function DataGridPagination({
+export const DataGridPagination = ({
   pageSizes = [25, 50, 100],
   showPageNumbers = true,
   className,
@@ -262,7 +258,7 @@ export function DataGridPagination({
 }: ComponentProps<"div"> & {
   pageSizes?: readonly number[];
   showPageNumbers?: boolean;
-}) {
+}) => {
   const { grid, labels } = useDataGridContext();
   const { count, from, index, links, numbered, page, pagination, to } =
     usePaginationPresentation(showPageNumbers);
@@ -281,17 +277,19 @@ export function DataGridPagination({
           : labels.page(index)}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Select
-          aria-label={labels.pageSize}
-          data={pageSizes.map((value) => ({ label: String(value), value }))}
-          value={pagination.pageSize}
-          onValueChange={(value) => {
-            if (value !== null) {
-              grid.setPageSize(value);
-            }
-          }}
-          size="sm"
-        />
+        {pageSizes.length > 1 && (
+          <Select
+            aria-label={labels.pageSize}
+            data={pageSizes.map((value) => ({ label: String(value), value }))}
+            value={pagination.pageSize}
+            onValueChange={(value) => {
+              if (value !== null) {
+                grid.setPageSize(value);
+              }
+            }}
+            size="sm"
+          />
+        )}
         {page && !numbered && (
           <Button
             type="button"
@@ -349,12 +347,12 @@ export function DataGridPagination({
       </div>
     </div>
   );
-}
+};
 
-export function DataGridSelectionBar({
+export const DataGridSelectionBar = ({
   className,
   ...props
-}: ComponentProps<"div">) {
+}: ComponentProps<"div">) => {
   const { grid, labels } = useDataGridContext();
   const all = grid.selection.mode === "allMatching";
   const count =
@@ -399,4 +397,4 @@ export function DataGridSelectionBar({
       </Button>
     </div>
   );
-}
+};

@@ -1,4 +1,5 @@
 const assert = require("node:assert/strict");
+const { readFileSync } = require("node:fs");
 const test = require("node:test");
 const { createJiti } = require("jiti");
 
@@ -38,15 +39,23 @@ test("DataGrid documentation retains standard sections and native contract owner
     "renderEmpty",
     "columnVisibility",
     "DataGridFilter",
-  ])
+  ]) {
     assert.ok(text.includes(value), value);
-  const mdx = require("node:fs").readFileSync(
-    "content/docs/components/data-grid.mdx",
-    "utf8"
-  );
+  }
+  const mdx = readFileSync("content/docs/components/data-grid.mdx", "utf-8");
   assert.ok(mdx.includes("Copying the Source block alone is insufficient"));
   assert.ok(mdx.includes("data-grid-schema.json"));
-  assert.ok(mdx.includes("data-grid-stories.json"));
+  assert.ok(
+    mdx.includes(
+      "node scripts/install-component-family.cjs data-grid-stories /absolute/path/to/consumer"
+    )
+  );
+  assert.ok(
+    !mdx.includes(
+      "npx shadcn@latest add https://vandor-ui.vercel.app/r/data-grid-stories.json"
+    ),
+    "Stories must resolve the configured family alias through the wrapper"
+  );
 });
 
 test("component metadata generates ordered sections from registry and shared props", () => {

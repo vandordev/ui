@@ -50,3 +50,9 @@ jobs:
 
       - name: Tests
         run: NODE_OPTIONS="--max-old-space-size=512" timeout --signal=TERM --kill-after=5s 900s node --test --test-concurrency=1 tests/*.test.cjs
+
+      - name: Component family CLI matrix (network required, serial layouts)
+        run: NODE_OPTIONS="--max-old-space-size=512" UV_THREADPOOL_SIZE=1 timeout --signal=TERM --kill-after=5s 1200s node tests/fixtures/component-families/verify.cjs
+
+      - name: DateTime installed Server Component boundary (network required)
+        run: NODE_OPTIONS="--max-old-space-size=512" UV_THREADPOOL_SIZE=1 timeout --signal=TERM --kill-after=5s 1200s node tests/fixtures/date-time-consumer/verify.cjs

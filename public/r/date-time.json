@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-time",
+  "title": "DateTime",
+  "description": "A timezone-aware instant formatter with strict ISO validation and hydration-safe local display.",
+  "dependencies": [],
+  "files": [
+    {
+      "path": "registry/new-york/date-time-index.ts",
+      "content": "export { DateTime } from \"./date-time\";\nexport type { DateTimeProps } from \"./date-time\";\nexport { formatDate, toDate } from \"./date-time-utils\";\nexport type { DateFormatOptions, DateInput } from \"./date-time-utils\";\n",
+      "type": "registry:component",
+      "target": "components/date-time/index.ts"
+    },
+    {
+      "path": "registry/new-york/date-time.tsx",
+      "content": "\"use client\";\n\nimport { useSyncExternalStore } from \"react\";\nimport type { ComponentPropsWithoutRef, Ref } from \"react\";\n\nimport { formatDate, toDate } from \"./date-time-utils\";\nimport type { DateFormatOptions, DateInput } from \"./date-time-utils\";\n\nexport type DateTimeProps = Omit<\n  ComponentPropsWithoutRef<\"time\">,\n  \"children\" | \"dateTime\"\n> & {\n  value: DateInput;\n  locale?: DateFormatOptions[\"locale\"];\n  timeZone?: string;\n  format?: Intl.DateTimeFormatOptions;\n  fallback?: string;\n  ref?: Ref<HTMLTimeElement>;\n};\n\nconst subscribe = () => () => {\n  // No external clock: updates come from props.\n};\nconst getServerSnapshot = () => \"\";\n\nexport const DateTime = ({\n  value,\n  locale,\n  timeZone,\n  format,\n  fallback = \"—\",\n  ref,\n  ...props\n}: DateTimeProps) => {\n  const instant = toDate(value);\n  const iso = instant?.toISOString();\n  const text = useSyncExternalStore(\n    subscribe,\n    () => formatDate(value, { fallback, format, locale, timeZone }),\n    getServerSnapshot\n  );\n  return (\n    <time {...props} ref={ref} data-slot=\"date-time\" dateTime={iso}>\n      {text || fallback}\n    </time>\n  );\n};\n",
+      "type": "registry:component",
+      "target": "components/date-time/date-time.tsx"
+    },
+    {
+      "path": "registry/new-york/date-time-utils.ts",
+      "content": "export type DateInput = string | number | Date | null | undefined;\n\nexport interface DateFormatOptions {\n  locale?: string | string[];\n  timeZone?: string;\n  format?: Intl.DateTimeFormatOptions;\n  fallback?: string;\n}\n\nconst instantPattern =\n  /^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(?:\\.(\\d{1,9}))?(Z|[+-]\\d{2}:\\d{2})$/;\nconst isLeapYear = (year: number) =>\n  year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);\n\nconst isCalendarDate = (year: number, month: number, day: number) => {\n  const days = [\n    31,\n    isLeapYear(year) ? 29 : 28,\n    31,\n    30,\n    31,\n    30,\n    31,\n    31,\n    30,\n    31,\n    30,\n    31,\n  ];\n  return month >= 1 && month <= 12 && day >= 1 && day <= (days[month - 1] ?? 0);\n};\n\nexport const toDate = (value: DateInput): Date | null => {\n  if (value instanceof Date) {\n    return Number.isFinite(value.getTime()) ? new Date(value) : null;\n  }\n  if (typeof value === \"number\") {\n    return Number.isFinite(value) && Number.isFinite(new Date(value).getTime())\n      ? new Date(value)\n      : null;\n  }\n  if (typeof value !== \"string\") {\n    return null;\n  }\n  const match = instantPattern.exec(value);\n  if (!match) {\n    return null;\n  }\n  const [\n    ,\n    yearText,\n    monthText,\n    dayText,\n    hourText,\n    minuteText,\n    secondText,\n    fraction = \"\",\n    zone = \"Z\",\n  ] = match;\n  const year = Number(yearText);\n  const month = Number(monthText);\n  const day = Number(dayText);\n  const hour = Number(hourText);\n  const minute = Number(minuteText);\n  const second = Number(secondText);\n  if (\n    !isCalendarDate(year, month, day) ||\n    hour > 23 ||\n    minute > 59 ||\n    second > 59\n  ) {\n    return null;\n  }\n  let offsetMinutes = 0;\n  if (zone !== \"Z\") {\n    const sign = zone[0] === \"+\" ? 1 : -1;\n    const offsetHour = Number(zone.slice(1, 3));\n    const offsetMinute = Number(zone.slice(4, 6));\n    if (offsetHour > 23 || offsetMinute > 59) {\n      return null;\n    }\n    offsetMinutes = sign * (offsetHour * 60 + offsetMinute);\n  }\n  const milliseconds = Number(`${fraction}000`.slice(0, 3));\n  const date = new Date(0);\n  date.setUTCFullYear(year, month - 1, day);\n  date.setUTCHours(hour, minute - offsetMinutes, second, milliseconds);\n  return Number.isFinite(date.getTime()) ? date : null;\n};\n\nexport const formatDate = (\n  value: DateInput,\n  options: DateFormatOptions = {}\n): string => {\n  const date = toDate(value);\n  if (!date) {\n    return options.fallback ?? \"—\";\n  }\n  const format = options.format ?? {};\n  const timeZone = options.timeZone ?? format.timeZone;\n  const intlOptions: Intl.DateTimeFormatOptions = options.format\n    ? { ...format, ...(timeZone === undefined ? {} : { timeZone }) }\n    : {\n        day: \"numeric\",\n        hour: \"2-digit\",\n        hourCycle: \"h23\",\n        minute: \"2-digit\",\n        month: \"short\",\n        year: \"numeric\",\n        ...format,\n        ...(timeZone === undefined ? {} : { timeZone }),\n      };\n  return new Intl.DateTimeFormat(options.locale ?? \"en-US\", intlOptions).format(\n    date\n  );\n};\n",
+      "type": "registry:component",
+      "target": "components/date-time/date-time-utils.ts"
+    }
+  ],
+  "type": "registry:component"
+}

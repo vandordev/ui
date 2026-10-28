@@ -139,6 +139,22 @@ export const Invalid: Story = { args: { invalid: true } };
 export const Loading: Story = { args: { loading: true } };
 export const Error: Story = { args: { error: "Suggestions unavailable." } };
 export const FloatingLabel: Story = { args: { labelStyle: "floating" } };
+export const StaticLabel: Story = { args: { labelStyle: "static" } };
+export const Unlabeled: Story = { args: { label: "" } };
+export const FloatingMultiple: Story = {
+  args: { labelStyle: "floating", mode: "selection", multiple: true },
+};
+export const KeyboardSelection: Story = {
+  args: { autoHighlight: true, mode: "selection", showTrigger: true },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Focus the input, type Ada, then use ArrowDown/Enter to select. Escape dismisses suggestions; Tab moves through the group. This story does not simulate browser focus.",
+      },
+    },
+  },
+};
 const PaginationExample = ({
   label,
   disabled,
@@ -157,9 +173,9 @@ const PaginationExample = ({
       getItemValue={(person) => person.id}
       defaultOpen
       pagination={{
-        hasNextPage: more,
-        fetchingNextPage: false,
         error: error ? "Could not load the next page." : undefined,
+        fetchingNextPage: false,
+        hasNextPage: more,
         onLoadMore: () => setMore(false),
         onRetry: () => setError(false),
       }}
@@ -175,11 +191,11 @@ export const NextPageLoading: Story = {
       label={args.label}
       items={["Ada", "Grace"]}
       defaultOpen
-      loadingProps={{ variant: "dots", size: 16 }}
+      loadingProps={{ size: 16, variant: "dots" }}
       pagination={{
-        hasNextPage: true,
         fetchingNextPage: true,
-        onLoadMore: () => undefined,
+        hasNextPage: true,
+        onLoadMore: () => Promise.resolve(),
       }}
     />
   ),
@@ -191,9 +207,9 @@ export const LoadMore: Story = {
       items={["Ada", "Grace"]}
       defaultOpen
       pagination={{
-        hasNextPage: true,
         fetchingNextPage: false,
-        onLoadMore: () => undefined,
+        hasNextPage: true,
+        onLoadMore: () => Promise.resolve(),
       }}
     />
   ),
@@ -215,7 +231,7 @@ export const BackgroundRefresh: Story = {
       items={["Ada", "Grace"]}
       defaultOpen
       backgroundLoading
-      loadingProps={{ variant: "dots", size: 16 }}
+      loadingProps={{ size: 16, variant: "dots" }}
     />
   ),
 };

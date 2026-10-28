@@ -809,23 +809,23 @@ test("Dropdown compact links compose router props, refs and handlers onto one an
   await mount(
     React.createElement(Dropdown, {
       animated: false,
-      modal: false,
-      trigger: React.createElement("button", { type: "button" }, "Open"),
       items: [
         {
           id: "docs",
           label: "Docs",
           link: React.createElement(Link, {
-            to: "#docs",
-            ref,
-            target: "_blank",
             onClick: (event) => {
               clicks += 1;
               event.preventDefault();
             },
+            ref,
+            target: "_blank",
+            to: "#docs",
           }),
         },
       ],
+      modal: false,
+      trigger: React.createElement("button", { type: "button" }, "Open"),
     })
   );
   await React.act(() => host.querySelector("button").click());
@@ -853,22 +853,17 @@ test("Dropdown compact links compose router props, refs and handlers onto one an
 test("Dropdown async success blocks duplicate and other actions, then closes", async () => {
   await ready;
   const { Dropdown } = load();
-  let resolve;
   let calls = 0;
   let other = 0;
-  const request = new Promise((done) => {
-    resolve = done;
-  });
+  const { promise: request, resolve } = Promise.withResolvers();
   await mount(
     React.createElement(Dropdown, {
       animated: false,
-      modal: false,
-      trigger: React.createElement("button", { type: "button" }, "Open"),
       items: [
         {
+          closeOnSelect: "success",
           id: "logout",
           label: "Logout",
-          closeOnSelect: "success",
           onSelect: () => {
             calls += 1;
             return request;
@@ -882,6 +877,8 @@ test("Dropdown async success blocks duplicate and other actions, then closes", a
           },
         },
       ],
+      modal: false,
+      trigger: React.createElement("button", { type: "button" }, "Open"),
     })
   );
   const trigger = host.querySelector("button");
@@ -912,9 +909,6 @@ test("Dropdown overlay survives popup unmount and waits for Motion exit before o
   const ref = React.createRef();
   await mount(
     React.createElement(Dropdown, {
-      modal: false,
-      triggerProps: { ref },
-      trigger: React.createElement("button", { type: "button" }, "Details"),
       items: [
         {
           id: "details",
@@ -922,11 +916,14 @@ test("Dropdown overlay survives popup unmount and waits for Motion exit before o
           renderOverlay: ({ finalFocus, ...props }) =>
             React.createElement(
               Dialog,
-              { ...props, title: "Details", contentProps: { finalFocus } },
+              { ...props, contentProps: { finalFocus }, title: "Details" },
               "Persistent details"
             ),
         },
       ],
+      modal: false,
+      trigger: React.createElement("button", { type: "button" }, "Details"),
+      triggerProps: { ref },
     })
   );
   await React.act(() => ref.current.click());
@@ -955,8 +952,9 @@ test("Dropdown overlay survives popup unmount and waits for Motion exit before o
     dialog.querySelector('[data-slot="dialog-close-button"]').click()
   );
   await React.act(async () => {
+    await frames();
     for (const element of document.querySelectorAll(
-      '[data-slot="dialog-content"], [data-slot="dialog-backdrop"]'
+      '[data-slot="dialog-popup"], [data-slot="dialog-overlay"]'
     )) {
       for (const animation of element.getAnimations()) {
         animation.finish();
@@ -968,7 +966,7 @@ test("Dropdown overlay survives popup unmount and waits for Motion exit before o
   // when focus differs. Report a small identity failure instead.
   assert.ok(
     document.activeElement === ref.current,
-    "Dialog focus must return to the menu trigger"
+    `Dialog focus must return to the menu trigger (active=${document.activeElement?.tagName}, triggerConnected=${ref.current?.isConnected}, dialogs=${document.querySelectorAll('[role="dialog"]').length})`
   );
 });
 
@@ -981,28 +979,29 @@ test("Dropdown async failure releases pending, reports the error and permits ret
   await mount(
     React.createElement(Dropdown, {
       animated: false,
-      modal: false,
-      trigger: React.createElement("button", { type: "button" }, "Open"),
       items: [
         {
+          closeOnSelect: "success",
           id: "save",
           label: "Save",
-          closeOnSelect: "success",
           onSelect: () => {
             calls += 1;
-            return new Promise((resolve, fail) => {
-              reject = fail;
-            });
+            const deferred = Promise.withResolvers();
+            ({ reject } = deferred);
+            return deferred.promise;
           },
           onSelectError: (error) => failures.push(error.message),
         },
       ],
+      modal: false,
+      trigger: React.createElement("button", { type: "button" }, "Open"),
     })
   );
   await React.act(() => host.querySelector("button").click());
   await React.act(() => document.querySelector('[role="menuitem"]').click());
   await React.act(async () => {
     reject(new Error("Offline"));
+    await Promise.resolve();
   });
   assert.deepEqual(failures, ["Offline"]);
   const item = document.querySelector('[role="menuitem"]');
@@ -1016,6 +1015,7 @@ test("Dropdown async failure releases pending, reports the error and permits ret
   assert.equal(calls, 2);
   await React.act(async () => {
     reject(new Error("Still offline"));
+    await Promise.resolve();
   });
   assert.deepEqual(failures, ["Offline", "Still offline"]);
 });
@@ -1023,27 +1023,24 @@ test("Dropdown async failure releases pending, reports the error and permits ret
 test("Dropdown dismissed pending action remains locked after reopen without closing the new menu on success", async () => {
   await ready;
   const { Dropdown } = load();
-  let resolve;
   let calls = 0;
-  const request = new Promise((done) => {
-    resolve = done;
-  });
+  const { promise: request, resolve } = Promise.withResolvers();
   await mount(
     React.createElement(Dropdown, {
       animated: false,
-      modal: false,
-      trigger: React.createElement("button", { type: "button" }, "Open"),
       items: [
         {
+          closeOnSelect: "success",
           id: "save",
           label: "Save",
-          closeOnSelect: "success",
           onSelect: () => {
             calls += 1;
             return request;
           },
         },
       ],
+      modal: false,
+      trigger: React.createElement("button", { type: "button" }, "Open"),
     })
   );
   const trigger = host.querySelector("button");
@@ -1079,13 +1076,6 @@ test("Dropdown rejected overlay close requests never open the overlay", async ()
   await mount(
     React.createElement(Dropdown, {
       animated: false,
-      modal: false,
-      onOpenChange: (open, details) => {
-        if (!open) {
-          details.cancel();
-        }
-      },
-      trigger: React.createElement("button", { type: "button" }, "Open"),
       items: [
         {
           id: "details",
@@ -1096,6 +1086,13 @@ test("Dropdown rejected overlay close requests never open the overlay", async ()
               : null,
         },
       ],
+      modal: false,
+      onOpenChange: (open, details) => {
+        if (!open) {
+          details.cancel();
+        }
+      },
+      trigger: React.createElement("button", { type: "button" }, "Open"),
     })
   );
   await React.act(() => host.querySelector("button").click());

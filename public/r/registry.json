@@ -11,10 +11,15 @@
       "registryDependencies": [
         "https://vandor-ui.vercel.app/r/button.json",
         "https://vandor-ui.vercel.app/r/drawer.json",
+        "https://vandor-ui.vercel.app/r/dropdown.json",
         "https://vandor-ui.vercel.app/r/tooltip.json"
       ],
       "files": [
-        { "path": "registry/new-york/app-shell.tsx", "type": "registry:ui" }
+        { "path": "registry/new-york/app-shell.tsx", "type": "registry:ui" },
+        {
+          "path": "registry/new-york/app-shell-user.tsx",
+          "type": "registry:ui"
+        }
       ]
     },
     {
@@ -176,6 +181,10 @@
         "motion@^12.38.0"
       ],
       "files": [
+        {
+          "path": "registry/new-york/field-outline.tsx",
+          "type": "registry:ui"
+        },
         {
           "path": "registry/new-york/autocomplete.tsx",
           "type": "registry:component",
@@ -419,6 +428,16 @@
           "target": "components/data-grid/data-grid-state.ts"
         },
         {
+          "path": "registry/new-york/data-grid-controller.ts",
+          "type": "registry:component",
+          "target": "components/data-grid/data-grid-controller.ts"
+        },
+        {
+          "path": "registry/new-york/use-data-grid-source.ts",
+          "type": "registry:component",
+          "target": "components/data-grid/use-data-grid-source.ts"
+        },
+        {
           "path": "registry/new-york/use-data-grid.ts",
           "type": "registry:component",
           "target": "components/data-grid/use-data-grid.ts"
@@ -497,6 +516,10 @@
       "dependencies": ["cn", "lucide-react", "motion@^12.38.0"],
       "files": [
         { "path": "registry/new-york/stats-card.tsx", "type": "registry:ui" },
+        {
+          "path": "registry/new-york/stats-card-layout.ts",
+          "type": "registry:ui"
+        },
         {
           "path": "registry/new-york/stats-card-badge.tsx",
           "type": "registry:ui"
@@ -841,6 +864,10 @@
         {
           "path": "registry/new-york/select.tsx",
           "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/field-outline.tsx",
+          "type": "registry:ui"
         }
       ]
     },
@@ -849,6 +876,13 @@
       "type": "registry:ui",
       "title": "Button",
       "description": "A shadcn-based Button with subtle press feedback powered by Motion, using the new-york style and Base UI primitives.",
+      "cssVars": {
+        "theme": {
+          "color-destructive-foreground": "var(--destructive-foreground)"
+        },
+        "light": { "destructive-foreground": "oklch(0.985 0 0)" },
+        "dark": { "destructive-foreground": "oklch(0.20 0.02 27)" }
+      },
       "dependencies": [
         "class-variance-authority",
         "cn",
@@ -1390,7 +1424,7 @@
         "https://vandor-ui.vercel.app/r/calendar.json",
         "https://vandor-ui.vercel.app/r/popover.json"
       ],
-      "dependencies": ["date-fns", "lucide-react"],
+      "dependencies": ["date-fns", "lucide-react", "react-day-picker"],
       "files": [
         {
           "path": "registry/new-york/date-range-picker.tsx",
@@ -1425,6 +1459,43 @@
         {
           "path": "registry/new-york/date-range-picker.stories.tsx",
           "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "date-time",
+      "type": "registry:component",
+      "title": "DateTime",
+      "description": "A timezone-aware instant formatter with strict ISO validation and hydration-safe local display.",
+      "dependencies": [],
+      "files": [
+        {
+          "path": "registry/new-york/date-time-index.ts",
+          "type": "registry:component",
+          "target": "components/date-time/index.ts"
+        },
+        {
+          "path": "registry/new-york/date-time.tsx",
+          "type": "registry:component",
+          "target": "components/date-time/date-time.tsx"
+        },
+        {
+          "path": "registry/new-york/date-time-utils.ts",
+          "type": "registry:component",
+          "target": "components/date-time/date-time-utils.ts"
+        }
+      ]
+    },
+    {
+      "name": "date-time-stories",
+      "type": "registry:item",
+      "title": "DateTime Stories",
+      "description": "Optional portable DateTime stories. Install DateTime first and use existing compatible Storybook packages.",
+      "files": [
+        {
+          "path": "registry/new-york/date-time.stories.tsx",
+          "type": "registry:component",
+          "target": "components/date-time/date-time.stories.tsx"
         }
       ]
     }

@@ -18,8 +18,10 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { useEffect, useId, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
+import { AppShellUserFooter } from "./app-shell-user";
+import type { AppShellUser } from "./app-shell-user";
 import { Button } from "./button";
 import { Drawer, DrawerBody } from "./drawer";
 import {
@@ -29,6 +31,7 @@ import {
   TooltipTrigger,
 } from "./tooltip";
 
+export type { AppShellUser } from "./app-shell-user";
 export interface AppShellNavigationState {
   collapsed: boolean;
   closeNavigation: () => void;
@@ -45,7 +48,7 @@ export interface AppShellNavigationItem {
   /** Separates this item from the following navigation. */
   dividerAfter?: boolean;
   /** Replaces the standard item. The caller owns semantics and disabled state. */
-  renderControl?: (state: AppShellNavigationState) => ReactNode;
+  renderControl?: (state: AppShellNavigationState) => ReactElement;
 }
 
 export interface AppShellProps {
@@ -53,9 +56,11 @@ export interface AppShellProps {
   navigation: readonly AppShellNavigationItem[];
   children: ReactNode;
   header?: ReactNode;
+  showHeader?: boolean;
   actions?: ReactNode;
   sidebarHeader?: ReactNode | ((state: AppShellNavigationState) => ReactNode);
-  sidebarFooter?: ReactNode | ((state: { collapsed: boolean }) => ReactNode);
+  sidebarFooter?: ReactNode | ((state: AppShellNavigationState) => ReactNode);
+  user?: AppShellUser;
   /** Enables the search button and Cmd/Ctrl+K listener only when supplied. */
   onSearch?: () => void;
   searchLabel?: string;
@@ -63,6 +68,14 @@ export interface AppShellProps {
   collapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
   navigationLabel?: string;
+  labels?: {
+    sidebar?: string;
+    skipToContent?: string;
+    openNavigation?: string;
+    closeNavigation?: string;
+    expandSidebar?: string;
+    collapseSidebar?: string;
+  };
   /** Change key only for a new panel, not active items or same-level resources. */
   navigationContext?: { key: string; depth: number };
   className?: string;
@@ -136,20 +149,38 @@ const useNavigationDirection = (
   return direction;
 };
 
+const useShellTransitions = () => {
+  const reduceMotion = useReducedMotion();
+  return {
+    labelTransition: {
+      duration: reduceMotion ? 0 : 0.14,
+      ease: "easeOut" as const,
+    },
+    reduceMotion,
+    sidebarTransition: {
+      duration: reduceMotion ? 0 : 0.22,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  };
+};
+
 export const AppShell = ({
   brand,
   navigation,
   children,
   header,
+  showHeader = true,
   actions,
   sidebarHeader,
   sidebarFooter,
+  user,
   onSearch,
   searchLabel = "Search workspace",
   defaultCollapsed = false,
   collapsed: controlledCollapsed,
   onCollapsedChange,
   navigationLabel = "Main navigation",
+  labels,
   navigationContext,
   className,
   contentClassName,
@@ -157,17 +188,10 @@ export const AppShell = ({
   const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
   const collapsed = controlledCollapsed ?? internalCollapsed;
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, sidebarTransition, labelTransition } =
+    useShellTransitions();
   const navigationDirection = useNavigationDirection(navigationContext);
   // Animate real width as in Universe: FLIP scaling distorts nested scroll areas.
-  const sidebarTransition = {
-    duration: reduceMotion ? 0 : 0.22,
-    ease: [0.22, 1, 0.36, 1] as const,
-  };
-  const labelTransition = {
-    duration: reduceMotion ? 0 : 0.14,
-    ease: "easeOut" as const,
-  };
   const contentId = useId();
   const sidebarId = useId();
   const closeNavigation = () => setMobileOpen(false);
@@ -226,7 +250,7 @@ export const AppShell = ({
           "aria-label": item.label,
           className: cn(
             "h-10 w-full justify-start gap-3 overflow-hidden px-3",
-            item.active && "bg-accent text-accent-foreground"
+            item.active && "bg-background text-foreground"
           ),
           onClick: () => {
             item.onClick?.();
@@ -253,7 +277,16 @@ export const AppShell = ({
         return (
           <div key={item.id}>
             {item.renderControl ? (
-              item.renderControl({ closeNavigation, collapsed: compact })
+              <Tooltip>
+                <TooltipTrigger
+                  disabled={!compact || mobile}
+                  render={item.renderControl({
+                    closeNavigation,
+                    collapsed: compact,
+                  })}
+                />
+                <TooltipContent side="right">{item.label}</TooltipContent>
+              </Tooltip>
             ) : (
               <Tooltip>
                 <TooltipTrigger
@@ -340,14 +373,116 @@ export const AppShell = ({
     ) : (
       renderBrand(compact)
     );
-  const renderFooter = (compact: boolean) =>
-    sidebarFooter && (
+  const renderFooter = (compact: boolean) => {
+    if (sidebarFooter === undefined) {
+      return user ? (
+        <AppShellUserFooter
+          user={user}
+          collapsed={compact}
+          closeNavigation={closeNavigation}
+        />
+      ) : null;
+    }
+    return (
       <div className="mt-auto shrink-0 border-t border-border p-2">
         {typeof sidebarFooter === "function"
-          ? sidebarFooter({ collapsed: compact })
+          ? sidebarFooter({ closeNavigation, collapsed: compact })
           : sidebarFooter}
       </div>
     );
+  };
+
+  const renderCollapseControl = (rail = false) => (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(
+              "hidden md:inline-flex",
+              rail && "group relative mx-auto my-3 shrink-0"
+            )}
+            aria-label={
+              collapsed
+                ? (labels?.expandSidebar ?? "Expand sidebar")
+                : (labels?.collapseSidebar ?? "Collapse sidebar")
+            }
+            aria-expanded={!collapsed}
+            aria-controls={sidebarId}
+            onClick={() => {
+              if (controlledCollapsed === undefined) {
+                setInternalCollapsed(!collapsed);
+              }
+              onCollapsedChange?.(!collapsed);
+            }}
+          >
+            {rail && collapsed && (
+              <span
+                aria-hidden="true"
+                className="absolute flex size-6 items-center justify-center font-semibold group-hover:opacity-0 group-focus-visible:opacity-0"
+              >
+                {brand.icon ?? brand.name.slice(0, 1)}
+              </span>
+            )}
+            <span
+              className={cn(
+                "flex",
+                rail &&
+                  collapsed &&
+                  "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
+              )}
+            >
+              {collapsed ? (
+                <PanelLeftOpenIcon aria-hidden="true" />
+              ) : (
+                <PanelLeftCloseIcon aria-hidden="true" />
+              )}
+            </span>
+          </Button>
+        }
+      />
+      <TooltipContent side="right">
+        {collapsed
+          ? (labels?.expandSidebar ?? "Expand sidebar")
+          : (labels?.collapseSidebar ?? "Collapse sidebar")}
+      </TooltipContent>
+    </Tooltip>
+  );
+  const renderMobileNavigation = () => (
+    <Drawer
+      title={sidebarHeader ? navigationLabel : brand.name}
+      open={mobileOpen}
+      onOpenChange={setMobileOpen}
+      swipeDirection={showHeader ? "left" : "right"}
+      contentProps={{
+        closeButtonLabel: labels?.closeNavigation ?? "Close navigation",
+      }}
+      showSwipeHandle={false}
+      trigger={
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "md:hidden",
+            !showHeader &&
+              "fixed right-4 top-[max(1rem,env(safe-area-inset-top))] z-20 bg-background ring-1 ring-border"
+          )}
+          aria-label={labels?.openNavigation ?? "Open navigation"}
+        >
+          <MenuIcon aria-hidden="true" />
+        </Button>
+      }
+    >
+      <DrawerBody className="flex min-h-0 flex-1 flex-col p-0">
+        {sidebarHeader && renderSidebarHeader(false)}
+        <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+          {renderContextNavigation(false, true)}
+        </div>
+        {renderFooter(false)}
+      </DrawerBody>
+    </Drawer>
+  );
 
   return (
     <TooltipProvider>
@@ -355,7 +490,7 @@ export const AppShell = ({
         data-slot="app-shell"
         data-collapsed={collapsed}
         className={cn(
-          "flex min-h-svh overflow-x-clip bg-muted/30 text-foreground",
+          "flex min-h-svh overflow-x-clip bg-background text-foreground",
           className
         )}
       >
@@ -363,99 +498,76 @@ export const AppShell = ({
           href={`#${contentId}`}
           className="sr-only z-50 rounded-md bg-background p-3 focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
         >
-          Skip to content
+          {labels?.skipToContent ?? "Skip to content"}
         </a>
         <motion.aside
           id={sidebarId}
           data-slot="app-shell-sidebar"
-          aria-label="Sidebar"
+          aria-label={labels?.sidebar ?? "Sidebar"}
           initial={false}
           animate={{ width: collapsed ? "4rem" : "15rem" }}
           transition={sidebarTransition}
-          className="sticky top-0 hidden h-svh shrink-0 flex-col overflow-hidden border-r border-border bg-background md:flex"
+          className="sticky top-0 hidden h-svh shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar text-sidebar-foreground md:flex"
         >
-          {renderSidebarHeader(collapsed)}
+          {!showHeader && collapsed
+            ? renderCollapseControl(true)
+            : renderSidebarHeader(collapsed)}
+          {!showHeader && !collapsed && renderCollapseControl(true)}
           <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
             {renderContextNavigation(collapsed)}
           </div>
           {renderFooter(collapsed)}
         </motion.aside>
         <div className="flex min-w-0 flex-1 flex-col">
-          <header
-            data-slot="app-shell-header"
-            className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background px-4 sm:px-6"
-          >
-            <Drawer
-              title={sidebarHeader ? navigationLabel : brand.name}
-              open={mobileOpen}
-              onOpenChange={setMobileOpen}
-              swipeDirection="left"
-              showSwipeHandle={false}
-              trigger={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  aria-label="Open navigation"
-                >
-                  <MenuIcon aria-hidden="true" />
-                </Button>
-              }
-            >
-              <DrawerBody className="flex min-h-0 flex-1 flex-col p-0">
-                {sidebarHeader && renderSidebarHeader(false)}
-                <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
-                  {renderContextNavigation(false, true)}
-                </div>
-                {renderFooter(false)}
-              </DrawerBody>
-            </Drawer>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden md:inline-flex"
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              aria-expanded={!collapsed}
-              aria-controls={sidebarId}
-              onClick={() => {
-                if (controlledCollapsed === undefined) {
-                  setInternalCollapsed(!collapsed);
-                }
-                onCollapsedChange?.(!collapsed);
-              }}
-            >
-              {collapsed ? (
-                <PanelLeftOpenIcon aria-hidden="true" />
-              ) : (
-                <PanelLeftCloseIcon aria-hidden="true" />
-              )}
-            </Button>
-            {onSearch && (
-              <Button
-                variant="outline"
-                onClick={onSearch}
-                className="min-w-0 flex-1 justify-start text-muted-foreground sm:max-w-sm"
+          {!showHeader && (
+            <>
+              <div
+                data-slot="app-shell-brand-tab"
+                className="fixed left-1/2 top-0 z-20 max-w-[calc(100%-8rem)] -translate-x-1/2 rounded-b-xl bg-sidebar px-5 pb-3 pt-[max(.75rem,env(safe-area-inset-top))] text-sidebar-foreground before:absolute before:-left-3 before:top-0 before:size-3 before:rounded-tr-xl before:shadow-[4px_-4px_0_4px_var(--sidebar)] after:absolute after:-right-3 after:top-0 after:size-3 after:rounded-tl-xl after:shadow-[-4px_-4px_0_4px_var(--sidebar)] md:hidden"
               >
-                <SearchIcon aria-hidden="true" />
-                <span className="truncate">{searchLabel}</span>
-                <kbd className="ml-auto hidden text-xs sm:inline">
-                  ⌘ / Ctrl K
-                </kbd>
-              </Button>
-            )}
-            {header}
-            {actions && (
-              <div className="ml-auto flex shrink-0 items-center gap-2">
-                {actions}
+                <span className="block truncate text-sm font-semibold">
+                  {brand.name}
+                </span>
               </div>
-            )}
-          </header>
+              {renderMobileNavigation()}
+            </>
+          )}
+          {showHeader && (
+            <header
+              data-slot="app-shell-header"
+              className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background px-4 sm:px-6"
+            >
+              {renderMobileNavigation()}
+              {renderCollapseControl()}
+              {onSearch && (
+                <Button
+                  variant="outline"
+                  onClick={onSearch}
+                  className="min-w-0 flex-1 justify-start text-muted-foreground sm:max-w-sm"
+                >
+                  <SearchIcon aria-hidden="true" />
+                  <span className="truncate">{searchLabel}</span>
+                  <kbd className="ml-auto hidden text-xs sm:inline">
+                    ⌘ / Ctrl K
+                  </kbd>
+                </Button>
+              )}
+              {header}
+              {actions && (
+                <div className="ml-auto flex shrink-0 items-center gap-2">
+                  {actions}
+                </div>
+              )}
+            </header>
+          )}
           <main
             id={contentId}
             data-slot="app-shell-main"
             tabIndex={-1}
             className={cn(
-              "min-w-0 flex-1 p-4 outline-none sm:p-6",
+              "min-w-0 flex-1 outline-none",
+              !showHeader &&
+                "pt-[calc(4.5rem+env(safe-area-inset-top))] md:pt-0",
               contentClassName
             )}
           >

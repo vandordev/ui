@@ -95,9 +95,9 @@ artifact works in a consumer project.
 
 ### Narrow component-family exception
 
-Autocomplete and DataGrid install outside UI under the configured components
-alias with `index.ts` public entries, optional `query.ts` and server-safe
-`schema.ts`. Their modules and optional colocated stories use
+Autocomplete, DataGrid and DateTime install outside UI under the configured components
+alias with `index.ts` public entries; Autocomplete/DataGrid may also include optional
+`query.ts` and server-safe `schema.ts`. Their modules and optional colocated stories use
 `registry:component` with default family targets. Other primitives retain the
 no-target UI convention below.
 

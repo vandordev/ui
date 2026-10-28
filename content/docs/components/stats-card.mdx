@@ -36,7 +36,7 @@ export function Demo() {
 }
 ```
 
-Requires React 19, Tailwind CSS 4 with shadcn tokens, Motion 12.38+, `lucide-react`, and `cn`. Use your configured UI alias if it differs. Installation includes `stats-card.tsx` and its colocated supporting `stats-card-badge.tsx`; it does not install or overwrite your existing Badge component. No providers or website-specific styles are required. Copying the displayed Source alone is insufficient for manual installation: use the CLI command above to receive both files.
+Requires React 19, Tailwind CSS 4 with shadcn tokens, Motion 12.38+, `lucide-react`, and `cn`. Use your configured UI alias if it differs. Installation includes `stats-card.tsx` and its colocated supporting `stats-card-badge.tsx` and `stats-card-layout.ts`; it does not install or overwrite your existing Badge component. No providers or website-specific styles are required. Copying the displayed Source alone is insufficient for manual installation: use the CLI command above to receive all three files.
 
 ## Examples
 
@@ -79,7 +79,7 @@ Keep each item's key stable. The first numeric value counts from zero; subsequen
 - The outer group requires `ariaLabel`. Metrics use a definition list, with titles in `dt` and values and supporting content in `dd`.
 - Screen readers receive the final formatted target, not every animated frame. Values are not a live region; applications should announce important asynchronous updates separately.
 - Reduced-motion preferences show the final number immediately. Server rendering also includes the final value before the client starts animation.
-- One metric fills the width. Three metrics use three columns from the `sm` breakpoint. Other counts use up to two columns at `sm` and four at `lg`, with dividers between rows and columns, including incomplete final rows. An empty array renders an empty group, not a loading or empty-state message.
+- One metric fills the width. Mobile stacks. Exactly three metrics use three columns from `sm`; other counts balance across at most two columns at `sm` and four at `lg`. Desktop five becomes 3+2, six becomes 3+3, seven becomes 4+3, and every row fills the available width. Separators follow actual row/column ends. Use the playground's metric count control or FiveMetrics/SixMetrics/SevenMetrics stories to inspect these cases. An empty array renders an empty group, not a loading or empty-state message.
 - The API is deliberately restricted to `ariaLabel`, `items`, and `className`. It does not forward native attributes, refs, or event handlers. Values, captions, and badge labels accept React nodes; avoid adding interactive content inside the animated numeric value.
 - Styling uses `card`, `card-foreground`, `border`, `muted-foreground`, `primary`, `primary-foreground`, `secondary`, `secondary-foreground`, `destructive`, and `destructive-foreground` tokens. Light and dark themes inherit your application setup.
 

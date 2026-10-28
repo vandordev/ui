@@ -6,7 +6,9 @@ const { prepareFamilyArtifacts } = require("./component-family-artifacts.cjs");
 
 const [name, consumer, ...flags] = process.argv.slice(2);
 if (
-  !/^(autocomplete|data-grid)(-query|-schema|-stories)?$/.test(name ?? "") ||
+  !/^(autocomplete(-query|-schema|-stories)?|data-grid(-query|-schema|-stories)?|date-time(-stories)?)$/.test(
+    name ?? ""
+  ) ||
   !consumer ||
   flags.some((flag) => flag !== "--dry-run")
 ) {

@@ -49,6 +49,12 @@ export const appShellProps: Record<string, PropDefinition> = {
       "Content after the navigation trigger and optional search button in the top header.",
     type: "ReactNode",
   },
+  labels: {
+    defaultValue: "English labels",
+    description:
+      "Accessible shell labels, independent of navigationLabel and searchLabel.",
+    type: "{ sidebar?: string; skipToContent?: string; openNavigation?: string; closeNavigation?: string; expandSidebar?: string; collapseSidebar?: string }",
+  },
   navigation: {
     defaultValue: "Required",
     description:
@@ -84,16 +90,28 @@ export const appShellProps: Record<string, PropDefinition> = {
     description: "Visible search-button label. Only used with onSearch.",
     type: "string",
   },
+  showHeader: {
+    defaultValue: "true",
+    description:
+      "Show the topbar. Headerless mode retains sidebar controls and a right-side mobile drawer; header/actions/search UI is hidden, not relocated.",
+    type: "boolean",
+  },
   sidebarFooter: {
     defaultValue: "undefined",
     description:
-      "Persistent footer below the scrollable navigation. Mobile receives collapsed=false.",
-    type: "ReactNode | ((state: { collapsed: boolean }) => ReactNode)",
+      "Persistent footer below the scrollable navigation. Receives collapsed and closeNavigation; mobile receives collapsed=false. Overrides user, including an explicit null.",
+    type: "ReactNode | ((state: AppShellNavigationState) => ReactNode)",
   },
   sidebarHeader: {
     defaultValue: "undefined",
     description:
       "Replaces the brand row. Receives collapsed and closeNavigation. Mobile receives collapsed=false; closeNavigation closes only the mobile drawer.",
     type: "ReactNode | ((state: AppShellNavigationState) => ReactNode)",
+  },
+  user: {
+    defaultValue: "undefined",
+    description:
+      "Optional name, description, avatar, readonly DropdownEntry[] items, pending and menuLabel. Custom sidebarFooter (including null) overrides this identity menu. Async drawer closure waits for accepted fulfillment; rejected and canceled actions retain navigation.",
+    type: "AppShellUser",
   },
 };

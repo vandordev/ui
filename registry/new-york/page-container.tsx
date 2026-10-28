@@ -22,7 +22,7 @@ export const PageContainer = ({
     data-slot="page-container"
     data-size={size}
     className={cn(
-      "mx-auto w-full min-w-0 p-4 sm:p-6 lg:p-8",
+      "mx-auto w-full min-w-0 p-4 sm:p-6 lg:p-12",
       widths[size],
       className
     )}

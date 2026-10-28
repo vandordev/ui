@@ -33,7 +33,7 @@ const resolveAliasDirectory = (cwd, alias) => {
         : null;
     })
     .filter(Boolean)
-    .sort(
+    .toSorted(
       (a, b) => b.key.replace("*", "").length - a.key.replace("*", "").length
     );
   const exact = matches.find((match) => !match.key.includes("*"));
@@ -57,6 +57,21 @@ const resolveAliasDirectory = (cwd, alias) => {
 };
 
 // Prepare local closure without copying deployed artifacts or changing source files.
+const familyModules = {
+  autocomplete: /^(autocomplete|use-autocomplete)([.-]|$)/,
+  "data-grid": /^(data-grid|use-data-grid)([.-]|$)/,
+  "date-time": /^date-time([.-]|$)/,
+};
+
+const validateItemName = (itemName) => {
+  if (!/^[a-z0-9-]+$/.test(itemName)) {
+    throw new Error("Invalid local registry item name");
+  }
+  if (itemName.startsWith("date-time-") && itemName !== "date-time-stories") {
+    throw new Error("Unsupported DateTime item");
+  }
+};
+
 // Caller owns outputDirectory and invokes stock CLI on the returned root artifact.
 const prepareFamilyArtifacts = ({
   artifactDirectory,
@@ -81,9 +96,7 @@ const prepareFamilyArtifacts = ({
     if (prepared.has(itemName)) {
       return prepared.get(itemName);
     }
-    if (!/^[a-z0-9-]+$/.test(itemName)) {
-      throw new Error("Invalid local registry item name");
-    }
+    validateItemName(itemName);
     visiting.add(itemName);
     const artifact = JSON.parse(
       readFileSync(path.join(artifactDirectory, `${itemName}.json`), "utf-8")
@@ -92,8 +105,8 @@ const prepareFamilyArtifacts = ({
     // and versioned foundation packages in a closure (pnpm can mis-pair specs).
     const foundationVersions = {
       cn: "cn@^0.4.0",
-      motion: "motion@^12.38.0",
       "lucide-react": "lucide-react@1.11.0",
+      motion: "motion@^12.38.0",
     };
     artifact.dependencies = artifact.dependencies?.map(
       (dependency) => foundationVersions[dependency] ?? dependency
@@ -127,8 +140,12 @@ const prepareFamilyArtifacts = ({
         );
       }
       const family =
-        file.path.match(/\/components\/(autocomplete|data-grid)\/(.+)$/) ??
-        file.target?.match(/^components\/(autocomplete|data-grid)\/(.+)$/);
+        file.path.match(
+          /\/components\/(autocomplete|data-grid|date-time)\/(.+)$/
+        ) ??
+        file.target?.match(
+          /^components\/(autocomplete|data-grid|date-time)\/(.+)$/
+        );
       if (family) {
         if (family[2].split("/").includes("..")) {
           throw new Error("Invalid family source path");
@@ -137,13 +154,10 @@ const prepareFamilyArtifacts = ({
         file.target = `~/${components}/${family[1]}/${family[2]}`;
         // Repository source stays flat. Only cross-family primitive imports move;
         // stock CLI then rewrites this documented registry UI import namespace.
-        file.content = file.content?.replace(
+        file.content = file.content?.replaceAll(
           /(["'])\.\/([^"']+)\1/g,
           (whole, quote, module) => {
-            const owned =
-              family[1] === "autocomplete"
-                ? /^(autocomplete|use-autocomplete)([.-]|$)/.test(module)
-                : /^(data-grid|use-data-grid)([.-]|$)/.test(module);
+            const owned = familyModules[family[1]].test(module);
             return owned
               ? whole
               : `${quote}@/registry/new-york/ui/${module}${quote}`;

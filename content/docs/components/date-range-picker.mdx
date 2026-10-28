@@ -10,6 +10,7 @@ credits:
 
 import { ComponentPreview } from "@/components/component-preview";
 import { DateRangePickerDemo } from "@/examples/date-range-picker-demo";
+import { DateRangePickerLocalized } from "@/examples/date-range-picker-localized";
 
 ## Usage
 
@@ -54,6 +55,17 @@ The controlled value changes only on Apply. Try a shortcut, alter its draft, the
 </ComponentPreview>
 
 ## Behavior & Accessibility
+
+### Indonesian calendar and action labels
+
+<ComponentPreview
+  name="date-range-picker-localized"
+  title="date-range-picker-localized.tsx"
+>
+  <DateRangePickerLocalized />
+</ComponentPreview>
+
+`dateRangeIndonesianLocale` is re-exported from the public `react-day-picker/locale` entry. It localizes calendar/date formatting; application copy remains caller-owned (`label`, `placeholder`, `applyLabel`, `cancelLabel`, `clearLabel`). Shortcut labels remain English, so this localized example intentionally omits shortcuts. The value is still a pair of local calendar dates, not a timezone-aware instant.
 
 The popup opens at the committed range's starting month and focuses an eligible date. Label and displayed value name the trigger; the popup has an accessible title. Two-month mode shows one month below 768px. Popup scrolling respects the available viewport height.
 

@@ -51,6 +51,27 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Playground: Story = {};
 export const ThreeMetrics: Story = { args: { items: items.slice(0, 3) } };
+export const FiveMetrics: Story = {
+  args: {
+    items: [
+      ...items,
+      { icon: Activity, key: "queued", title: "Queued", value: { target: 12 } },
+    ],
+  },
+};
+export const SevenMetrics: Story = {
+  args: {
+    items: [
+      ...items,
+      ...["Queued", "Retried", "Archived"].map((title, index) => ({
+        icon: Activity,
+        key: title,
+        title,
+        value: { target: index + 1 },
+      })),
+    ],
+  },
+};
 export const ExactValues: Story = {
   args: {
     ariaLabel: "Payment overview",

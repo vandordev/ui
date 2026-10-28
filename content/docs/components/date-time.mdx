@@ -1,0 +1,46 @@
+---
+title: DateTime
+description: A strict timezone-aware instant formatter with hydration-safe display.
+component: date-time
+---
+
+import { ComponentPreview } from "@/components/component-preview";
+import { DateTimeDemo } from "@/examples/date-time-demo";
+import { DateTimeFormatsDemo } from "@/examples/date-time-formats-demo";
+
+## Usage
+
+```tsx
+import { DateTime } from "@/components/date-time";
+
+<DateTime value="2026-10-24T08:00:00Z" timeZone="Asia/Jakarta" />;
+```
+
+`value` accepts an epoch-millisecond number, a valid `Date`, or an ISO instant that includes `Z` or an explicit numeric offset. Date-only strings and timezone-free local timestamps are rejected. Numeric values are milliseconds, not seconds. The server and initial hydration render the fallback (`—` by default); the browser formats the instant after hydration using the selected locale/timezone. Supply `timeZone` for stable display across viewers. This component does not live-update.
+
+## Examples
+
+<ComponentPreview name="date-time-demo" title="date-time-demo.tsx">
+  <DateTimeDemo />
+</ComponentPreview>
+
+<ComponentPreview
+  name="date-time-formats-demo"
+  title="date-time-formats-demo.tsx"
+>
+  <DateTimeFormatsDemo />
+</ComponentPreview>
+
+## Behavior & Accessibility
+
+The native `<time>` element receives `dateTime` only for valid instants and forwards native time attributes/ref. Invalid values use the configured fallback. Invalid Intl locales/timezones/options throw instead of being hidden as invalid data.
+
+## Family setup and optional stories
+
+Install with `node scripts/install-component-family.cjs date-time <consumer-directory>` after generating fresh registry artifacts. The family wrapper reads the consumer's `components` alias and places `index.ts`, `date-time.tsx`, and `date-time-utils.ts` under `components/date-time/`. Manual installation requires all three files and React 19; no date library or Query provider is required. Optional stories install separately with `date-time-stories` after the component and the consumer's existing compatible Storybook packages.
+
+Storybook discovers colocated `**/*.stories.tsx`; inherit consumer theme/Tailwind styles. Storybook UI was not verified because this project has no Storybook server.
+
+The default locale is `en-US`; omit `timeZone` for the browser timezone. Defaults include numeric day/year, short month, and two-digit 24-hour hours/minutes. `format` replaces these defaults entirely, so `{ dateStyle: "medium" }` or `{ timeStyle: "short" }` is valid. Explicit `timeZone` overrides `format.timeZone`. Helpers `toDate`, `formatDate`, `DateInput` and `DateFormatOptions` are exported from the family entry; helpers are React-free and can be imported on the server. `children` and `dateTime` are intentionally derived, not public overrides. Use null/undefined or invalid input for fallback; use timestamps with seconds, not calendar-only birthdays.
+
+Use `node scripts/install-component-family.cjs date-time-stories <consumer-directory>` for the separate story file after core installation. It declares no core dependency and preserves customized core source. Supply your existing matching `@storybook/react` packages (verified against 10.6.1); no addon or website asset is required.

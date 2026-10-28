@@ -11,6 +11,24 @@ export const selectItems = [
 
 // eslint-disable-next-line sort-keys
 export const selectProps = {
+  label: {
+    control: { initialValue: "Fruit", kind: "text", label: "Label" },
+    defaultValue: "undefined",
+    description:
+      "Visible field label for the built-in trigger. Custom triggers own their label layout.",
+    type: "string",
+  },
+  labelStyle: {
+    control: {
+      initialValue: "floating" as "floating" | "static",
+      kind: "select",
+      label: "Label style",
+      options: ["floating", "static"],
+    },
+    defaultValue: '"floating"',
+    description: "Select label presentation.",
+    type: '"floating" | "static"',
+  },
   placeholder: {
     control: {
       initialValue: "Select a fruit",
@@ -112,6 +130,15 @@ export const selectProps = {
 
 export const getSelectDefaults = () => getPlaygroundDefaults(selectProps);
 export type SelectPlaygroundValues = ReturnType<typeof getSelectDefaults>;
+export const getSelectPreviewProps = (values: SelectPlaygroundValues) => ({
+  animated: values.animated,
+  data: selectItems,
+  disabled: values.disabled,
+  label: values.label,
+  labelStyle: values.labelStyle as "floating" | "static",
+  placeholder: values.placeholder,
+  size: values.size,
+});
 
 export const getSelectCode = (
   values: SelectPlaygroundValues
@@ -122,7 +149,8 @@ const items = ${JSON.stringify(selectItems, null, 2)};
 export const SelectDemo = () => (
   <Select
     data={items}
-    aria-label="Fruit"
+    label={${JSON.stringify(values.label)}}
+    labelStyle=${JSON.stringify(values.labelStyle)}
     className="w-56"
     placeholder={${JSON.stringify(values.placeholder)}}${values.size === "sm" ? '\n    size="sm"' : ""}${values.disabled ? "\n    disabled" : ""}${values.animated ? "" : "\n    animated={false}"}
   />

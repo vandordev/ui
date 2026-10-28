@@ -25,18 +25,20 @@ const meta = {
     onCollapsedChange: { control: false },
     onSearch: { control: false },
     searchLabel: { control: "text" },
+    showHeader: { control: "boolean" },
     sidebarFooter: { control: false },
     sidebarHeader: { control: false },
+    user: { control: false },
   },
   args: {
     brand: { icon: <LayoutGridIcon />, name: "Acme" },
     children: (
-      <>
+      <div className="p-4 sm:p-6 lg:p-12">
         <h1 className="text-2xl font-semibold">Workspace</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Consumer content belongs here.
         </p>
-      </>
+      </div>
     ),
     navigation: [
       {
@@ -59,6 +61,115 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const Collapsed: Story = { args: { collapsed: true } };
 export const Minimal: Story = { args: { navigation: [] } };
+export const Headerless: Story = {
+  args: {
+    children: (
+      <div className="p-4">
+        <h1 className="text-2xl font-semibold">Full-bleed workspace</h1>
+      </div>
+    ),
+    showHeader: false,
+  },
+};
+export const BuiltInUserMenu: Story = {
+  args: {
+    user: {
+      description: "avery@example.test",
+      items: [
+        { id: "profile", label: "Profile", onSelect: () => Promise.resolve() },
+        {
+          id: "sign-out",
+          label: "Sign out",
+          onSelect: () => Promise.resolve(),
+          variant: "destructive",
+        },
+      ],
+      name: "Avery Cole",
+    },
+  },
+};
+export const LocalizedHeaderless: Story = {
+  args: {
+    labels: {
+      closeNavigation: "Tutup navigasi",
+      collapseSidebar: "Ciutkan sidebar",
+      expandSidebar: "Perluas sidebar",
+      openNavigation: "Buka navigasi",
+      sidebar: "Sidebar",
+      skipToContent: "Langsung ke konten",
+    },
+    showHeader: false,
+  },
+};
+export const CustomLinkRail: Story = {
+  args: {
+    collapsed: true,
+    navigation: [
+      {
+        id: "reports",
+        label: "Reports",
+        renderControl: ({ closeNavigation }) => (
+          <a
+            className="flex size-10 items-center justify-center rounded-md focus-visible:outline-2 focus-visible:outline-ring"
+            href="#reports"
+            aria-label="Reports"
+            aria-current="page"
+            onClick={closeNavigation}
+          >
+            R
+          </a>
+        ),
+      },
+    ],
+  },
+};
+export const PendingIdentity: Story = {
+  args: {
+    user: {
+      description: "Action in progress",
+      items: [],
+      name: "Avery Cole",
+      pending: true,
+    },
+  },
+};
+export const CustomFooterOverride: Story = {
+  args: {
+    sidebarFooter: ({ closeNavigation }) => (
+      <Button onClick={closeNavigation}>Custom account</Button>
+    ),
+    user: { items: [], name: "Hidden identity" },
+  },
+};
+export const RejectedUserAction: Story = {
+  render: function RejectedAction(args) {
+    const [error, setError] = useState("");
+    return (
+      <AppShell
+        {...args}
+        user={{
+          items: [
+            {
+              closeOnSelect: "success",
+              id: "retry",
+              label: "Simulate rejection",
+              onSelect: () =>
+                Promise.reject(new Error("Demonstration rejection")),
+              onSelectError: () =>
+                setError("Rejected. The menu remains available for retry."),
+            },
+          ],
+          name: "Avery Cole",
+        }}
+      >
+        <p role="status" className="p-4">
+          {error ||
+            "Open the identity menu and select the local rejection action."}
+        </p>
+      </AppShell>
+    );
+  },
+};
 export const DisabledDestination: Story = {
   args: {
     navigation: [

@@ -17,6 +17,8 @@ import { ButtonLoading } from "@/examples/button-loading";
 
 ## Usage
 
+The destructive variant uses `text-destructive-foreground`. CLI installation declares `--destructive-foreground` for both light and dark themes and maps it through Tailwind 4's `--color-destructive-foreground`. Manual installation must supply the same semantic token alongside `--destructive`; do not rely on this documentation website's stylesheet. Customized palettes must keep foreground/background contrast readable, including the dark destructive surface.
+
 ```tsx
 import { Button } from "@/components/ui/button";
 

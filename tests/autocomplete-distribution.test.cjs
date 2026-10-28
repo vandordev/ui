@@ -25,7 +25,24 @@ test("autocomplete artifacts match every support file and isolate optional stori
         manifest.files.find((entry) => entry.path === file.path)
       );
       assert.equal(content, readFileSync(file.path, "utf-8"));
-      assert.ok(file.target.startsWith("components/autocomplete/"));
+      if (file.path.endsWith("/field-outline.tsx")) {
+        assert.equal(file.type, "registry:ui");
+        assert.equal(
+          file.target,
+          undefined,
+          "Shared outline follows configured UI alias"
+        );
+        const select = JSON.parse(
+          readFileSync("public/r/select.json", "utf-8")
+        );
+        assert.ok(
+          select.files.find((entry) => entry.path === file.path)?.content ===
+            content,
+          "Shared target must have identical owner content"
+        );
+      } else {
+        assert.ok(file.target.startsWith("components/autocomplete/"));
+      }
       assert.doesNotMatch(content, /from ["']@\//);
       assert.doesNotMatch(
         content,
@@ -33,7 +50,7 @@ test("autocomplete artifacts match every support file and isolate optional stori
       );
     }
     if (name === "autocomplete") {
-      assert.equal(artifact.files.length, 7);
+      assert.equal(artifact.files.length, 8);
       assert.ok(
         artifact.registryDependencies.includes(
           "https://vandor-ui.vercel.app/r/loading.json"
@@ -43,7 +60,7 @@ test("autocomplete artifacts match every support file and isolate optional stori
         !artifact.dependencies.some((entry) => entry.includes("query"))
       );
       assert.doesNotMatch(
-        artifact.files.find((file) => file.target.endsWith("/index.ts"))
+        artifact.files.find((file) => file.target?.endsWith("/index.ts"))
           .content,
         /autocomplete-query|use-autocomplete-query/
       );
@@ -52,8 +69,10 @@ test("autocomplete artifacts match every support file and isolate optional stori
       assert.ok(
         !artifact.dependencies.some((entry) => entry.includes("storybook"))
       );
-      for (const file of artifact.files.filter((entry) =>
-        entry.path.endsWith(".tsx")
+      for (const file of artifact.files.filter(
+        (entry) =>
+          entry.path.endsWith(".tsx") &&
+          !entry.path.endsWith("/field-outline.tsx")
       )) {
         assert.match(file.content, /^"use client";/);
       }

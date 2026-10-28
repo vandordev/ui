@@ -98,6 +98,29 @@ test("Select preserves empty placeholders, numeric values and multiple labels", 
   assert.match(html, /One/);
 });
 
+test("Select visible labels support floating and static modes without overriding caller naming", () => {
+  const { Select } = jiti("../registry/new-york/select.tsx");
+  const props = {
+    data: [{ label: "Pear", value: "pear" }],
+    label: "Fruit",
+    placeholder: "Choose",
+  };
+  const floating = renderToStaticMarkup(el(Select, props));
+  assert.match(floating, /<label[^>]*id="[^"]+"[^>]*>Fruit<\/label>/);
+  assert.match(floating, /aria-labelledby="[^"]+"/);
+  assert.match(floating, /<fieldset aria-hidden="true"/);
+  const staticMarkup = renderToStaticMarkup(
+    el(Select, { ...props, labelStyle: "static" })
+  );
+  assert.match(staticMarkup, /<label[^>]*>Fruit<\/label>/);
+  assert.doesNotMatch(staticMarkup, /<fieldset aria-hidden="true"/);
+  const explicit = renderToStaticMarkup(
+    el(Select, { ...props, "aria-label": "Produce selector" })
+  );
+  assert.match(explicit, /aria-label="Produce selector"/);
+  assert.doesNotMatch(explicit, /aria-labelledby="[^"]+"/);
+});
+
 test("registry SelectRoot preserves labels, selected values, form names, and disabled semantics", () => {
   const { SelectRoot, SelectTrigger, SelectValue } = jiti(
     "../registry/new-york/select.tsx"

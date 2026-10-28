@@ -6,6 +6,7 @@ import type { Locale } from "date-fns";
 import { CalendarDays } from "lucide-react";
 import * as React from "react";
 import type { DateRange, Matcher } from "react-day-picker";
+import { id as indonesianLocale } from "react-day-picker/locale";
 
 import { Button } from "./button";
 import { Calendar } from "./calendar";
@@ -24,6 +25,8 @@ import {
 // shadcn Date Picker composition, extended with transactional range selection.
 
 export type DateRangeFeature = "twoMonths" | "shortcuts";
+
+export const dateRangeIndonesianLocale = indonesianLocale;
 
 const allShortcuts: readonly DateShortcut[] = [
   "last7Days",
