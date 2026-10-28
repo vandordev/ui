@@ -113,8 +113,8 @@ export const selectProps = {
   triggerProps: {
     defaultValue: "Not set",
     description:
-      "Select: additional trigger props, including ref and event handlers.",
-    type: "Omit<SelectTriggerProps, 'children' | 'className' | 'size' | 'render'>",
+      "Select: additional trigger props, including ref, event handlers, id and trigger-specific className styling.",
+    type: "Omit<SelectTriggerProps, 'children' | 'size' | 'render'>",
   },
   contentProps: {
     defaultValue: "Not set",

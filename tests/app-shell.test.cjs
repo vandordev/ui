@@ -126,6 +126,39 @@ test("AppShell portable stories compose and controlled collapse remains interact
   assert.equal(host.querySelectorAll("[data-navigation-panel]").length, 1);
 });
 
+test("AppShell desktop toggle stays beside the brand or workspace header and expands the rail", async () => {
+  await setup();
+  for (const showHeader of [true, false]) {
+    for (const sidebarHeader of [
+      undefined,
+      React.createElement("button", { type: "button" }, "Workspace"),
+    ]) {
+      await render({ collapsed: false, showHeader, sidebarHeader });
+      const sidebar = host.querySelector('[data-slot="app-shell-sidebar"]');
+      const row = sidebar.firstElementChild;
+      assert.ok(
+        row.textContent.includes(sidebarHeader ? "Workspace" : "Acme"),
+        "Sidebar header keeps the identity"
+      );
+      const toggle = row.querySelector('[aria-label="Collapse sidebar"]');
+      assert.ok(Boolean(toggle), "Desktop toggle belongs in the identity row");
+      assert.ok(
+        toggle.closest("a") === null,
+        "Toggle must not be nested in a brand link"
+      );
+      assert.equal(
+        host.querySelectorAll('[aria-label="Collapse sidebar"]').length,
+        1
+      );
+      await render({ collapsed: true, showHeader, sidebarHeader });
+      assert.ok(
+        Boolean(sidebar.querySelector('[aria-label="Expand sidebar"]')),
+        "Compact rail retains its expand control"
+      );
+    }
+  }
+});
+
 test("AppShell collapse supports uncontrolled and controlled ownership", async () => {
   await setup();
   const changes = [];
@@ -153,6 +186,32 @@ test("AppShell collapse supports uncontrolled and controlled ownership", async (
   assert.deepEqual(changes, [true, true]);
   await render({ collapsed: true });
   assert.ok(host.querySelector('[aria-label="Expand sidebar"]'));
+});
+
+test("AppShell linked brand remains independently available in the collapsed sidebar", async () => {
+  await setup();
+  for (const showHeader of [true, false]) {
+    await render({
+      brand: { href: "/workspace", name: "Acme" },
+      collapsed: true,
+      showHeader,
+    });
+    const sidebar = host.querySelector('[data-slot="app-shell-sidebar"]');
+    const link = sidebar.querySelector('a[href="/workspace"]');
+    assert.ok(
+      Boolean(link),
+      "Collapsing must not remove the brand destination"
+    );
+    assert.equal(link.getAttribute("aria-label"), "Acme");
+    assert.ok(
+      Boolean(sidebar.querySelector('[aria-label="Expand sidebar"]')),
+      "Brand link is separate from expansion"
+    );
+    assert.ok(
+      link.querySelector("button") === null,
+      "Brand link must not wrap the toggle"
+    );
+  }
 });
 
 test("AppShell supports headerless content and localized shell labels", async () => {

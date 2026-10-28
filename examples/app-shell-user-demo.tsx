@@ -12,7 +12,7 @@ export const AppShellUserDemo = () => {
       brand={{ name: "Acme" }}
       navigation={[]}
       showHeader={false}
-      className="min-h-80 w-full [&_[data-slot=app-shell-sidebar]]:h-80"
+      className="relative isolate min-h-80 w-full [contain:layout] [&_[data-slot=app-shell-sidebar]]:h-80"
       labels={{
         closeNavigation: "Tutup navigasi",
         collapseSidebar: "Ciutkan sidebar",

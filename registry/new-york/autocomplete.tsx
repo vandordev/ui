@@ -540,6 +540,10 @@ const Assembly = <Item,>({ props }: { props: AutocompleteProps<Item> }) => {
         htmlFor={id}
         raised={raised}
         staticLabel={!floating}
+        className={cn(
+          floating &&
+            "[&:focus-within>fieldset]:border-2 [&:has([aria-invalid=true])>fieldset]:border-2"
+        )}
       >
         <Combobox.InputGroup
           data-slot="autocomplete-control"
@@ -549,7 +553,8 @@ const Assembly = <Item,>({ props }: { props: AutocompleteProps<Item> }) => {
             control,
             surface,
             "flex items-center gap-1",
-            floating && "border-transparent focus-within:border-transparent",
+            floating &&
+              "border-transparent shadow-none focus-within:border-transparent focus-within:ring-0 data-invalid:border-transparent data-invalid:ring-0",
             props.size === "sm" && "min-h-8"
           )}
           onFocus={() => {

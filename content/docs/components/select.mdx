@@ -41,7 +41,7 @@ export function Demo() {
 }
 ```
 
-`className` and `aria-*` props apply to the trigger. `size` controls the built-in trigger's height. Use `triggerProps` for additional trigger attributes, event handlers, or a ref. Use `contentProps` for popup positioning and styling. Root props such as `value`, `defaultValue`, `onValueChange`, `name`, `required`, and `multiple` are forwarded to Base UI. `data` is the single source for option rendering and selected labels; do not also pass `items` or `children`.
+`className` sizes and styles the field wrapper when a visible `label` is provided; its built-in trigger fills that field. Without a label, or with a custom trigger, `className` applies directly to the trigger. `aria-*` props always apply to the trigger. `size` controls the built-in trigger's height. Use `triggerProps` for additional trigger attributes, event handlers, a ref, or trigger-specific `className` styling. Use `contentProps` for popup positioning and styling. Root props such as `value`, `defaultValue`, `onValueChange`, `name`, `required`, and `multiple` are forwarded to Base UI. `data` is the single source for option rendering and selected labels; do not also pass `items` or `children`.
 
 ### Custom Trigger
 

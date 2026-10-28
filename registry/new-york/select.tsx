@@ -331,7 +331,7 @@ type SelectProps<
       | ((context: SelectTriggerContext<Value, Multiple>) => ReactElement);
     triggerProps?: Omit<
       ComponentProps<typeof SelectTrigger>,
-      "children" | "className" | "size" | "render"
+      "children" | "size" | "render"
     >;
     contentProps?: Omit<SelectContentProps, "children" | "animated">;
     renderItem?: (item: Option) => ReactNode;
@@ -395,6 +395,7 @@ const Select = <
   // Base UI resolves labels from a flat lookup even when data mixes groups and options.
   const items = groups.flatMap((group) => group.items);
   const labelId = useId();
+  const triggerId = useId();
   const rootProps = { ...props };
   const ariaProps: AriaAttributes = {};
   for (const key of Object.keys(rootProps)) {
@@ -409,13 +410,15 @@ const Select = <
       <FieldOutline
         label={label}
         labelId={labelId}
+        htmlFor={triggerProps?.id ?? triggerId}
         raised={labelStyle === "floating"}
         staticLabel={labelStyle === "static"}
-        className="group relative w-full"
+        className={cn("group relative w-full", className)}
       >
         <SelectTrigger
           {...triggerProps}
           {...ariaProps}
+          id={triggerProps?.id ?? triggerId}
           aria-labelledby={
             ariaProps["aria-labelledby"] ??
             triggerProps?.["aria-labelledby"] ??
@@ -427,7 +430,7 @@ const Select = <
             "w-full",
             labelStyle === "floating" &&
               "border-transparent shadow-none focus-visible:ring-0",
-            className
+            triggerProps?.className
           )}
           size={size}
         >
@@ -438,7 +441,7 @@ const Select = <
       <SelectTrigger
         {...triggerProps}
         {...ariaProps}
-        className={className}
+        className={cn(className, triggerProps?.className)}
         size={size}
       >
         <SelectValue placeholder={placeholder} />
@@ -455,7 +458,7 @@ const Select = <
           {...ariaProps}
           data-slot="select-trigger"
           data-size={size}
-          className={className}
+          className={cn(className, triggerProps?.className)}
           render={
             typeof trigger === "function"
               ? (nativeProps, state) => {

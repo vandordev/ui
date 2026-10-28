@@ -579,6 +579,7 @@ export const Dropdown = ({
   const [activeOverlay, setActiveOverlay] = useState<string | null>(null);
   const queuedOverlay = useRef<string | null>(null);
   const session = useRef(0);
+  const observedOpen = useRef(props.open);
   const mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
@@ -588,7 +589,12 @@ export const Dropdown = ({
   }, []);
   // Controlled changes can happen without an onOpenChange request.
   useLayoutEffect(() => {
-    session.current += 1;
+    // An accepted request already advanced the session synchronously. Do not
+    // invalidate its async completion again when the controlled prop catches up.
+    if (observedOpen.current !== props.open) {
+      session.current += 1;
+      observedOpen.current = props.open;
+    }
     if (props.open) {
       queuedOverlay.current = null;
     }
@@ -701,6 +707,7 @@ export const Dropdown = ({
             return;
           }
           session.current += 1;
+          observedOpen.current = open;
           if (open) {
             queuedOverlay.current = null;
           }

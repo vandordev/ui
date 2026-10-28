@@ -7,7 +7,7 @@ export const AppShellFullBleedDemo = () => (
     brand={{ name: "Acme" }}
     navigation={[{ active: true, id: "canvas", label: "Canvas" }]}
     showHeader={false}
-    className="relative h-96 min-h-0 w-full [&_[data-slot=app-shell-sidebar]]:h-full"
+    className="relative isolate h-96 min-h-0 w-full [contain:layout] [&_[data-slot=app-shell-sidebar]]:h-full"
   >
     <section
       aria-label="Full-bleed canvas"

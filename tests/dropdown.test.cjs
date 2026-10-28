@@ -850,6 +850,102 @@ test("Dropdown compact links compose router props, refs and handlers onto one an
   );
 });
 
+const testAsyncCompletion = (controlled, closeOnSelect) => {
+  test(`Dropdown async completion survives its own close (controlled=${controlled}, closeOnSelect=${closeOnSelect})`, async () => {
+    await ready;
+    const { Dropdown } = load();
+    const { promise, resolve } = Promise.withResolvers();
+    let completions = 0;
+    const App = () => {
+      const [open, setOpen] = React.useState(true);
+      return React.createElement(Dropdown, {
+        ...(controlled
+          ? { onOpenChange: setOpen, open }
+          : { defaultOpen: true }),
+        animated: false,
+        items: [
+          {
+            closeOnSelect,
+            id: "save",
+            label: "Save",
+            onSelect: () => promise,
+          },
+        ],
+        modal: false,
+        onSelectionComplete: () => {
+          completions += 1;
+        },
+        trigger: React.createElement("button", { type: "button" }, "Actions"),
+      });
+    };
+    await mount(React.createElement(App));
+    const trigger = host.querySelector("button");
+    await React.act(() => document.querySelector('[role="menuitem"]').click());
+    assert.equal(completions, 0);
+    assert.equal(
+      trigger.getAttribute("aria-expanded"),
+      closeOnSelect === "success" ? "true" : "false"
+    );
+    await React.act(async () => {
+      resolve();
+      await promise;
+    });
+    assert.equal(
+      completions,
+      1,
+      "Accepted async selection must complete once after fulfillment"
+    );
+    assert.equal(trigger.getAttribute("aria-expanded"), "false");
+  });
+};
+for (const controlled of [false, true]) {
+  for (const closeOnSelect of [undefined, "success"]) {
+    testAsyncCompletion(controlled, closeOnSelect);
+  }
+}
+
+test("Dropdown controlled external close and reopen invalidate pending completion", async () => {
+  await ready;
+  const { Dropdown } = load();
+  const { promise, resolve } = Promise.withResolvers();
+  let completions = 0;
+  const app = (open) =>
+    React.createElement(Dropdown, {
+      animated: false,
+      items: [
+        {
+          closeOnSelect: "success",
+          id: "save",
+          label: "Save",
+          onSelect: () => promise,
+        },
+      ],
+      modal: false,
+      onSelectionComplete: () => {
+        completions += 1;
+      },
+      open,
+      trigger: React.createElement("button", { type: "button" }, "Actions"),
+    });
+  await mount(app(true));
+  await React.act(() => document.querySelector('[role="menuitem"]').click());
+  await React.act(() => root.render(app(false)));
+  await React.act(() => root.render(app(true)));
+  await React.act(async () => {
+    resolve();
+    await promise;
+  });
+  assert.equal(
+    completions,
+    0,
+    "A stale action must not complete in a new session"
+  );
+  assert.equal(
+    host.querySelector("button").getAttribute("aria-expanded"),
+    "true"
+  );
+});
+
 test("Dropdown async success blocks duplicate and other actions, then closes", async () => {
   await ready;
   const { Dropdown } = load();

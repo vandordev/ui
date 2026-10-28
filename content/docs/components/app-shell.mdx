@@ -52,7 +52,7 @@ export default function WorkspaceLayout() {
 
 AppShell owns the layout and navigation presentation. Your application owns routes, active destinations, resource data, and search UI. These previews demonstrate local state, not real routing or authentication. AppShell uses states and runnable examples rather than a props playground.
 
-`showHeader` defaults to `true`. Set it to `false` for a headerless shell; the main surface remains edge-to-edge so the consumer can choose page spacing. `PageContainer` now defaults to `p-4 sm:p-6 lg:p-12` (16/24/48px), so add it only where that inset is wanted. This is a breaking spacing change from the previous shell padding and `lg:p-8` page container.
+`showHeader` defaults to `true`. On desktop, the sidebar toggle sits beside the brand or custom workspace header, not in the content header. The collapsed rail keeps an expand control in its identity area. Set `showHeader` to `false` for a headerless shell; the main surface remains edge-to-edge so the consumer can choose page spacing. `PageContainer` now defaults to `p-4 sm:p-6 lg:p-12` (16/24/48px), so add it only where that inset is wanted. This is a breaking spacing change from the previous shell padding and `lg:p-8` page container.
 
 An optional `user` config renders the built-in account menu. It is presentation only: the consumer supplies the identity and `DropdownEntry[]` actions. A provided `sidebarFooter` takes precedence, including `null`. Async action and cancellation behavior follows Dropdown's `closeOnSelect` contract. Use `labels` to localize shell navigation controls.
 
@@ -69,7 +69,7 @@ export function HeaderlessLayout() {
 }
 ```
 
-Install PageContainer separately when using this composition. Omit it for full-bleed content. Headerless mode hides `header`, `actions`, and the search button without relocating them; the search shortcut still runs when `onSearch` is supplied. The mobile brand tab and floating menu honor safe-area insets, with initial content clearance. Its drawer opens from the right; header mode opens from the left. The sidebar uses `sidebar`/`sidebar-foreground` tokens.
+Install PageContainer separately when using this composition. Omit it for full-bleed content. Headerless mode hides `header`, `actions`, and the search button without relocating them; the search shortcut still runs when `onSearch` is supplied. The mobile brand tab and floating menu honor safe-area insets, with initial content clearance. When embedding a headerless shell in a preview, give the shell `relative isolate [contain:layout]` to contain these fixed controls without changing the full-page layout. Its drawer opens from the right; header mode opens from the left. The sidebar uses `sidebar`/`sidebar-foreground` tokens.
 
 ### Built-in identity and localized controls
 

@@ -339,15 +339,17 @@ export const AppShell = ({
           animate={{ opacity: compact ? 0 : 1 }}
           transition={labelTransition}
           aria-hidden={compact || undefined}
-          className="min-w-0 truncate font-semibold"
+          className={cn("min-w-0 truncate font-semibold", compact && "sr-only")}
         >
           {brand.name}
         </motion.span>
         {compact && <span className="sr-only">{brand.name}</span>}
       </>
     );
-    const styles =
-      "flex h-16 shrink-0 items-center gap-3 overflow-hidden border-b border-border px-5";
+    const styles = cn(
+      "flex h-full min-w-0 flex-1 items-center gap-3 overflow-hidden px-3",
+      compact && "h-10 w-full flex-none justify-center gap-0 px-0"
+    );
     return brand.href ? (
       <a
         href={brand.href}
@@ -365,7 +367,7 @@ export const AppShell = ({
   };
   const renderSidebarHeader = (compact: boolean) =>
     sidebarHeader ? (
-      <div className="flex h-16 shrink-0 items-center border-b border-border p-2">
+      <div className="flex min-w-0 flex-1 items-center">
         {typeof sidebarHeader === "function"
           ? sidebarHeader({ closeNavigation, collapsed: compact })
           : sidebarHeader}
@@ -400,8 +402,8 @@ export const AppShell = ({
             variant="ghost"
             size="icon"
             className={cn(
-              "hidden md:inline-flex",
-              rail && "group relative mx-auto my-3 shrink-0"
+              "hidden shrink-0 md:inline-flex",
+              rail && "group relative"
             )}
             aria-label={
               collapsed
@@ -475,13 +477,32 @@ export const AppShell = ({
       }
     >
       <DrawerBody className="flex min-h-0 flex-1 flex-col p-0">
-        {sidebarHeader && renderSidebarHeader(false)}
+        {sidebarHeader && (
+          <div className="flex h-16 shrink-0 items-center border-b border-border p-2">
+            {renderSidebarHeader(false)}
+          </div>
+        )}
         <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
           {renderContextNavigation(false, true)}
         </div>
         {renderFooter(false)}
       </DrawerBody>
     </Drawer>
+  );
+
+  const renderDesktopIdentity = () => (
+    <div
+      data-slot="app-shell-sidebar-header"
+      className={cn(
+        "flex h-16 shrink-0 items-center gap-1 border-b border-border px-2",
+        collapsed && "flex-col justify-center gap-0",
+        collapsed && (sidebarHeader || brand.href) && "h-auto gap-1 py-2"
+      )}
+    >
+      {(!collapsed || sidebarHeader || brand.href) &&
+        renderSidebarHeader(collapsed)}
+      {renderCollapseControl(!sidebarHeader && !brand.href)}
+    </div>
   );
 
   return (
@@ -509,10 +530,7 @@ export const AppShell = ({
           transition={sidebarTransition}
           className="sticky top-0 hidden h-svh shrink-0 flex-col overflow-hidden border-r border-border bg-sidebar text-sidebar-foreground md:flex"
         >
-          {!showHeader && collapsed
-            ? renderCollapseControl(true)
-            : renderSidebarHeader(collapsed)}
-          {!showHeader && !collapsed && renderCollapseControl(true)}
+          {renderDesktopIdentity()}
           <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
             {renderContextNavigation(collapsed)}
           </div>
@@ -538,7 +556,6 @@ export const AppShell = ({
               className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background px-4 sm:px-6"
             >
               {renderMobileNavigation()}
-              {renderCollapseControl()}
               {onSearch && (
                 <Button
                   variant="outline"
