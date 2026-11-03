@@ -38,6 +38,21 @@ export const InputSearch = React.forwardRef<HTMLInputElement, InputSearchProps>(
     const [uncontrolled, setUncontrolled] = React.useState(
       String(defaultValue ?? "")
     );
+    React.useEffect(() => {
+      const form = inputRef.current?.form;
+      if (!form || value !== undefined) {
+        return;
+      }
+      const reset = (event: Event) => {
+        queueMicrotask(() => {
+          if (!event.defaultPrevented) {
+            setUncontrolled(String(defaultValue ?? ""));
+          }
+        });
+      };
+      form.addEventListener("reset", reset);
+      return () => form.removeEventListener("reset", reset);
+    }, [defaultValue, props.form, value]);
     const current = String(value === undefined ? uncontrolled : (value ?? ""));
     return (
       <div data-slot="search-input" className="relative min-w-0">
@@ -67,7 +82,12 @@ export const InputSearch = React.forwardRef<HTMLInputElement, InputSearchProps>(
             variant="ghost"
             size="icon-sm"
             aria-label={clearLabel}
-            className="absolute top-1/2 right-1 -translate-y-1/2"
+            className={cn(
+              "absolute right-1",
+              props.label && props.labelStyle === "static"
+                ? "bottom-4.5 translate-y-1/2"
+                : "top-1/2 -translate-y-1/2"
+            )}
             onClick={() => {
               const input = inputRef.current;
               if (!input) {

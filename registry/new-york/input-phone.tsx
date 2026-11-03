@@ -150,7 +150,13 @@ export const InputPhone = React.forwardRef<HTMLInputElement, InputPhoneProps>(
         }
         pendingCaret.current = nextCaret;
       }
-      setState({ ...parsed, controlledValue: value });
+      setState({
+        ...parsed,
+        controlledValue:
+          value === undefined || (!parsed.value && parsed.draft)
+            ? value
+            : parsed.value,
+      });
       onValueChange?.(parsed.value);
     };
 

@@ -54,10 +54,22 @@ export const InputOTP = React.forwardRef<HTMLInputElement, InputOTPProps>(
       throw new Error("InputOTP length must be a positive integer.");
     }
     React.useEffect(() => {
-      if (value !== undefined) {
-        previous.current = current;
+      const form = inputRef.current?.form;
+      if (!form || value !== undefined) {
+        return;
       }
-    }, [current, value]);
+      const reset = (event: Event) => {
+        queueMicrotask(() => {
+          if (!event.defaultPrevented) {
+            const initial = sanitize(defaultValue);
+            previous.current = initial;
+            setInternal(initial);
+          }
+        });
+      };
+      form.addEventListener("reset", reset);
+      return () => form.removeEventListener("reset", reset);
+    }, [defaultValue, props.form, sanitize, value]);
 
     const update = (
       raw: string,
@@ -67,7 +79,7 @@ export const InputOTP = React.forwardRef<HTMLInputElement, InputOTPProps>(
       if (value === undefined) {
         setInternal(next);
       }
-      if (next !== previous.current) {
+      if (next !== (value === undefined ? previous.current : current)) {
         previous.current = next;
         onValueChange?.(next);
         if (next.length === length) {
@@ -81,6 +93,12 @@ export const InputOTP = React.forwardRef<HTMLInputElement, InputOTPProps>(
       <div
         data-slot="input-otp"
         data-focused={focused}
+        data-disabled={props.disabled || undefined}
+        data-invalid={
+          props["aria-invalid"] && props["aria-invalid"] !== "false"
+            ? true
+            : undefined
+        }
         className={cn("group relative inline-flex min-w-0 gap-2", className)}
       >
         <div aria-hidden="true" className="flex gap-2">
@@ -89,7 +107,7 @@ export const InputOTP = React.forwardRef<HTMLInputElement, InputOTPProps>(
               key={index}
               data-filled={index < current.length}
               className={cn(
-                "flex size-11 items-center justify-center rounded-md border border-input text-lg text-foreground data-[filled=true]:border-ring group-data-[focused=true]:ring-[3px] group-data-[focused=true]:ring-ring/50",
+                "flex size-11 items-center justify-center rounded-md border border-input text-lg text-foreground data-[filled=true]:border-ring group-data-[focused=true]:ring-[3px] group-data-[focused=true]:ring-ring/50 group-data-[disabled=true]:cursor-not-allowed group-data-[disabled=true]:opacity-50 group-data-[invalid=true]:border-destructive group-data-[invalid=true]:ring-[3px] group-data-[invalid=true]:ring-destructive/20 dark:group-data-[invalid=true]:ring-destructive/40",
                 fieldSurfaceClassName
               )}
             >

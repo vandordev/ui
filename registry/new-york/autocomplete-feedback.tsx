@@ -14,14 +14,13 @@ export const AutocompleteFeedback = ({
   const a = useAutocomplete();
   const c = a.config;
   const busy = c.loading || c.backgroundLoading;
-  const message =
-    c.hintMessage ??
-    c.error ??
-    (busy
-      ? (c.loadingMessage ?? "Loading suggestions…")
-      : a.options.length === 0
-        ? (c.emptyMessage ?? "No results found.")
-        : children);
+  let statusMessage = children;
+  if (busy) {
+    statusMessage = c.loadingMessage ?? "Loading suggestions…";
+  } else if (a.options.length === 0) {
+    statusMessage = c.emptyMessage ?? "No results found.";
+  }
+  const message = c.hintMessage ?? c.error ?? statusMessage;
   if (!message && !busy) {
     return null;
   }
@@ -50,9 +49,13 @@ export const AutocompleteFeedback = ({
           type="button"
           disabled={c.disabled || c.readOnly || c.loading}
           className="shrink-0 rounded-sm px-2 py-1 text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          onClick={() => {
+          onClick={async () => {
             if (a.open && !c.disabled && !c.readOnly) {
-              void c.onRetry?.();
+              try {
+                await c.onRetry?.();
+              } catch {
+                // The caller owns the error message and retry state.
+              }
             }
           }}
         >

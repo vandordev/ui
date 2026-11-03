@@ -69,14 +69,25 @@ export const DatePicker = (props: DatePickerProps) => {
   const [internal, setInternal] = React.useState(defaultValue);
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
   const current = controlled ? value : internal;
-  const isOpen = open === undefined ? internalOpen : open;
+  const isOpen = !disabled && (open === undefined ? internalOpen : open);
+  React.useEffect(() => {
+    if (disabled) {
+      setInternalOpen(false);
+    }
+  }, [disabled]);
   const setOpen = (next: boolean) => {
+    if (disabled && next) {
+      return;
+    }
     if (open === undefined) {
       setInternalOpen(next);
     }
     onOpenChange?.(next);
   };
   const selectDate = (date?: Date) => {
+    if (disabled || readOnly) {
+      return;
+    }
     if (!controlled) {
       setInternal(date);
     }
@@ -129,7 +140,9 @@ export const DatePicker = (props: DatePickerProps) => {
             defaultMonth={current}
             locale={locale}
             selected={current}
-            disabled={readOnly ? () => true : calendarOptions.disabledDates}
+            disabled={
+              disabled || readOnly ? () => true : calendarOptions.disabledDates
+            }
             startMonth={calendarOptions.startMonth}
             endMonth={calendarOptions.endMonth}
             onSelect={(date) => {
@@ -137,7 +150,7 @@ export const DatePicker = (props: DatePickerProps) => {
               setOpen(false);
             }}
           />
-          {clearable && current && !readOnly ? (
+          {clearable && current && !disabled && !readOnly ? (
             <Button
               type="button"
               variant="ghost"

@@ -112,11 +112,30 @@ export const Input = ({
   labelStyle = "floating",
   value,
   onChange,
+  ref,
   ...props
 }: InputProps) => {
+  const [internalValue, setInternalValue] = React.useState(defaultValue);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
+  React.useEffect(() => {
+    const input = inputRef.current;
+    const form = input?.form;
+    if (!form || value !== undefined) {
+      return;
+    }
+    const reset = (event: Event) => {
+      queueMicrotask(() => {
+        if (!event.defaultPrevented) {
+          setInternalValue(input.value);
+        }
+      });
+    };
+    form.addEventListener("reset", reset);
+    return () => form.removeEventListener("reset", reset);
+  }, [props.form, value]);
   const generatedId = React.useId();
   const inputId = id ?? generatedId;
-  const [internalValue, setInternalValue] = React.useState(defaultValue);
   const floating = label && labelStyle === "floating";
   const staticLabel = Boolean(label) && labelStyle === "static";
   const hasValue =
@@ -126,6 +145,7 @@ export const Input = ({
     <input
       data-slot="input"
       {...props}
+      ref={inputRef}
       id={label ? inputId : id}
       {...(value === undefined ? { defaultValue } : { value })}
       onChange={(event) => {

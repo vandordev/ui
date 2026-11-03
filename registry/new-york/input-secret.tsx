@@ -75,7 +75,14 @@ export const InputSecret = React.forwardRef<HTMLInputElement, InputSecretProps>(
           }}
           className={cn("pr-20", className)}
         />
-        <div className="absolute top-1/2 right-1 z-10 flex -translate-y-1/2 items-center gap-0.5">
+        <div
+          className={cn(
+            "absolute right-1 z-10 flex items-center gap-0.5",
+            props.label && props.labelStyle === "static"
+              ? "bottom-4.5 translate-y-1/2"
+              : "top-1/2 -translate-y-1/2"
+          )}
+        >
           <Button
             type="button"
             variant="ghost"

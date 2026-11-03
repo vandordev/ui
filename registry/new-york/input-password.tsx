@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "cn";
 import { Eye, EyeOff } from "lucide-react";
 import * as React from "react";
 
@@ -28,7 +29,7 @@ export const InputPassword = ({
         type={visible ? "text" : "password"}
         disabled={disabled}
         readOnly={readOnly}
-        className={["pr-11", className].filter(Boolean).join(" ")}
+        className={cn("pr-11", className)}
       />
       <Button
         type="button"
@@ -37,7 +38,12 @@ export const InputPassword = ({
         disabled={disabled}
         aria-label={visible ? hidePasswordLabel : showPasswordLabel}
         aria-pressed={visible}
-        className="absolute top-1/2 right-1 -translate-y-1/2"
+        className={cn(
+          "absolute right-1",
+          props.label && props.labelStyle === "static"
+            ? "bottom-4.5 translate-y-1/2"
+            : "top-1/2 -translate-y-1/2"
+        )}
         onClick={() => setVisible((current) => !current)}
       >
         {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}

@@ -150,13 +150,19 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     className,
     motion,
   } = withRangePickerDefaults(props);
+  const blocked = disabled || readOnly;
   const controlled = Object.hasOwn(props, "value");
   const generatedId = React.useId();
   const triggerId = id ?? generatedId;
   const [internalValue, setInternalValue] = React.useState(defaultValue);
   const committed = controlled ? value : internalValue;
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
-  const isOpen = open === undefined ? internalOpen : open;
+  const isOpen = !disabled && (open ?? internalOpen);
+  React.useEffect(() => {
+    if (disabled) {
+      setInternalOpen(false);
+    }
+  }, [disabled]);
   const [draft, setDraft] = React.useState<DateRange | undefined>(committed);
   const [clearedDraft, setClearedDraft] = React.useState(false);
   const [wideViewport, setWideViewport] = React.useState(false);
@@ -182,6 +188,9 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
   }, [controlled, fromTime, toTime]);
 
   const setOpen = (next: boolean) => {
+    if (disabled && next) {
+      return;
+    }
     setDraft(committed);
     setClearedDraft(false);
     if (open === undefined) {
@@ -197,12 +206,9 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
         item.getMonth() === date.getMonth() &&
         item.getDate() === date.getDate()
     );
-  const matcher: Matcher[] = [dateDisabled];
-  if (readOnly) {
-    matcher.push(() => true);
-  }
+  const matcher: Matcher[] = [dateDisabled, Boolean(blocked)];
   const canApply =
-    !readOnly && (clearedDraft || isSelectableDateRange(draft, disabledDates));
+    !blocked && (clearedDraft || isSelectableDateRange(draft, disabledDates));
   const shownValue = getShownValue(committed, dateFormat, locale, placeholder);
   const whileTap = motion ? { scale: 0.96 } : false;
 
@@ -254,8 +260,11 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                     size="sm"
                     whileTap={whileTap}
                     className="justify-start whitespace-nowrap"
-                    disabled={readOnly}
+                    disabled={blocked}
                     onClick={() => {
+                      if (blocked) {
+                        return;
+                      }
                       setDraft(
                         resolveDateShortcut(shortcut, now(), weekStartsOn)
                       );
@@ -282,6 +291,9 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
               endMonth={endMonth}
               weekStartsOn={weekStartsOn}
               onSelect={(range) => {
+                if (blocked) {
+                  return;
+                }
                 setDraft(range);
                 setClearedDraft(false);
               }}
@@ -293,8 +305,11 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 type="button"
                 variant="ghost"
                 whileTap={whileTap}
-                disabled={readOnly}
+                disabled={blocked}
                 onClick={() => {
+                  if (blocked) {
+                    return;
+                  }
                   setDraft(undefined);
                   setClearedDraft(true);
                 }}
@@ -315,6 +330,9 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
               disabled={!canApply}
               whileTap={whileTap}
               onClick={() => {
+                if (!canApply) {
+                  return;
+                }
                 const next = clearedDraft ? undefined : draft;
                 if (!controlled) {
                   setInternalValue(next);
