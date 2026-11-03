@@ -98,8 +98,8 @@ test("optional sections are omitted and non-component pages are unchanged", () =
     before: [],
   });
   const sections = buildComponentDocSections({ component: "button" }, null);
-  assert.ok(!JSON.stringify(sections).includes("Source"));
-  assert.ok(!JSON.stringify(sections).includes("Credits"));
+  assert.ok(!headings(sections.after).includes("Source"));
+  assert.ok(!headings(sections.after).includes("Credits"));
   assert.throws(
     () => buildComponentDocSections({ component: "missing" }, null),
     /Unknown registry component/
@@ -155,4 +155,70 @@ test("remark transformer preserves imports and custom content between standard s
     data: { frontmatter: { title: "Introduction" } },
   });
   assert.deepEqual(regular.children, [usage]);
+});
+
+test("Source selects each public implementation instead of its helpers", async () => {
+  const { remarkComponentDocs } = jiti("../lib/remark-component-docs.ts");
+  for (const name of ["autocomplete", "data-grid", "date-time"]) {
+    const tree = { children: [], type: "root" };
+    await remarkComponentDocs()(tree, {
+      data: { frontmatter: { component: name } },
+    });
+    const source = tree.children.find((node) =>
+      node.attributes?.some(
+        (attribute) =>
+          attribute.name === "section" && attribute.value === "source"
+      )
+    );
+    assert.ok(source, `${name} has Source`);
+    assert.ok(
+      source.children[0].value ===
+        readFileSync(`registry/new-york/${name}.tsx`, "utf-8"),
+      `${name} implementation matches Source`
+    );
+  }
+});
+
+test("processed installation guidance discloses registry dependencies and supporting files", async () => {
+  const { remarkComponentDocs } = jiti("../lib/remark-component-docs.ts");
+  for (const [name, requirements] of [
+    ["input-password", ["input.json", "button.json"]],
+    ["toast", ["toast-utils.ts"]],
+    [
+      "loading",
+      [
+        "node scripts/install-component-family.cjs loading /absolute/path/to/consumer",
+        "components/loading-ui/LICENSE.md",
+      ],
+    ],
+  ]) {
+    const tree = { children: [], type: "root" };
+    await remarkComponentDocs()(tree, {
+      data: { frontmatter: { component: name } },
+    });
+    const output = JSON.stringify(tree);
+    assert.ok(
+      output.includes("Copying the Source block alone is insufficient")
+    );
+    for (const requirement of requirements) {
+      assert.ok(output.includes(requirement), requirement);
+    }
+  }
+});
+
+test("date picker props describe their restricted native API", () => {
+  const { buildComponentDocSections } = jiti("../lib/component-docs.ts");
+  for (const component of ["date-picker", "date-range-picker"]) {
+    const output = JSON.stringify(
+      buildComponentDocSections({ component }, null)
+    );
+    assert.ok(
+      output.includes("does not forward arbitrary native attributes"),
+      component
+    );
+    assert.ok(
+      !output.includes("Other native attributes are forwarded"),
+      component
+    );
+  }
 });

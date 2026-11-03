@@ -1,8 +1,7 @@
+import { Drawer as PrimitiveDrawer } from "@base-ui/react/drawer";
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 
-import { Button } from "./button";
-import { Drawer, DrawerBody } from "./drawer";
 import { Select } from "./select";
 
 const data = [
@@ -132,19 +131,39 @@ export const Controlled: Story = {
   render: () => <ControlledExample />,
 };
 
-const DrawerExample = () => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="min-h-[200vh]">
-      <Button onClick={() => setOpen(true)}>Open selection drawer</Button>
-      <Drawer title="Choose fruit" open={open} onOpenChange={setOpen}>
-        <DrawerBody>
-          <ControlledExample />
-        </DrawerBody>
-      </Drawer>
-    </div>
-  );
-};
+const DrawerExample = () => (
+  <div className="min-h-[200vh]">
+    <PrimitiveDrawer.Root>
+      <PrimitiveDrawer.Trigger
+        render={
+          <button
+            type="button"
+            className="rounded-md border px-3 py-2 text-sm"
+          />
+        }
+      >
+        Open selection drawer
+      </PrimitiveDrawer.Trigger>
+      <PrimitiveDrawer.Portal>
+        <PrimitiveDrawer.Backdrop className="fixed inset-0 bg-foreground/20" />
+        <PrimitiveDrawer.Viewport className="fixed inset-0 flex items-end justify-center">
+          <PrimitiveDrawer.Popup className="flex w-full max-w-lg flex-col gap-4 rounded-t-lg border border-border bg-background p-6 text-foreground">
+            <PrimitiveDrawer.Title className="text-base font-medium">
+              Choose fruit
+            </PrimitiveDrawer.Title>
+            <PrimitiveDrawer.Description className="text-sm text-muted-foreground">
+              Select a fruit, then close the drawer.
+            </PrimitiveDrawer.Description>
+            <ControlledExample />
+            <PrimitiveDrawer.Close className="rounded-md border px-3 py-2 text-sm">
+              Close drawer
+            </PrimitiveDrawer.Close>
+          </PrimitiveDrawer.Popup>
+        </PrimitiveDrawer.Viewport>
+      </PrimitiveDrawer.Portal>
+    </PrimitiveDrawer.Root>
+  </div>
+);
 
 export const InsideDrawer: Story = {
   parameters: { controls: { disable: true } },

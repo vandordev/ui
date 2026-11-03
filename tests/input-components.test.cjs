@@ -885,3 +885,84 @@ test("internal input refs are also delivered to consumer refs", async () => {
   );
   assert.equal(received.phone, document.querySelector('input[type="tel"]'));
 });
+
+test("search playground placeholder control updates preview and generated code", async () => {
+  await ready;
+  const { InputFamilyPlayground } = jiti(
+    "../components/input-family-playground.tsx"
+  );
+  await mount(
+    React.createElement(InputFamilyPlayground, { component: "input-search" })
+  );
+  const label = [...host.querySelectorAll("label")].find(
+    (node) => node.textContent === "Placeholder"
+  );
+  const control = document.querySelector(`[id="${label.htmlFor}"]`);
+  await React.act(() => {
+    Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value"
+    ).set.call(control, "Find invoices");
+    control.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  assert.equal(
+    host.querySelector('[data-slot="playground-preview"] input').placeholder,
+    "Find invoices"
+  );
+  assert.ok(
+    host
+      .querySelector('[aria-label="Generated component code"]')
+      .textContent.includes("Find invoices")
+  );
+});
+
+test("range playground date format reaches committed preview and generated code", async () => {
+  await ready;
+  const { AdvancedInputPreview } = jiti(
+    "../components/input-family-playground.tsx"
+  );
+  const { getInputPlaygroundCode, getInputPlaygroundDefaults } = jiti(
+    "../lib/input-component-props.ts"
+  );
+  const values = {
+    ...getInputPlaygroundDefaults("date-range-picker"),
+    dateFormat: "yyyy-MM-dd",
+    motion: false,
+  };
+  await mount(
+    React.createElement(AdvancedInputPreview, {
+      component: "date-range-picker",
+      values,
+    })
+  );
+  await React.act(() =>
+    host.querySelector('[data-slot="popover-trigger"]').click()
+  );
+  await React.act(() => buttonByText("Last 7 days").click());
+  await React.act(() => buttonByText("Apply").click());
+  assert.match(
+    host.querySelector('[data-slot="popover-trigger"]').textContent,
+    /\d{4}-\d{2}-\d{2}/
+  );
+  assert.ok(
+    getInputPlaygroundCode("date-range-picker", values).includes(
+      'dateFormat={"yyyy-MM-dd"}'
+    )
+  );
+});
+
+test("phone generated demo retains normalized-value feedback after the first JSX section", async () => {
+  await ready;
+  const { getInputPlaygroundCode, getInputPlaygroundDefaults } = jiti(
+    "../lib/input-component-props.ts"
+  );
+  const code = getInputPlaygroundCode(
+    "input-phone",
+    getInputPlaygroundDefaults("input-phone")
+  );
+  assert.ok(
+    code.includes(
+      '<p>Normalized value (digits without +): {phone ?? "empty"}</p>'
+    )
+  );
+});

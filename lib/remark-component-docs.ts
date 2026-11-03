@@ -22,7 +22,9 @@ export const remarkComponentDocs =
       (entry) => entry.name === metadata.component
     );
     const sourcePath = item?.files.find(
-      (entry) => entry.type === "registry:ui"
+      (entry) =>
+        path.basename(entry.path) === `${metadata.component}.tsx` ||
+        path.basename(entry.path) === `${metadata.component}.ts`
     )?.path;
     const source = sourcePath
       ? await readFile(path.resolve(process.cwd(), sourcePath), "utf-8")

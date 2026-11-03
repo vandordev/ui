@@ -1029,7 +1029,7 @@ export const getInputPlaygroundCode = (
         'import { useState } from "react";\nimport { DatePicker } from "@/components/ui/date-picker";',
     },
     "date-range-picker": {
-      code: `const [range, setRange] = useState<DateRange>();\n\n<DateRangePicker\n    label={${stringLiteral(String(values.label ?? "Reporting period"))}}\n    value={range}\n    onValueChange={setRange}\n${propsBlock(values, ["placeholder", "clearable", "disabled", "readOnly", "motion"])}\n    weekStartsOn={${Number(values.weekStartsOn ?? 1)}}\n    features={${JSON.stringify(resolveRangeFeatures(values.features))}}\n/>`,
+      code: `const [range, setRange] = useState<DateRange>();\n\n<DateRangePicker\n    label={${stringLiteral(String(values.label ?? "Reporting period"))}}\n    value={range}\n    onValueChange={setRange}\n${propsBlock(values, ["placeholder", "dateFormat", "clearable", "disabled", "readOnly", "motion"])}\n    weekStartsOn={${Number(values.weekStartsOn ?? 1)}}\n    features={${JSON.stringify(resolveRangeFeatures(values.features))}}\n/>`,
       imports:
         'import { useState } from "react";\nimport type { DateRange } from "react-day-picker";\nimport { DateRangePicker } from "@/components/ui/date-range-picker";',
     },
@@ -1084,9 +1084,10 @@ export const getInputPlaygroundCode = (
   if (!config) {
     throw new Error(`Unknown input-family component: ${component}`);
   }
-  const stateful = config.code.includes("\n\n");
+  const separator = config.code.indexOf("\n\n");
+  const stateful = separator !== -1;
   const [state, jsx] = stateful
-    ? config.code.split("\n\n", 2)
+    ? [config.code.slice(0, separator), config.code.slice(separator + 2)]
     : ["", config.code];
   return `"use client";\n\n${config.imports}\n\nexport function ${componentToName(component)}Demo() {\n${stateful ? `  ${state}\n  return (\n    <>\n      ${jsx.replaceAll("\n", "\n      ")}\n    </>\n  );` : `  return (\n    ${jsx.replaceAll("\n", "\n    ")}\n  );`}\n}`;
 };

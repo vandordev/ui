@@ -802,13 +802,11 @@
       "files": [
         {
           "path": "registry/new-york/toast.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/toast.tsx"
+          "type": "registry:ui"
         },
         {
           "path": "registry/new-york/toast-utils.ts",
-          "type": "registry:ui",
-          "target": "components/ui/toast-utils.ts"
+          "type": "registry:ui"
         }
       ]
     },
@@ -831,8 +829,7 @@
       "files": [
         {
           "path": "registry/new-york/toast-tanstack-query.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/toast-tanstack-query.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -940,13 +937,11 @@
       "files": [
         {
           "path": "registry/new-york/loading.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/loading.tsx"
+          "type": "registry:ui"
         },
         {
           "path": "registry/new-york/loading-variants.ts",
-          "type": "registry:ui",
-          "target": "components/ui/loading-variants.ts"
+          "type": "registry:ui"
         },
         { "path": "registry/new-york/loading-arc.tsx", "type": "registry:ui" },
         {
@@ -1214,8 +1209,7 @@
       "files": [
         {
           "path": "registry/new-york/textarea.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/textarea.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -1229,8 +1223,7 @@
       "files": [
         {
           "path": "registry/new-york/input-group.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/input-group.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -1247,8 +1240,7 @@
       "files": [
         {
           "path": "registry/new-york/input-password.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/input-password.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -1279,8 +1271,7 @@
       "files": [
         {
           "path": "registry/new-york/input-amount.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/input-amount.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -1298,8 +1289,7 @@
       "files": [
         {
           "path": "registry/new-york/input-phone.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/input-phone.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -1313,8 +1303,7 @@
       "files": [
         {
           "path": "registry/new-york/input-otp.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/input-otp.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -1331,8 +1320,7 @@
       "files": [
         {
           "path": "registry/new-york/input-secret.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/input-secret.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -1428,8 +1416,7 @@
       "files": [
         {
           "path": "registry/new-york/date-picker.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/date-picker.tsx"
+          "type": "registry:ui"
         }
       ]
     },
@@ -1447,13 +1434,11 @@
       "files": [
         {
           "path": "registry/new-york/date-range-picker.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/date-range-picker.tsx"
+          "type": "registry:ui"
         },
         {
           "path": "registry/new-york/date-picker-utils.ts",
-          "type": "registry:ui",
-          "target": "components/ui/date-picker-utils.ts"
+          "type": "registry:ui"
         }
       ]
     },

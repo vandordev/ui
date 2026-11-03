@@ -195,6 +195,18 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
     playground: { code: getCheckboxCode(getCheckboxDefaults()) },
     props: checkboxProps,
   },
+  "date-picker": {
+    nativePropsDescription:
+      "DatePicker uses a restricted props API and does not forward arbitrary native attributes, refs or event handlers. id labels the trigger; className styles the trigger. Native form name, required and input submission are not supported.",
+    playground: { code: inputPlaygroundCode["date-picker"] },
+    props: inputComponentProps["date-picker"],
+  },
+  "date-range-picker": {
+    nativePropsDescription:
+      "DateRangePicker uses a restricted props API and does not forward arbitrary native attributes, refs or event handlers. id labels the trigger; className styles the trigger. Native form name, required and input submission are not supported.",
+    playground: { code: inputPlaygroundCode["date-range-picker"] },
+    props: inputComponentProps["date-range-picker"],
+  },
   dialog: {
     playground: { code: getDialogCode(getDialogDefaults()) },
     props: dialogProps,
@@ -342,6 +354,27 @@ const section = (
   type: "mdxJsxFlowElement",
 });
 
+const manualInstallationNotes = (item: (typeof registry.items)[number]) => {
+  if (item.registryDependencies?.length || item.files.length > 1) {
+    return [
+      paragraph(
+        "Copying the Source block alone is insufficient. Use the CLI installation above to include all registry dependencies and supporting files; the npm command alone does not install them."
+      ),
+      ...(item.registryDependencies?.length
+        ? [
+            paragraph(
+              `Required registry dependencies: ${item.registryDependencies.join(", ")}.`
+            ),
+          ]
+        : []),
+      paragraph(
+        `Required source and supporting files: ${item.files.map((file) => file.path).join(", ")}.`
+      ),
+    ];
+  }
+  return [];
+};
+
 export const buildComponentDocSections = (
   metadata: ComponentDocFrontmatter,
   source: string | null
@@ -370,7 +403,7 @@ export const buildComponentDocSections = (
       "Initialize shadcn in your React project, then install this component from the Vandor UI registry:"
     ),
     code(
-      /^(autocomplete(-query|-schema|-stories)?|data-grid(-query|-schema|-stories)?|date-time(-stories)?)$/.test(
+      /^(autocomplete(-query|-schema|-stories)?|data-grid(-query|-schema|-stories)?|date-time(-stories)?|loading)$/.test(
         name
       )
         ? `# From the Vandor UI checkout, after initializing shadcn in the consumer:\npnpm registry:build\nnode scripts/install-component-family.cjs ${name} /absolute/path/to/consumer`
@@ -399,6 +432,7 @@ export const buildComponentDocSections = (
       ])
     );
   }
+  before.push(...manualInstallationNotes(item));
   if (definition?.props) {
     const cell = (value: string): DocumentationNode => ({
       children: [text(value)],

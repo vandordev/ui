@@ -94,7 +94,7 @@ const BasicInputPreview = ({
       return (
         <InputSearch
           label={label("Search")}
-          placeholder="Search components"
+          placeholder={String(values.placeholder ?? "")}
           defaultValue="Calendar"
           clearable={Boolean(values.clearable)}
           disabled={disabled}
@@ -309,6 +309,7 @@ export const AdvancedInputPreview = ({
           placeholder={String(values.placeholder)}
           value={range}
           onValueChange={setRange}
+          dateFormat={String(values.dateFormat)}
           features={features as ("twoMonths" | "shortcuts")[]}
           weekStartsOn={Number(values.weekStartsOn) as 0 | 1 | 6}
           clearable={Boolean(values.clearable)}
