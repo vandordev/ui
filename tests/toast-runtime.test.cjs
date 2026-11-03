@@ -1022,3 +1022,49 @@ test("portable Toast story args affect the emitted notification", async () => {
   assert.ok(document.body.textContent.includes("Custom detail"));
   assert.ok(document.body.textContent.includes("Undo"));
 });
+
+test("configured query background errors remain silent when cached data exists", async () => {
+  await mount();
+  const { QueryClient } = require("@tanstack/react-query");
+  const jiti = createJiti(__filename, {
+    fsCache: false,
+    jsx: { runtime: "automatic" },
+  });
+  const { subscribeToastQueryClient } = jiti(
+    "../registry/new-york/toast-tanstack-query.tsx"
+  );
+  const client = new QueryClient({
+    defaultOptions: { queries: { gcTime: Infinity, retry: false } },
+  });
+  let stop = subscribeToastQueryClient(client);
+  try {
+    for (const data of [[], null, false, 0, ""]) {
+      const queryKey = ["background-silent", data];
+      client.setQueryData(queryKey, data);
+      await React.act(async () => {
+        await client
+          .fetchQuery({
+            meta: { vandorToast: { error: "Background failure" } },
+            queryFn: async () => {
+              throw new Error("private");
+            },
+            queryKey,
+          })
+          .catch(() => {});
+      });
+    }
+    assert.equal(snapshot.toasts.length, 0);
+    stop();
+    await React.act(async () => {
+      stop = subscribeToastQueryClient(client);
+    });
+    assert.equal(
+      snapshot.toasts.length,
+      0,
+      "remount must also ignore cached background failures"
+    );
+  } finally {
+    stop();
+    client.clear();
+  }
+});

@@ -586,3 +586,58 @@ test("request cancellation and late completion cannot replace current rows", asy
   await settle();
   assert.equal(grid.table.getRowModel().rows[0].id, "new");
 });
+
+test("page correction can repeat after another request is accepted", async () => {
+  let rowCount = 30;
+  await mount({
+    queryOptions: (input) =>
+      queryApi.queryOptions({
+        queryFn: () => Promise.resolve({ rowCount, rows: [] }),
+        queryKey: ["repeat-correction", input],
+      }),
+  });
+  await settle();
+  assert.equal(grid.request.pagination.pageIndex, 1);
+  rowCount = 200;
+  await React.act(() => {
+    client.setQueriesData(
+      { queryKey: ["repeat-correction"] },
+      { rowCount, rows: [] }
+    );
+  });
+  await settle();
+  await React.act(() => grid.setPageIndex(4));
+  await settle();
+  assert.equal(grid.request.pagination.pageIndex, 4);
+  rowCount = 30;
+  await React.act(() => grid.query.refetch());
+  await settle();
+  assert.equal(grid.request.pagination.pageIndex, 1);
+});
+
+test("rejected controlled page correction is proposed only once", async () => {
+  const changes = [];
+  await mount({
+    onStateChange: { request: (request) => changes.push(request) },
+    queryOptions: (input) =>
+      queryApi.queryOptions({
+        queryFn: () => Promise.resolve({ rowCount: 30, rows: [] }),
+        queryKey: ["rejected-correction", input],
+      }),
+    state: {
+      request: {
+        filters: { active: true, search: "" },
+        pagination: { pageIndex: 4, pageSize: 25 },
+        sorting: [],
+      },
+    },
+  });
+  await settle();
+  await React.act(() => grid.query.refetch());
+  await settle();
+  assert.equal(grid.request.pagination.pageIndex, 4);
+  assert.deepEqual(
+    changes.map((request) => request.pagination.pageIndex),
+    [1]
+  );
+});

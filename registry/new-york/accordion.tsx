@@ -90,7 +90,7 @@ const AnimatedPanel = ({
         ...transition,
         duration: reduceMotion ? 0 : transition.duration,
       }}
-      inert={!state.open}
+      inert={!state.open && !hiddenUntilFound}
       aria-hidden={state.open ? undefined : true}
       onAnimationComplete={() => {
         if (!openRef.current) {

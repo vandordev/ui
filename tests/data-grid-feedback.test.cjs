@@ -245,3 +245,65 @@ test("async loading, refreshing, updating and paused announcements are screen-re
     await f.dispose();
   }
 });
+
+for (const custom of [false, true]) {
+  test(`retained empty results preserve ${custom ? "custom" : "default"} feedback during refresh and background failure`, async () => {
+    const f = await createFixture();
+    const deferred = Promise.withResolvers();
+    let calls = 0;
+    try {
+      await f.mount({
+        options: {
+          queryOptions: (input) =>
+            f.query.queryOptions({
+              queryFn: () => {
+                calls += 1;
+                return calls === 1
+                  ? Promise.resolve({ rowCount: 0, rows: [] })
+                  : deferred.promise;
+              },
+              queryKey: ["retained-empty", input],
+            }),
+        },
+        table: custom
+          ? {
+              renderEmpty: () =>
+                f.React.createElement("span", null, "Custom empty"),
+            }
+          : {},
+      });
+      const emptyText = custom ? "Custom empty" : "No data yet";
+      let pending;
+      await f.React.act(() => {
+        pending = f.grid.query.refetch();
+      });
+      await f.settle();
+      assert.equal(f.grid.presentation.status, "refreshing");
+      assert.ok(f.host.textContent.includes(emptyText));
+      assert.equal(
+        f.host.textContent.includes("Results are not active"),
+        false
+      );
+      assert.ok(
+        Boolean(f.host.querySelector('[role="status"][aria-live="polite"]'))
+      );
+      await f.React.act(async () => {
+        deferred.reject(new Error("private"));
+        await pending;
+      });
+      await f.settle();
+      assert.equal(f.grid.presentation.status, "backgroundError");
+      assert.ok(f.host.textContent.includes(emptyText));
+      assert.equal(
+        f.host.textContent.includes("Results are not active"),
+        false
+      );
+      assert.equal(
+        f.host.querySelector('[data-slot="error-state"]').dataset.variant,
+        "inline"
+      );
+    } finally {
+      await f.dispose();
+    }
+  });
+}

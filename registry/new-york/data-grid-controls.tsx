@@ -85,9 +85,9 @@ export const DataGridSearch = <
       <InputSearch
         {...props}
         value={String(binding.value ?? "")}
-        searchLabel={labels.search}
-        clearLabel={labels.clearSearch}
-        aria-invalid={Boolean(binding.error)}
+        searchLabel={props.searchLabel ?? labels.search}
+        clearLabel={props.clearLabel ?? labels.clearSearch}
+        aria-invalid={binding.error ? true : props["aria-invalid"]}
         aria-describedby={
           binding.error
             ? [props["aria-describedby"], errorId].filter(Boolean).join(" ")

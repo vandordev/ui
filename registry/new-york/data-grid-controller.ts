@@ -429,6 +429,9 @@ export const useDataGridController = <C extends DataGridContract, Q>(
   });
   const [correction, setCorrection] = useState<string | null>(null);
   useEffect(() => {
+    if (correction !== null && correction !== requestKey) {
+      setCorrection(null);
+    }
     if (!adapter.success || placeholder || !data) {
       return;
     }

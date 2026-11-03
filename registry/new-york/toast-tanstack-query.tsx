@@ -117,6 +117,7 @@ export const subscribeToastQueryClient = (queryClient: QueryClient) => {
 
     const handleQuery = (query: Query) => {
       if (
+        query.state.data !== undefined ||
         query.state.status !== "error" ||
         query.state.fetchStatus !== "idle"
       ) {

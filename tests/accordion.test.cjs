@@ -231,3 +231,11 @@ test("Accordion playground code reflects multiple and disabled controls", () => 
   assert.ok(!openingTag.includes(" multiple"));
   assert.ok(!openingTag.includes(" disabled"));
 });
+
+test("Accordion searchable collapsed panels omit inert while ordinary mounted panels stay inert", () => {
+  const searchable = renderAccordion({ hiddenUntilFound: true });
+  assert.ok(searchable.includes("second content"));
+  assert.doesNotMatch(searchable, / inert=/);
+  assert.match(searchable, /aria-hidden="true"/);
+  assert.match(renderAccordion({ keepMounted: true }), / inert=""/);
+});

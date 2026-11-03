@@ -232,3 +232,47 @@ test("native page controls and real visibility menu honor non-hideable columns",
     await f.dispose();
   }
 });
+
+test("search preserves consumer invalid state and label overrides", async () => {
+  const f = await createFixture();
+  try {
+    const contract = f.schemas.createDataGridContract({
+      filters: f.z.object({
+        active: f.z.boolean().default(true),
+        search: f.z.string().max(3).default(""),
+      }),
+      pagination: "page",
+      row: f.z.object({ id: f.z.string(), name: f.z.string() }),
+      sortBy: f.z.enum(["name", "id"]),
+    });
+    await f.mount({
+      children: (grid, { ui }) =>
+        f.React.createElement(ui.DataGridSearch, {
+          "aria-invalid": "grammar",
+          clearLabel: "Erase search",
+          clearable: true,
+          field: "search",
+          grid,
+          searchLabel: "Find users",
+        }),
+      options: { contract },
+    });
+    await f.React.act(() => f.grid.setFilter("search", "Ada"));
+    assert.equal(
+      f.host.querySelector("input").getAttribute("aria-invalid"),
+      "grammar"
+    );
+    assert.equal(
+      f.host.querySelector("input").getAttribute("aria-label"),
+      "Find users"
+    );
+    assert.ok(Boolean(f.host.querySelector('[aria-label="Erase search"]')));
+    await f.React.act(() => f.grid.setFilter("search", "too long"));
+    assert.equal(
+      f.host.querySelector("input").getAttribute("aria-invalid"),
+      "true"
+    );
+  } finally {
+    await f.dispose();
+  }
+});

@@ -211,6 +211,10 @@ export function DataGridTable<C extends DataGridContract>({
       />
     );
   const neutral = status === "paused" ? labels.paused : labels.inactive;
+  const showEmpty =
+    status === "empty" ||
+    status === "refreshing" ||
+    status === "backgroundError";
   const content = (
     <table
       {...props}
@@ -306,10 +310,10 @@ export function DataGridTable<C extends DataGridContract>({
                           {renderCell ? (
                             renderCell({
                               grid,
-                              row: row.original,
                               native: cell,
-                              value: cell.getValue(),
                               props: cellProps,
+                              row: row.original,
+                              value: cell.getValue(),
                             })
                           ) : (
                             <DataGridCell {...cellProps} />
@@ -350,10 +354,9 @@ export function DataGridTable<C extends DataGridContract>({
         {!grid.presentation.hasRows && status !== "loading" && (
           <tr>
             <td colSpan={span}>
-              {status === "error" ? (
-                error(false)
-              ) : status === "empty" ? (
-                renderEmpty ? (
+              {status === "error" && error(false)}
+              {showEmpty &&
+                (renderEmpty ? (
                   renderEmpty({
                     filtered: grid.filtered,
                     grid,
@@ -361,8 +364,8 @@ export function DataGridTable<C extends DataGridContract>({
                   })
                 ) : (
                   <DataGridEmpty grid={grid} labels={labels} />
-                )
-              ) : (
+                ))}
+              {status !== "error" && !showEmpty && (
                 <div
                   className="px-4 py-10 text-center text-sm text-muted-foreground"
                   role="status"
@@ -387,11 +390,7 @@ export function DataGridTable<C extends DataGridContract>({
         status === "refreshing" ||
         status === "loading" ||
         (status === "paused" && grid.presentation.hasRows)) && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="sr-only"
-        >
+        <div role="status" aria-live="polite" className="sr-only">
           {status === "placeholder"
             ? labels.updating
             : status === "paused"
