@@ -9,14 +9,17 @@ import type { Matcher } from "react-day-picker";
 
 import { Button } from "./button";
 import { Calendar } from "./calendar";
+import { PickerFooter, TimeField } from "./date-time-picker-parts";
+import type { TimeUnitLabels } from "./date-time-picker-parts";
 import {
   defaultTimeValue,
   formatTimeValue,
   mergeDateAndTime,
   normalizeDateTime,
   parseTimeValue,
+  resolveHourCycle,
 } from "./date-time-picker-utils";
-import type { DateTimePrecision } from "./date-time-picker-utils";
+import type { DateTimePrecision, HourCycle } from "./date-time-picker-utils";
 import {
   Popover,
   PopoverContent,
@@ -24,69 +27,10 @@ import {
   PopoverTrigger,
 } from "./popover";
 
-// Composes Vandor's Button, Popover and Calendar with a native time field. Values are
+// Composes Vandor's Button, Popover and Calendar with a Vandor time field. Values are
 // local-time `Date`s; the draft is committed only by Apply (or Clear).
 
-export type { DateTimePrecision };
-
-export interface TimeFieldProps {
-  id: string;
-  label: string;
-  value: string;
-  onValueChange: (value: string) => void;
-  precision: DateTimePrecision;
-  disabled?: boolean;
-  readOnly?: boolean;
-  invalid?: boolean;
-  describedBy?: string;
-  onEnter?: () => void;
-}
-
-/**
- * Building block shared with DateTimeRangePicker; its API may change.
- *
- * @internal
- */
-export const TimeField = ({
-  id,
-  label,
-  value,
-  onValueChange,
-  precision,
-  disabled,
-  readOnly,
-  invalid,
-  describedBy,
-  onEnter,
-}: TimeFieldProps) => (
-  <div data-slot="time-field" className="grid min-w-0 gap-1.5">
-    <label htmlFor={id} className="text-sm font-medium">
-      {label}
-    </label>
-    <input
-      id={id}
-      type="time"
-      step={precision === "second" ? 1 : 60}
-      value={value}
-      disabled={disabled}
-      readOnly={readOnly}
-      aria-invalid={invalid ? true : undefined}
-      aria-describedby={describedBy}
-      onChange={(event) => {
-        if (!(disabled || readOnly)) {
-          onValueChange(event.currentTarget.value);
-        }
-      }}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" && onEnter) {
-          event.preventDefault();
-          onEnter();
-        }
-      }}
-      className="h-9 w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:aria-invalid:ring-destructive/40"
-    />
-  </div>
-);
+export type { DateTimePrecision, HourCycle, TimeUnitLabels };
 
 export interface DateTimePickerProps {
   id?: string;
@@ -99,6 +43,8 @@ export interface DateTimePickerProps {
   locale?: Locale;
   dateFormat?: string;
   precision?: DateTimePrecision;
+  hourCycle?: HourCycle;
+  timeUnitLabels?: TimeUnitLabels;
   disabled?: boolean;
   readOnly?: boolean;
   open?: boolean;
@@ -153,6 +99,8 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
     locale,
     dateFormat,
     precision,
+    hourCycle,
+    timeUnitLabels,
     disabled,
     readOnly,
     open,
@@ -266,65 +214,56 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
           className="w-auto gap-0 p-0"
         >
           <PopoverTitle className="sr-only">{label}</PopoverTitle>
-          <Calendar
-            mode="single"
-            motion={motion}
-            autoFocus
-            defaultMonth={draft.day}
-            locale={locale}
-            selected={draft.day}
-            disabled={blocked ? () => true : disabledDates}
-            startMonth={startMonth}
-            endMonth={endMonth}
-            onSelect={(day) => {
-              // Re-clicking the selected day must not empty the draft.
-              if (day && !blocked) {
-                setDraft((current) => ({ ...current, day }));
-              }
-            }}
-          />
-          <div className="grid gap-3 border-t p-3">
-            <TimeField
-              id={`${triggerId}-time`}
-              label={timeLabel}
-              value={draft.time}
-              precision={precision}
-              disabled={disabled}
-              readOnly={readOnly}
-              invalid={parsedTime === undefined}
-              onEnter={apply}
-              onValueChange={(time) =>
-                setDraft((current) => ({ ...current, time }))
-              }
+          <div className="flex flex-col sm:flex-row">
+            <Calendar
+              mode="single"
+              motion={motion}
+              autoFocus
+              defaultMonth={draft.day}
+              locale={locale}
+              selected={draft.day}
+              disabled={blocked ? () => true : disabledDates}
+              startMonth={startMonth}
+              endMonth={endMonth}
+              onSelect={(day) => {
+                // Re-clicking the selected day must not empty the draft.
+                if (day && !blocked) {
+                  setDraft((current) => ({ ...current, day }));
+                }
+              }}
             />
-            <div className="flex justify-end gap-2">
-              {clearable && committed && !blocked ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  whileTap={whileTap}
-                  onClick={() => commit()}
-                >
-                  {clearLabel}
-                </Button>
-              ) : null}
-              <Button
-                type="button"
-                variant="outline"
-                whileTap={whileTap}
-                onClick={() => setOpen(false)}
-              >
-                {cancelLabel}
-              </Button>
-              <Button
-                type="button"
-                disabled={!canApply}
-                whileTap={whileTap}
-                onClick={apply}
-              >
-                {applyLabel}
-              </Button>
+            <div className="border-t p-3 sm:border-t-0 sm:border-l">
+              <TimeField
+                id={`${triggerId}-time`}
+                label={timeLabel}
+                value={draft.time}
+                precision={precision}
+                hourCycle={resolveHourCycle(locale, hourCycle)}
+                locale={locale}
+                unitLabels={timeUnitLabels}
+                disabled={disabled}
+                readOnly={readOnly}
+                onEnter={apply}
+                onValueChange={(time) =>
+                  setDraft((current) => ({ ...current, time }))
+                }
+              />
             </div>
+          </div>
+          <div className="border-t p-3">
+            <PickerFooter
+              showClear={Boolean(clearable && committed && !blocked)}
+              canApply={canApply}
+              whileTap={whileTap}
+              labels={{
+                apply: applyLabel,
+                cancel: cancelLabel,
+                clear: clearLabel,
+              }}
+              onClear={() => commit()}
+              onCancel={() => setOpen(false)}
+              onApply={apply}
+            />
           </div>
         </PopoverContent>
       </Popover>

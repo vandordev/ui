@@ -1,11 +1,11 @@
 ---
 title: Date Time Range Picker
-description: A transactional date and time range picker combining a calendar and two native time fields in an accessible popover.
+description: A transactional date and time range picker combining a calendar and two time pickers in an accessible popover.
 component: date-time-range-picker
 credits:
   - name: shadcn/ui
     url: https://ui.shadcn.com/docs/components/base/date-picker
-    contribution: Button, Popover, and Calendar composition pattern; Vandor adds the start/end time fields, the Apply/Cancel draft flow, range validation, precision control, and motion controls.
+    contribution: Button, Popover, and Calendar composition pattern; Vandor adds the start/end time columns, the Apply/Cancel draft flow, range validation, precision control, and motion controls.
 ---
 
 import { ComponentPreview } from "@/components/component-preview";
@@ -53,7 +53,7 @@ A controlled picker with a clear action. Start defaults to the beginning of the 
   <DateTimeRangePickerDemo />
 </ComponentPreview>
 
-A same-day time window with a 24-hour display. One clicked day is a complete range, so no second click is needed.
+A same-day time window with a 24-hour cycle (`hourCycle={24}`). One clicked day is a complete range, so no second click is needed.
 
 <ComponentPreview
   name="date-time-range-picker-24h-demo"
@@ -64,20 +64,20 @@ A same-day time window with a 24-hour display. One clicked day is a complete ran
 
 ## Behavior & Accessibility
 
-Picking days or editing either time changes a draft only. `onValueChange` fires on **Apply** with a complete `{ from, to }`, and on **Clear** with `undefined`. **Cancel**, Escape, or an outside click discards the draft; reopening always starts from the committed value. Enter inside a time field applies.
+Picking days or either time changes a draft only. `onValueChange` fires on **Apply** with a complete `{ from, to }`, and on **Clear** with `undefined`. **Cancel**, Escape, or an outside click discards the draft; reopening always starts from the committed value. Enter inside a time column applies.
 
-A single clicked day is a same-day range, so one day with a start and an end time is valid. Apply is disabled until days are chosen and both times are complete, and while the end is before the start, including on the same day. In that case a message (`rangeErrorLabel`) appears in a polite live region, both time fields get `aria-invalid`, and both reference the message through `aria-describedby`.
+A single clicked day is a same-day range, so one day with a start and an end time is valid. Apply is disabled until days are chosen, and while the end is before the start, including on the same day. In that case a message (`rangeErrorLabel`) appears in a polite live region, every time column gets `aria-invalid` and references the message through `aria-describedby`.
 
 Emitted dates always have zero milliseconds, and zero seconds at the default `minute` precision. With `precision="second"` an empty end time starts at 23:59:59. `disabledDates` makes any range that would include a disabled day reset; the month bounds limit navigation. Time is not constrained.
 
-`disabled` prevents opening and closes an open popup. `readOnly` shows the range and lets the popup open, but the calendar, both time fields, Apply, and Clear cannot change anything. `value` (including explicit `undefined`) is controlled; otherwise `defaultValue` initializes internal state. `open`/`onOpenChange` independently control visibility.
+`disabled` prevents opening and closes an open popup. `readOnly` shows the range and lets the popup open, but the calendar, both time pickers, Apply, and Clear cannot change anything. `value` (including explicit `undefined`) is controlled; otherwise `defaultValue` initializes internal state. `open`/`onOpenChange` independently control visibility.
 
-The trigger's accessible name includes the label and the displayed range. The popup has an accessible title, and each time field has its own visible label (`startTimeLabel`, `endTimeLabel`). Escape returns focus to the trigger.
+The trigger's accessible name includes the label and the displayed range. The popup has an accessible title, and each time picker is a labelled group (`startTimeLabel`, `endTimeLabel`) of listboxes named by `timeUnitLabels`, with the same keyboard behavior as Date Time Picker. Escape returns focus to the trigger.
 
 ## Time zone and formatting
 
 Dates and times are read and written in the device's **local time zone**. Convert explicitly before sending a value to a server. A local time that does not exist because of a daylight-saving gap resolves to the next valid local time.
 
-The native time fields follow the operating system's 12/24-hour setting, while the trigger follows `dateFormat` (default `"PPP p"`). Use `dateFormat="PPP HH:mm"` for a 24-hour display that matches 24-hour fields. Shortcuts and a two-month layout are not offered; use [Date Range Picker](/docs/components/date-range-picker) when you only need whole days.
+The time columns use a 12-hour or 24-hour cycle: the locale's time pattern decides by default, and `hourCycle` overrides it. The trigger text follows `dateFormat` (default `"PPP p"`), so pair `hourCycle={24}` with a 24-hour format such as `"PPP HH:mm"`. Shortcuts and a two-month layout are not offered; use [Date Range Picker](/docs/components/date-range-picker) when you only need whole days.
 
 This is not a native form input: serialize your range explicitly. The public API is restricted to the listed props, not arbitrary native input attributes.

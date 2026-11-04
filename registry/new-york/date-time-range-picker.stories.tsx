@@ -20,6 +20,7 @@ const meta = {
     onValueChange: { control: false },
     open: { control: false },
     placeholder: { control: "text" },
+    hourCycle: { control: "inline-radio", options: [12, 24] },
     precision: { control: "inline-radio", options: ["minute", "second"] },
     readOnly: { control: "boolean" },
     value: { control: false },
@@ -58,6 +59,7 @@ export const SameDayWindow: Story = {
       to: new Date(2026, 9, 5, 17, 30),
     },
     dateFormat: "PPP HH:mm",
+    hourCycle: 24,
   },
 };
 export const WithSeconds: Story = {

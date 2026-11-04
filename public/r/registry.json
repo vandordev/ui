@@ -1488,6 +1488,10 @@
           "type": "registry:ui"
         },
         {
+          "path": "registry/new-york/date-time-picker-parts.tsx",
+          "type": "registry:ui"
+        },
+        {
           "path": "registry/new-york/date-time-picker-utils.ts",
           "type": "registry:ui"
         }

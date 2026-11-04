@@ -270,7 +270,7 @@ export const inputComponentProps: Record<
     dateFormat: p(
       "string",
       '"PPP p"',
-      "DateTimePicker: date-fns display format for the trigger. Use a 24-hour token such as HH:mm to match a 24-hour time field.",
+      "DateTimePicker: date-fns display format for the trigger. Use a 24-hour token such as HH:mm together with hourCycle 24 for a 24-hour display.",
       text("Date format", "PPP p")
     ),
     defaultOpen: p(
@@ -295,6 +295,17 @@ export const inputComponentProps: Record<
       "DateTimePicker: calendar days that cannot be selected. Time is not constrained."
     ),
     endMonth: p("Date", "undefined", "DateTimePicker: latest navigable month."),
+    hourCycle: p(
+      "12 | 24",
+      "from locale",
+      "DateTimePicker: hour cycle of the time columns. By default the locale's time pattern decides (12-hour without a locale); set it so the columns agree with dateFormat.",
+      select("Hour cycle", "12", ["12", "24"])
+    ),
+    timeUnitLabels: p(
+      "{ hours: string; minutes: string; seconds: string; period: string }",
+      "English labels",
+      "DateTimePicker: accessible names of the hour, minute, second and AM/PM columns."
+    ),
     id: p(
       "string",
       "generated",
@@ -392,7 +403,7 @@ export const inputComponentProps: Record<
     dateFormat: p(
       "string",
       '"PPP p"',
-      "DateTimeRangePicker: date-fns display format for the trigger. Use a 24-hour token such as HH:mm to match a 24-hour time field.",
+      "DateTimeRangePicker: date-fns display format for the trigger. Use a 24-hour token such as HH:mm together with hourCycle 24 for a 24-hour display.",
       text("Date format", "PPP p")
     ),
     defaultOpen: p(
@@ -420,6 +431,17 @@ export const inputComponentProps: Record<
       "Date",
       "undefined",
       "DateTimeRangePicker: latest navigable month."
+    ),
+    hourCycle: p(
+      "12 | 24",
+      "from locale",
+      "DateTimeRangePicker: hour cycle of the time columns. By default the locale's time pattern decides (12-hour without a locale); set it so the columns agree with dateFormat.",
+      select("Hour cycle", "12", ["12", "24"])
+    ),
+    timeUnitLabels: p(
+      "{ hours: string; minutes: string; seconds: string; period: string }",
+      "English labels",
+      "DateTimeRangePicker: accessible names of the hour, minute, second and AM/PM columns."
     ),
     id: p(
       "string",
@@ -1204,7 +1226,13 @@ const propLine = (
   if (typeof value === "boolean") {
     return value ? `    ${name}` : "";
   }
-  const numericProps = ["decimalScale", "weekStartsOn", "length", "rows"];
+  const numericProps = [
+    "decimalScale",
+    "weekStartsOn",
+    "length",
+    "rows",
+    "hourCycle",
+  ];
   const serialized = numericProps.includes(name)
     ? Number(value)
     : stringLiteral(String(value));
@@ -1275,12 +1303,12 @@ export const getInputPlaygroundCode = (
         'import { useState } from "react";\nimport { DatePicker } from "@/components/ui/date-picker";',
     },
     "date-time-picker": {
-      code: `const [date, setDate] = useState<Date>();\n\n<DateTimePicker\n    label={${stringLiteral(String(values.label ?? "Starts at"))}}\n    value={date}\n    onValueChange={setDate}\n${propsBlock(values, ["placeholder", "dateFormat", "precision", "clearable", "disabled", "readOnly", "motion"])}\n/>`,
+      code: `const [date, setDate] = useState<Date>();\n\n<DateTimePicker\n    label={${stringLiteral(String(values.label ?? "Starts at"))}}\n    value={date}\n    onValueChange={setDate}\n${propsBlock(values, ["placeholder", "dateFormat", "precision", "hourCycle", "clearable", "disabled", "readOnly", "motion"])}\n/>`,
       imports:
         'import { useState } from "react";\nimport { DateTimePicker } from "@/components/ui/date-time-picker";',
     },
     "date-time-range-picker": {
-      code: `const [range, setRange] = useState<DateRange>();\n\n<DateTimeRangePicker\n    label={${stringLiteral(String(values.label ?? "Maintenance window"))}}\n    value={range}\n    onValueChange={setRange}\n${propsBlock(values, ["placeholder", "dateFormat", "precision", "clearable", "disabled", "readOnly", "motion"])}\n/>`,
+      code: `const [range, setRange] = useState<DateRange>();\n\n<DateTimeRangePicker\n    label={${stringLiteral(String(values.label ?? "Maintenance window"))}}\n    value={range}\n    onValueChange={setRange}\n${propsBlock(values, ["placeholder", "dateFormat", "precision", "hourCycle", "clearable", "disabled", "readOnly", "motion"])}\n/>`,
       imports:
         'import { useState } from "react";\nimport type { DateRange } from "react-day-picker";\nimport { DateTimeRangePicker } from "@/components/ui/date-time-range-picker";',
     },

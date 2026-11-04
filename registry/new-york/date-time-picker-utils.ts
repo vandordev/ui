@@ -1,3 +1,5 @@
+import type { Locale } from "date-fns";
+
 export type DateTimePrecision = "minute" | "second";
 
 export interface TimeParts {
@@ -10,7 +12,7 @@ const pad = (value: number) => String(value).padStart(2, "0");
 
 const timePattern = /^(\d{2}):(\d{2})(?::(\d{2}))?$/;
 
-/** Parses a native time input value ("HH:mm" or "HH:mm:ss"); undefined if invalid. */
+/** Parses a canonical time value ("HH:mm" or "HH:mm:ss"); undefined if invalid. */
 export const parseTimeValue = (value: string): TimeParts | undefined => {
   const match = timePattern.exec(value);
   if (!match) {
@@ -25,7 +27,7 @@ export const parseTimeValue = (value: string): TimeParts | undefined => {
   return { hours, minutes, seconds };
 };
 
-/** Formats a date's local time for a native time input at the given precision. */
+/** Formats a date's local time at the given precision. */
 export const formatTimeValue = (
   date: Date,
   precision: DateTimePrecision
@@ -128,4 +130,49 @@ export const resolveDateTimeRangeDraft = (
     start,
     startTimeInvalid: startParts === undefined,
   };
+};
+
+export type HourCycle = 12 | 24;
+
+/**
+ * An explicit cycle wins. Otherwise follow the locale's short time pattern: a day-period
+ * token (a, b, B) means 12-hour. Without a locale this is 12-hour, like date-fns' default.
+ */
+export const resolveHourCycle = (
+  locale?: Locale,
+  explicit?: HourCycle
+): HourCycle => {
+  if (explicit) {
+    return explicit;
+  }
+  const pattern = locale?.formatLong?.time({ width: "short" });
+  return pattern && !/[abB]/.test(pattern) ? 24 : 12;
+};
+
+export const to12Hour = (hours: number): { hour: number; pm: boolean } => ({
+  hour: hours % 12 || 12,
+  pm: hours >= 12,
+});
+
+export const from12Hour = (hour: number, pm: boolean): number =>
+  (hour % 12) + (pm ? 12 : 0);
+
+export type TimePart = keyof TimeParts;
+
+/** Returns the canonical "HH:mm[:ss]" value with one part replaced. */
+export const withTimePart = (
+  value: string,
+  part: TimePart,
+  next: number,
+  precision: DateTimePrecision
+): string => {
+  const parts = {
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    ...parseTimeValue(value),
+    [part]: next,
+  };
+  const base = `${pad(parts.hours)}:${pad(parts.minutes)}`;
+  return precision === "second" ? `${base}:${pad(parts.seconds)}` : base;
 };

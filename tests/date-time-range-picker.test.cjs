@@ -7,16 +7,17 @@ const buttonByText = (text) =>
   [...document.querySelectorAll("button")].find(
     (button) => button.textContent.trim() === text
   );
-const timeInputs = () => [...document.querySelectorAll('input[type="time"]')];
-const setTime = async (f, index, value) => {
-  await f.React.act(async () => {
-    const input = timeInputs()[index];
-    Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      "value"
-    ).set.call(input, value);
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-  });
+const fields = () => [...document.querySelectorAll('[data-slot="time-field"]')];
+// Field 0 is the start time, field 1 the end time.
+const column = (field, name) =>
+  fields()[field].querySelector(`[role="listbox"][aria-label="${name}"]`);
+const chosen = (field, name) =>
+  column(field, name).querySelector('[aria-selected="true"]').textContent;
+const choose = async (f, field, name, label) => {
+  const option = [
+    ...column(field, name).querySelectorAll('[role="option"]'),
+  ].find((item) => item.textContent === label);
+  await f.React.act(async () => option.click());
 };
 const rangeError = () => document.querySelector('[id$="-range-error"]');
 const day = (iso) => document.querySelector(`button[data-day="${iso}"]`);
@@ -50,8 +51,11 @@ test("Apply commits the range with both times at minute precision", async () => 
     },
     async (f) => {
       await f.React.act(async () => day("2026-03-10").click());
-      await setTime(f, 0, "08:15");
-      await setTime(f, 1, "18:45");
+      await choose(f, 0, "Hours", "08");
+      await choose(f, 0, "Minutes", "15");
+      await choose(f, 1, "Hours", "06");
+      await choose(f, 1, "Minutes", "45");
+      await choose(f, 1, "AM/PM", "PM");
       assert.deepEqual(changes, [], "editing the draft does not commit");
       await f.React.act(async () => buttonByText("Apply").click());
       assert.equal(changes.length, 1);
@@ -80,8 +84,9 @@ test("a single clicked day is a same-day time window", async () => {
       onValueChange: (next) => changes.push(next),
     },
     async (f) => {
-      await setTime(f, 0, "09:00");
-      await setTime(f, 1, "17:30");
+      await choose(f, 0, "Hours", "09");
+      await choose(f, 1, "Hours", "05");
+      await choose(f, 1, "Minutes", "30");
       await f.React.act(async () => buttonByText("Apply").click());
       assert.equal(changes.length, 1);
       assert.equal(
@@ -100,18 +105,21 @@ test("an end before the start blocks Apply, flags both fields and explains why",
   await withPicker(
     { defaultOpen: true, defaultValue: { from: fifth, to: fifth } },
     async (f) => {
-      await setTime(f, 0, "17:00");
-      await setTime(f, 1, "09:00");
+      await choose(f, 0, "AM/PM", "PM");
       assert.equal(buttonByText("Apply").disabled, true);
       const error = rangeError();
       assert.match(error.textContent, /must not be before the start/);
-      for (const input of timeInputs()) {
-        assert.equal(input.getAttribute("aria-invalid"), "true");
-        assert.equal(input.getAttribute("aria-describedby"), error.id);
+      for (const index of [0, 1]) {
+        for (const name of ["Hours", "Minutes", "AM/PM"]) {
+          const list = column(index, name);
+          assert.equal(list.getAttribute("aria-invalid"), "true");
+          assert.equal(list.getAttribute("aria-describedby"), error.id);
+        }
       }
-      await setTime(f, 1, "18:00");
+      await choose(f, 1, "AM/PM", "PM");
       assert.equal(buttonByText("Apply").disabled, false);
       assert.equal(rangeError().textContent, "");
+      assert.equal(column(0, "Hours").getAttribute("aria-invalid"), null);
     }
   );
 });
@@ -125,13 +133,14 @@ test("Cancel discards the draft and a reopen shows the committed times", async (
       onValueChange: (next) => changes.push(next),
     },
     async (f) => {
-      await setTime(f, 0, "01:00");
+      await choose(f, 0, "Hours", "01");
       await f.React.act(async () => buttonByText("Cancel").click());
       assert.deepEqual(changes, []);
       await f.React.act(async () =>
         document.querySelector('[data-slot="popover-trigger"]').click()
       );
-      assert.equal(timeInputs()[0].value, "09:30");
+      assert.equal(chosen(0, "Hours"), "09");
+      assert.equal(chosen(0, "Minutes"), "30");
     }
   );
 });
@@ -153,20 +162,31 @@ test("Clear commits undefined immediately and closes", async () => {
   );
 });
 
-test("empty range defaults to a full-day window at each precision", async () => {
+test("an empty range defaults to a full-day window at each cycle and precision", async () => {
   await withPicker({ defaultOpen: true }, async () => {
     assert.deepEqual(
-      timeInputs().map((input) => input.value),
-      ["00:00", "23:59"]
+      ["Hours", "Minutes", "AM/PM"].map((name) => chosen(0, name)),
+      ["12", "00", "AM"]
+    );
+    assert.deepEqual(
+      ["Hours", "Minutes", "AM/PM"].map((name) => chosen(1, name)),
+      ["11", "59", "PM"]
     );
   });
-  await withPicker({ defaultOpen: true, precision: "second" }, async () => {
-    const [start, end] = timeInputs().map((input) => input.value);
-    // The DOM may serialize a zero seconds part away ("00:00:00" -> "00:00").
-    assert.match(start, /^00:00(:00)?$/);
-    assert.equal(end, "23:59:59");
-    assert.equal(timeInputs()[0].getAttribute("step"), "1");
-  });
+  await withPicker(
+    { defaultOpen: true, hourCycle: 24, precision: "second" },
+    async () => {
+      assert.deepEqual(
+        ["Hours", "Minutes", "Seconds"].map((name) => chosen(0, name)),
+        ["00", "00", "00"]
+      );
+      assert.deepEqual(
+        ["Hours", "Minutes", "Seconds"].map((name) => chosen(1, name)),
+        ["23", "59", "59"]
+      );
+      assert.equal(column(0, "AM/PM"), null);
+    }
+  );
 });
 
 test("readOnly shows the range but blocks every mutating control", async () => {
@@ -180,12 +200,12 @@ test("readOnly shows the range but blocks every mutating control", async () => {
       readOnly: true,
     },
     async (f) => {
-      assert.ok(timeInputs().every((input) => input.readOnly));
+      assert.equal(column(0, "Hours").getAttribute("aria-readonly"), "true");
       assert.equal(buttonByText("Apply").disabled, true);
       assert.equal(buttonByText("Clear"), undefined);
       assert.equal(day("2026-03-10").disabled, true);
-      await setTime(f, 0, "11:11");
-      assert.equal(timeInputs()[0].value, "09:30", "time edits are ignored");
+      await choose(f, 0, "Hours", "11");
+      assert.equal(chosen(0, "Hours"), "09", "time edits are ignored");
       assert.deepEqual(changes, []);
     }
   );

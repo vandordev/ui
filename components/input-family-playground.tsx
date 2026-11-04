@@ -48,6 +48,7 @@ const DateTimePickerPreview = ({ values }: { values: Values }) => {
       clearable={Boolean(values.clearable)}
       dateFormat={String(values.dateFormat)}
       precision={values.precision as "minute" | "second"}
+      hourCycle={values.hourCycle === "24" ? 24 : 12}
       disabled={Boolean(values.disabled)}
       readOnly={Boolean(values.readOnly)}
     />
@@ -66,6 +67,7 @@ const DateTimeRangePickerPreview = ({ values }: { values: Values }) => {
       clearable={Boolean(values.clearable)}
       dateFormat={String(values.dateFormat)}
       precision={values.precision as "minute" | "second"}
+      hourCycle={values.hourCycle === "24" ? 24 : 12}
       disabled={Boolean(values.disabled)}
       readOnly={Boolean(values.readOnly)}
     />

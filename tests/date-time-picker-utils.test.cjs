@@ -130,3 +130,42 @@ test("resolveDateTimeRangeDraft spans multiple days", () => {
   assert.equal(draft.orderInvalid, false);
   assert.equal(draft.end.getTime(), new Date(2026, 2, 7, 6, 0).getTime());
 });
+
+test("resolveHourCycle follows an explicit value, then the locale's time pattern", () => {
+  const { enUS, id, de } = createJiti(__filename, { fsCache: false })(
+    "date-fns/locale"
+  );
+  assert.equal(utils.resolveHourCycle(), 12, "no locale is 12-hour");
+  assert.equal(utils.resolveHourCycle(enUS), 12);
+  assert.equal(utils.resolveHourCycle(id), 24);
+  assert.equal(utils.resolveHourCycle(de), 24);
+  assert.equal(utils.resolveHourCycle(enUS, 24), 24, "explicit wins");
+  assert.equal(utils.resolveHourCycle(de, 12), 12, "explicit wins");
+});
+
+test("12-hour conversion round-trips every hour, including midnight and noon", () => {
+  assert.deepEqual(utils.to12Hour(0), { hour: 12, pm: false });
+  assert.deepEqual(utils.to12Hour(12), { hour: 12, pm: true });
+  assert.deepEqual(utils.to12Hour(13), { hour: 1, pm: true });
+  assert.deepEqual(utils.to12Hour(23), { hour: 11, pm: true });
+  for (let hours = 0; hours < 24; hours += 1) {
+    const { hour, pm } = utils.to12Hour(hours);
+    assert.equal(utils.from12Hour(hour, pm), hours, `hour ${hours}`);
+  }
+});
+
+test("withTimePart replaces one part and respects precision", () => {
+  assert.equal(utils.withTimePart("09:30", "hours", 14, "minute"), "14:30");
+  assert.equal(utils.withTimePart("09:30", "minutes", 5, "minute"), "09:05");
+  assert.equal(utils.withTimePart("09:30", "seconds", 7, "minute"), "09:30");
+  assert.equal(
+    utils.withTimePart("09:30:15", "seconds", 7, "second"),
+    "09:30:07"
+  );
+  assert.equal(utils.withTimePart("09:30", "seconds", 7, "second"), "09:30:07");
+  assert.equal(
+    utils.withTimePart("", "hours", 3, "minute"),
+    "03:00",
+    "an unparsable value falls back to midnight"
+  );
+});

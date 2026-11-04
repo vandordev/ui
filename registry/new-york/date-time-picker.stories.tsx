@@ -19,6 +19,7 @@ const meta = {
     onValueChange: { control: false },
     open: { control: false },
     placeholder: { control: "text" },
+    hourCycle: { control: "inline-radio", options: [12, 24] },
     precision: { control: "inline-radio", options: ["minute", "second"] },
     readOnly: { control: "boolean" },
     value: { control: false },
@@ -53,7 +54,7 @@ export const WithSeconds: Story = {
   },
 };
 export const TwentyFourHour: Story = {
-  args: { ...Populated.args, dateFormat: "PPP HH:mm" },
+  args: { ...Populated.args, dateFormat: "PPP HH:mm", hourCycle: 24 },
 };
 export const ReadOnly: Story = { args: { ...Populated.args, readOnly: true } };
 export const Disabled: Story = { args: { disabled: true } };

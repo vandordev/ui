@@ -9,16 +9,19 @@ import type { DateRange, Matcher } from "react-day-picker";
 
 import { Button } from "./button";
 import { Calendar } from "./calendar";
-import { TimeField } from "./date-time-picker";
+import { PickerFooter, TimeField } from "./date-time-picker-parts";
+import type { TimeUnitLabels } from "./date-time-picker-parts";
 import {
   defaultTimeValue,
   formatTimeValue,
   normalizeDateTime,
   resolveDateTimeRangeDraft,
+  resolveHourCycle,
 } from "./date-time-picker-utils";
 import type {
   DateTimePrecision,
   DateTimeRangeDraft,
+  HourCycle,
 } from "./date-time-picker-utils";
 import {
   Popover,
@@ -27,7 +30,7 @@ import {
   PopoverTrigger,
 } from "./popover";
 
-// Composes Vandor's Button, Popover and Calendar with two native time fields. Values are
+// Composes Vandor's Button, Popover and Calendar with two time pickers. Values are
 // local-time `Date`s; the draft is committed only by Apply (or Clear).
 
 export interface DateTimeRangePickerProps {
@@ -41,6 +44,8 @@ export interface DateTimeRangePickerProps {
   locale?: Locale;
   dateFormat?: string;
   precision?: DateTimePrecision;
+  hourCycle?: HourCycle;
+  timeUnitLabels?: TimeUnitLabels;
   disabled?: boolean;
   readOnly?: boolean;
   open?: boolean;
@@ -132,55 +137,6 @@ const toCommittableRange = (
     ? { from: resolved.start, to: resolved.end }
     : undefined;
 
-interface RangeFooterProps {
-  showClear: boolean;
-  canApply: boolean;
-  whileTap: { scale: number } | false;
-  labels: { apply: string; cancel: string; clear: string };
-  onClear: () => void;
-  onCancel: () => void;
-  onApply: () => void;
-}
-
-const RangeFooter = ({
-  showClear,
-  canApply,
-  whileTap,
-  labels,
-  onClear,
-  onCancel,
-  onApply,
-}: RangeFooterProps) => (
-  <div className="flex justify-end gap-2">
-    {showClear ? (
-      <Button
-        type="button"
-        variant="ghost"
-        whileTap={whileTap}
-        onClick={onClear}
-      >
-        {labels.clear}
-      </Button>
-    ) : null}
-    <Button
-      type="button"
-      variant="outline"
-      whileTap={whileTap}
-      onClick={onCancel}
-    >
-      {labels.cancel}
-    </Button>
-    <Button
-      type="button"
-      disabled={!canApply}
-      whileTap={whileTap}
-      onClick={onApply}
-    >
-      {labels.apply}
-    </Button>
-  </div>
-);
-
 // The draft mirrors the committed value whenever the popup is closed, so a reopen
 // (including a controlled `open`) never shows a discarded or stale edit.
 const useRangeDraft = (
@@ -216,6 +172,8 @@ export const DateTimeRangePicker = (props: DateTimeRangePickerProps) => {
     locale,
     dateFormat,
     precision,
+    hourCycle,
+    timeUnitLabels,
     disabled,
     readOnly,
     open,
@@ -282,6 +240,7 @@ export const DateTimeRangePicker = (props: DateTimeRangePickerProps) => {
       commit(next);
     }
   };
+  const cycle = resolveHourCycle(locale, hourCycle);
   const errorId = `${triggerId}-range-error`;
   const describedBy = resolved.orderInvalid ? errorId : undefined;
   const whileTap = motion ? { scale: 0.96 } : false;
@@ -348,12 +307,15 @@ export const DateTimeRangePicker = (props: DateTimeRangePickerProps) => {
             }}
           />
           <div className="grid gap-3 border-t p-3">
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-[max-content_max-content]">
               <TimeField
                 id={`${triggerId}-start-time`}
                 label={startTimeLabel}
                 value={draft.startTime}
                 precision={precision}
+                hourCycle={cycle}
+                locale={locale}
+                unitLabels={timeUnitLabels}
                 disabled={disabled}
                 readOnly={readOnly}
                 invalid={resolved.startTimeInvalid || resolved.orderInvalid}
@@ -368,6 +330,9 @@ export const DateTimeRangePicker = (props: DateTimeRangePickerProps) => {
                 label={endTimeLabel}
                 value={draft.endTime}
                 precision={precision}
+                hourCycle={cycle}
+                locale={locale}
+                unitLabels={timeUnitLabels}
                 disabled={disabled}
                 readOnly={readOnly}
                 invalid={resolved.endTimeInvalid || resolved.orderInvalid}
@@ -386,7 +351,7 @@ export const DateTimeRangePicker = (props: DateTimeRangePickerProps) => {
             >
               {resolved.orderInvalid ? rangeErrorLabel : null}
             </p>
-            <RangeFooter
+            <PickerFooter
               showClear={Boolean(clearable && committed?.from && !blocked)}
               canApply={canApply}
               whileTap={whileTap}

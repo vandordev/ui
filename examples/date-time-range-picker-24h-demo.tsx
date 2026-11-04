@@ -16,6 +16,7 @@ export const DateTimeRangePicker24hDemo = () => {
       value={range}
       onValueChange={setRange}
       dateFormat="PPP HH:mm"
+      hourCycle={24}
     />
   );
 };
