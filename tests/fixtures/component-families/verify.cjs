@@ -119,7 +119,10 @@ try {
         include: [`${source}**/*.ts`, `${source}**/*.tsx`],
       })
     );
-    writeFileSync(path.join(cwd, `${source}app/globals.css`), "");
+    writeFileSync(
+      path.join(cwd, `${source}app/globals.css`),
+      '@import "tailwindcss";\n'
+    );
     writeFileSync(
       path.join(cwd, "components.json"),
       JSON.stringify({

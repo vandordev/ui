@@ -94,7 +94,10 @@ try {
         compilerOptions: { baseUrl: ".", paths: { "@/*": [`${source}/*`] } },
       })
     );
-    writeFileSync(path.join(directory, source, "app/globals.css"), "");
+    writeFileSync(
+      path.join(directory, source, "app/globals.css"),
+      '@import "tailwindcss";\n'
+    );
     writeFileSync(
       path.join(directory, "components.json"),
       JSON.stringify({
