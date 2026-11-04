@@ -213,6 +213,12 @@ export const componentDocDefinitions: Record<string, ComponentDocDefinition> = {
     playground: { code: inputPlaygroundCode["date-time-picker"] },
     props: inputComponentProps["date-time-picker"],
   },
+  "date-time-range-picker": {
+    nativePropsDescription:
+      "DateTimeRangePicker uses a restricted props API and does not forward arbitrary native attributes, refs or event handlers. id labels the trigger; className styles the trigger; startTimeLabel and endTimeLabel name the time fields. Native form name, required and input submission are not supported.",
+    playground: { code: inputPlaygroundCode["date-time-range-picker"] },
+    props: inputComponentProps["date-time-range-picker"],
+  },
   dialog: {
     playground: { code: getDialogCode(getDialogDefaults()) },
     props: dialogProps,

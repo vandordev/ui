@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-time-range-picker-stories",
+  "title": "Date Time Range Picker Stories",
+  "description": "Portable stories for an already installed DateTimeRangePicker.",
+  "files": [
+    {
+      "path": "registry/new-york/date-time-range-picker.stories.tsx",
+      "content": "/* eslint-disable sort-keys */\nimport type { Meta, StoryObj } from \"@storybook/react\";\nimport { id } from \"date-fns/locale\";\nimport { useState } from \"react\";\nimport type { DateRange } from \"react-day-picker\";\n\nimport { DateTimeRangePicker } from \"./date-time-range-picker\";\n\nconst meta = {\n  argTypes: {\n    clearable: { control: \"boolean\" },\n    dateFormat: { control: \"text\" },\n    defaultValue: { control: false },\n    disabled: { control: \"boolean\" },\n    disabledDates: { control: false },\n    label: { control: \"text\" },\n    locale: { control: false },\n    motion: { control: \"boolean\" },\n    onOpenChange: { control: false },\n    onValueChange: { control: false },\n    open: { control: false },\n    placeholder: { control: \"text\" },\n    precision: { control: \"inline-radio\", options: [\"minute\", \"second\"] },\n    readOnly: { control: \"boolean\" },\n    value: { control: false },\n  },\n  args: {\n    clearable: true,\n    dateFormat: \"PPP p\",\n    disabled: false,\n    label: \"Maintenance window\",\n    motion: true,\n    placeholder: \"Select date and time range\",\n    precision: \"minute\",\n    readOnly: false,\n  },\n  component: DateTimeRangePicker,\n  parameters: { layout: \"centered\" },\n  tags: [\"autodocs\"],\n  title: \"Vandor UI/DateTimeRangePicker\",\n} satisfies Meta<typeof DateTimeRangePicker>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\nexport const Playground: Story = {};\nexport const Populated: Story = {\n  args: {\n    defaultValue: {\n      from: new Date(2026, 9, 5, 22, 0),\n      to: new Date(2026, 9, 6, 6, 30),\n    },\n  },\n};\nexport const SameDayWindow: Story = {\n  args: {\n    defaultValue: {\n      from: new Date(2026, 9, 5, 9, 0),\n      to: new Date(2026, 9, 5, 17, 30),\n    },\n    dateFormat: \"PPP HH:mm\",\n  },\n};\nexport const WithSeconds: Story = {\n  args: { ...Populated.args, dateFormat: \"PPP pp\", precision: \"second\" },\n};\nexport const ReadOnly: Story = { args: { ...Populated.args, readOnly: true } };\nexport const Disabled: Story = { args: { disabled: true } };\nexport const Indonesian: Story = {\n  args: { ...Populated.args, dateFormat: \"PPP HH:mm\", locale: id },\n};\nexport const WithoutMotion: Story = { args: { motion: false } };\nexport const Controlled: Story = {\n  render: function ControlledPicker(args) {\n    const [range, setRange] = useState<DateRange>();\n    return (\n      <DateTimeRangePicker {...args} value={range} onValueChange={setRange} />\n    );\n  },\n};\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:item"
+}

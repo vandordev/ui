@@ -1506,6 +1506,42 @@
       ]
     },
     {
+      "name": "date-time-range-picker",
+      "type": "registry:ui",
+      "title": "Date Time Range Picker",
+      "description": "A transactional date and time range picker with a calendar and two native time fields.",
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/button.json",
+        "https://vandor-ui.vercel.app/r/calendar.json",
+        "https://vandor-ui.vercel.app/r/date-time-picker.json",
+        "https://vandor-ui.vercel.app/r/popover.json"
+      ],
+      "dependencies": [
+        "cn@^0.4.0",
+        "date-fns@^4.4.0",
+        "lucide-react@1.11.0",
+        "react-day-picker@^10.0.2"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/date-time-range-picker.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "date-time-range-picker-stories",
+      "type": "registry:item",
+      "title": "Date Time Range Picker Stories",
+      "description": "Portable stories for an already installed DateTimeRangePicker.",
+      "files": [
+        {
+          "path": "registry/new-york/date-time-range-picker.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "date-time",
       "type": "registry:component",
       "title": "DateTime",

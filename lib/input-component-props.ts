@@ -356,6 +356,146 @@ export const inputComponentProps: Record<
       "DateTimePicker: controlled date and local time."
     ),
   },
+  "date-time-range-picker": {
+    motion: p(
+      "boolean",
+      "true",
+      "Enables popup, calendar, and button motion; system reduced-motion takes priority.",
+      boolean("Motion", true)
+    ),
+    applyLabel: p(
+      "string",
+      '"Apply"',
+      "DateTimeRangePicker: apply button text."
+    ),
+    cancelLabel: p(
+      "string",
+      '"Cancel"',
+      "DateTimeRangePicker: cancel button text."
+    ),
+    className: p(
+      "string",
+      "undefined",
+      "DateTimeRangePicker: trigger class name."
+    ),
+    clearLabel: p(
+      "string",
+      '"Clear"',
+      "DateTimeRangePicker: clear button text."
+    ),
+    clearable: p(
+      "boolean",
+      "false",
+      "DateTimeRangePicker: shows a Clear action that commits an empty value immediately.",
+      boolean("Clearable")
+    ),
+    dateFormat: p(
+      "string",
+      '"PPP p"',
+      "DateTimeRangePicker: date-fns display format for the trigger. Use a 24-hour token such as HH:mm to match a 24-hour time field.",
+      text("Date format", "PPP p")
+    ),
+    defaultOpen: p(
+      "boolean",
+      "false",
+      "DateTimeRangePicker: initial uncontrolled popover visibility."
+    ),
+    defaultValue: p(
+      "DateRange | undefined",
+      "undefined",
+      "DateTimeRangePicker: initial uncontrolled range with local start and end times."
+    ),
+    disabled: p(
+      "boolean",
+      "false",
+      "DateTimeRangePicker: disables opening the trigger and closes an open popup.",
+      boolean("Disabled")
+    ),
+    disabledDates: p(
+      "Matcher | Matcher[]",
+      "undefined",
+      "DateTimeRangePicker: calendar days that cannot be part of a range. Time is not constrained."
+    ),
+    endMonth: p(
+      "Date",
+      "undefined",
+      "DateTimeRangePicker: latest navigable month."
+    ),
+    id: p(
+      "string",
+      "generated",
+      "DateTimeRangePicker: optional stable id for the label relationship."
+    ),
+    label: p(
+      "string",
+      "required",
+      "DateTimeRangePicker: visible accessible name.",
+      text("Label", "Maintenance window")
+    ),
+    locale: p(
+      "date-fns Locale",
+      "undefined",
+      "DateTimeRangePicker: display and calendar locale."
+    ),
+    onOpenChange: p(
+      "(open: boolean) => void",
+      "undefined",
+      "DateTimeRangePicker: observes popover visibility changes."
+    ),
+    onValueChange: p(
+      "(range: DateRange | undefined) => void",
+      "undefined",
+      "DateTimeRangePicker: fires on Apply with a complete { from, to }, or on Clear with undefined. Never fires while editing the draft."
+    ),
+    open: p(
+      "boolean",
+      "uncontrolled",
+      "DateTimeRangePicker: controlled popover visibility."
+    ),
+    placeholder: p(
+      "string",
+      '"Select date and time range"',
+      "DateTimeRangePicker: trigger text when empty.",
+      text("Placeholder", "Select date and time range")
+    ),
+    precision: p(
+      '"minute" | "second"',
+      '"minute"',
+      "DateTimeRangePicker: time granularity. Emitted dates always have zero milliseconds, and zero seconds at minute precision.",
+      select("Precision", "minute", ["minute", "second"])
+    ),
+    readOnly: p(
+      "boolean",
+      "false",
+      "DateTimeRangePicker: opens the popup but prevents changes.",
+      boolean("Read only")
+    ),
+    startMonth: p(
+      "Date",
+      "undefined",
+      "DateTimeRangePicker: earliest navigable month."
+    ),
+    startTimeLabel: p(
+      "string",
+      '"Start time"',
+      "DateTimeRangePicker: start time field label."
+    ),
+    endTimeLabel: p(
+      "string",
+      '"End time"',
+      "DateTimeRangePicker: end time field label."
+    ),
+    rangeErrorLabel: p(
+      "string",
+      '"The end must not be before the start."',
+      "DateTimeRangePicker: message shown, and linked to both time fields, when the end is before the start."
+    ),
+    value: p(
+      "DateRange | undefined",
+      "uncontrolled",
+      "DateTimeRangePicker: controlled range with local start and end times."
+    ),
+  },
   "date-range-picker": {
     motion: p(
       "boolean",
@@ -1138,6 +1278,11 @@ export const getInputPlaygroundCode = (
       code: `const [date, setDate] = useState<Date>();\n\n<DateTimePicker\n    label={${stringLiteral(String(values.label ?? "Starts at"))}}\n    value={date}\n    onValueChange={setDate}\n${propsBlock(values, ["placeholder", "dateFormat", "precision", "clearable", "disabled", "readOnly", "motion"])}\n/>`,
       imports:
         'import { useState } from "react";\nimport { DateTimePicker } from "@/components/ui/date-time-picker";',
+    },
+    "date-time-range-picker": {
+      code: `const [range, setRange] = useState<DateRange>();\n\n<DateTimeRangePicker\n    label={${stringLiteral(String(values.label ?? "Maintenance window"))}}\n    value={range}\n    onValueChange={setRange}\n${propsBlock(values, ["placeholder", "dateFormat", "precision", "clearable", "disabled", "readOnly", "motion"])}\n/>`,
+      imports:
+        'import { useState } from "react";\nimport type { DateRange } from "react-day-picker";\nimport { DateTimeRangePicker } from "@/components/ui/date-time-range-picker";',
     },
     "date-range-picker": {
       code: `const [range, setRange] = useState<DateRange>();\n\n<DateRangePicker\n    label={${stringLiteral(String(values.label ?? "Reporting period"))}}\n    value={range}\n    onValueChange={setRange}\n${propsBlock(values, ["placeholder", "dateFormat", "clearable", "disabled", "readOnly", "motion"])}\n    weekStartsOn={${Number(values.weekStartsOn ?? 1)}}\n    features={${JSON.stringify(resolveRangeFeatures(values.features))}}\n/>`,

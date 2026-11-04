@@ -10,6 +10,7 @@ import type { Matcher } from "react-day-picker";
 import { Button } from "./button";
 import { Calendar } from "./calendar";
 import {
+  defaultTimeValue,
   formatTimeValue,
   mergeDateAndTime,
   normalizeDateTime,
@@ -114,9 +115,6 @@ export interface DateTimePickerProps {
   motion?: boolean;
 }
 
-const defaultTimeOf = (precision: DateTimePrecision) =>
-  precision === "second" ? "00:00:00" : "00:00";
-
 const withPickerDefaults = ({
   placeholder = "Select date and time",
   clearable = false,
@@ -188,7 +186,7 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
     day: committed,
     time: committed
       ? formatTimeValue(committed, precision)
-      : defaultTimeOf(precision),
+      : defaultTimeValue("start", precision),
   });
   const [draft, setDraft] = React.useState(fromCommitted);
   // The draft mirrors the committed value whenever the popup is closed, so a reopen

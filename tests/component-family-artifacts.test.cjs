@@ -176,3 +176,54 @@ test("DateTime family targets stay in components alias and preserve owned relati
     rmSync(root, { force: true, recursive: true });
   }
 });
+
+test("picker items prepare as ordinary UI items while other date-time-* names stay rejected", () => {
+  const root = mkdtempSync("/tmp/opencode/family-artifacts-picker-");
+  try {
+    const artifacts = path.join(root, "artifacts");
+    const output = path.join(root, "output");
+    mkdirSync(artifacts);
+    mkdirSync(output);
+    writeFileSync(
+      path.join(root, "tsconfig.json"),
+      JSON.stringify({ compilerOptions: { paths: { "~/*": ["src/*"] } } })
+    );
+    writeFileSync(
+      path.join(root, "components.json"),
+      JSON.stringify({
+        aliases: { components: "~/widgets", ui: "~/primitives" },
+      })
+    );
+    for (const name of ["date-time-picker", "date-time-range-picker"]) {
+      writeFileSync(
+        path.join(artifacts, `${name}.json`),
+        JSON.stringify({
+          files: [
+            { path: `registry/new-york/${name}.tsx`, type: "registry:ui" },
+          ],
+          name,
+        })
+      );
+      const prepared = prepareFamilyArtifacts({
+        artifactDirectory: artifacts,
+        cwd: root,
+        name,
+        outputDirectory: output,
+      });
+      const [file] = JSON.parse(readFileSync(prepared, "utf-8")).files;
+      assert.equal(file.target, undefined, `${name} keeps the consumer alias`);
+    }
+    assert.throws(
+      () =>
+        prepareFamilyArtifacts({
+          artifactDirectory: artifacts,
+          cwd: root,
+          name: "date-time-utils",
+          outputDirectory: output,
+        }),
+      /Unsupported DateTime item/
+    );
+  } finally {
+    rmSync(root, { force: true, recursive: true });
+  }
+});

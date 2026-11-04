@@ -55,6 +55,7 @@ const ready = (async () => {
       "date-picker",
       "date-range-picker",
       "date-time-picker",
+      "date-time-range-picker",
       "input-phone",
     ].map((name) => jiti(`../registry/new-york/${name}.tsx`))
   );
@@ -177,6 +178,7 @@ for (const name of [
   "DatePicker",
   "DateRangePicker",
   "DateTimePicker",
+  "DateTimeRangePicker",
   "InputPhone",
 ]) {
   for (const layout of ["flex", "grid"]) {

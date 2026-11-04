@@ -65,3 +65,68 @@ test("isDateTimeRangeValid needs both ends and from not after to, same day inclu
   assert.equal(utils.isDateTimeRangeValid(morning), false);
   assert.equal(utils.isDateTimeRangeValid(undefined, noon), false);
 });
+
+test("defaultTimeValue gives start and end of day at each precision", () => {
+  assert.equal(utils.defaultTimeValue("start", "minute"), "00:00");
+  assert.equal(utils.defaultTimeValue("end", "minute"), "23:59");
+  assert.equal(utils.defaultTimeValue("start", "second"), "00:00:00");
+  assert.equal(utils.defaultTimeValue("end", "second"), "23:59:59");
+});
+
+test("resolveDateTimeRangeDraft treats one clicked day as a same-day range", () => {
+  const day = new Date(2026, 2, 5);
+  const same = utils.resolveDateTimeRangeDraft(
+    { from: day },
+    "09:00",
+    "17:30",
+    "minute"
+  );
+  assert.equal(same.start.getTime(), new Date(2026, 2, 5, 9, 0).getTime());
+  assert.equal(same.end.getTime(), new Date(2026, 2, 5, 17, 30).getTime());
+  assert.equal(same.orderInvalid, false);
+});
+
+test("resolveDateTimeRangeDraft flags an end before the start, even on one day", () => {
+  const day = new Date(2026, 2, 5);
+  const draft = utils.resolveDateTimeRangeDraft(
+    { from: day, to: day },
+    "17:00",
+    "09:00",
+    "minute"
+  );
+  assert.equal(draft.orderInvalid, true);
+});
+
+test("resolveDateTimeRangeDraft reports incomplete input without an order error", () => {
+  const day = new Date(2026, 2, 5);
+  const noDays = utils.resolveDateTimeRangeDraft(
+    undefined,
+    "09:00",
+    "10:00",
+    "minute"
+  );
+  assert.equal(noDays.start, undefined);
+  assert.equal(noDays.end, undefined);
+  assert.equal(noDays.orderInvalid, false);
+  const badTime = utils.resolveDateTimeRangeDraft(
+    { from: day },
+    "",
+    "10:00",
+    "minute"
+  );
+  assert.equal(badTime.startTimeInvalid, true);
+  assert.equal(badTime.endTimeInvalid, false);
+  assert.equal(badTime.start, undefined);
+  assert.equal(badTime.orderInvalid, false);
+});
+
+test("resolveDateTimeRangeDraft spans multiple days", () => {
+  const draft = utils.resolveDateTimeRangeDraft(
+    { from: new Date(2026, 2, 5), to: new Date(2026, 2, 7) },
+    "22:00",
+    "06:00",
+    "minute"
+  );
+  assert.equal(draft.orderInvalid, false);
+  assert.equal(draft.end.getTime(), new Date(2026, 2, 7, 6, 0).getTime());
+});

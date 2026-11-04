@@ -212,6 +212,7 @@ test("date picker props describe their restricted native API", () => {
     "date-picker",
     "date-range-picker",
     "date-time-picker",
+    "date-time-range-picker",
   ]) {
     const output = JSON.stringify(
       buildComponentDocSections({ component }, null)

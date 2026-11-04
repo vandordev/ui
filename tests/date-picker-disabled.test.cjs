@@ -5,6 +5,8 @@ const { createAutocompleteFixture } = require("./autocomplete-ui-fixture.cjs");
 for (const [name, module] of [
   ["DatePicker", "date-picker"],
   ["DateRangePicker", "date-range-picker"],
+  ["DateTimePicker", "date-time-picker"],
+  ["DateTimeRangePicker", "date-time-range-picker"],
 ]) {
   test(`${name} closes an open popup when disabled and blocks controlled opening`, async () => {
     const f = await createAutocompleteFixture();

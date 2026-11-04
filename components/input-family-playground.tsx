@@ -13,6 +13,7 @@ import { Calendar } from "@/registry/new-york/calendar";
 import { DatePicker } from "@/registry/new-york/date-picker";
 import { DateRangePicker } from "@/registry/new-york/date-range-picker";
 import { DateTimePicker } from "@/registry/new-york/date-time-picker";
+import { DateTimeRangePicker } from "@/registry/new-york/date-time-range-picker";
 import { Input } from "@/registry/new-york/input";
 import { InputAmount } from "@/registry/new-york/input-amount";
 import {
@@ -44,6 +45,24 @@ const DateTimePickerPreview = ({ values }: { values: Values }) => {
       placeholder={String(values.placeholder)}
       value={dateTime}
       onValueChange={setDateTime}
+      clearable={Boolean(values.clearable)}
+      dateFormat={String(values.dateFormat)}
+      precision={values.precision as "minute" | "second"}
+      disabled={Boolean(values.disabled)}
+      readOnly={Boolean(values.readOnly)}
+    />
+  );
+};
+
+const DateTimeRangePickerPreview = ({ values }: { values: Values }) => {
+  const [range, setRange] = React.useState<DateRange>();
+  return (
+    <DateTimeRangePicker
+      motion={Boolean(values.motion ?? true)}
+      label={String(values.label ?? "Maintenance window")}
+      placeholder={String(values.placeholder)}
+      value={range}
+      onValueChange={setRange}
       clearable={Boolean(values.clearable)}
       dateFormat={String(values.dateFormat)}
       precision={values.precision as "minute" | "second"}
@@ -378,6 +397,9 @@ const getHint = (component: string) => {
   if (component === "date-time-picker") {
     return "Choose a day and a time as a draft, then Apply. Cancel, Escape, and outside dismissal discard changes; Clear commits immediately.";
   }
+  if (component === "date-time-range-picker") {
+    return "Choose days and start/end times as a draft, then Apply. One clicked day is a same-day window; an end before the start blocks Apply.";
+  }
   if (component === "date-range-picker") {
     return "Choose dates as a draft, then Apply. Cancel, Escape, and outside dismissal discard changes.";
   }
@@ -398,7 +420,10 @@ const advancedComponents = new Set([
 const standalonePreviews: Record<
   string,
   (props: { values: Values }) => React.ReactNode
-> = { "date-time-picker": DateTimePickerPreview };
+> = {
+  "date-time-picker": DateTimePickerPreview,
+  "date-time-range-picker": DateTimeRangePickerPreview,
+};
 
 export const InputFamilyPlayground = ({ component }: { component: string }) => {
   const initialValues = getInputPlaygroundDefaults(component);

@@ -6,9 +6,6 @@ export interface TimeParts {
   seconds: number;
 }
 
-export const defaultStartTime = "00:00";
-export const defaultEndTime = "23:59";
-
 const pad = (value: number) => String(value).padStart(2, "0");
 
 const timePattern = /^(\d{2}):(\d{2})(?::(\d{2}))?$/;
@@ -81,3 +78,54 @@ export const isDateTimeRangeValid = (
   to: Date | undefined
 ): boolean =>
   from !== undefined && to !== undefined && from.getTime() <= to.getTime();
+
+/** Time shown before the user picks one: start of day, or the last moment for an end. */
+export const defaultTimeValue = (
+  kind: "start" | "end",
+  precision: DateTimePrecision
+): string => {
+  const base = kind === "start" ? "00:00" : "23:59";
+  if (precision === "minute") {
+    return base;
+  }
+  return kind === "start" ? `${base}:00` : `${base}:59`;
+};
+
+export interface DateTimeRangeDraft {
+  start?: Date;
+  end?: Date;
+  startTimeInvalid: boolean;
+  endTimeInvalid: boolean;
+  orderInvalid: boolean;
+}
+
+/**
+ * Resolves a range draft. A single clicked day is a same-day range, so a time window
+ * inside one day needs no second click. `orderInvalid` means both ends exist but the end
+ * is before the start.
+ */
+export const resolveDateTimeRangeDraft = (
+  days: { from?: Date; to?: Date } | undefined,
+  startTime: string,
+  endTime: string,
+  precision: DateTimePrecision
+): DateTimeRangeDraft => {
+  const startParts = parseTimeValue(startTime);
+  const endParts = parseTimeValue(endTime);
+  const lastDay = days?.to ?? days?.from;
+  const start =
+    days?.from && startParts
+      ? mergeDateAndTime(days.from, startParts, precision)
+      : undefined;
+  const end =
+    lastDay && endParts
+      ? mergeDateAndTime(lastDay, endParts, precision)
+      : undefined;
+  return {
+    end,
+    endTimeInvalid: endParts === undefined,
+    orderInvalid: Boolean(start && end && !isDateTimeRangeValid(start, end)),
+    start,
+    startTimeInvalid: startParts === undefined,
+  };
+};

@@ -67,7 +67,12 @@ const validateItemName = (itemName) => {
   if (!/^[a-z0-9-]+$/.test(itemName)) {
     throw new Error("Invalid local registry item name");
   }
-  if (itemName.startsWith("date-time-") && itemName !== "date-time-stories") {
+  // The pickers are ordinary registry:ui items, not part of the DateTime family.
+  if (
+    itemName.startsWith("date-time-") &&
+    itemName !== "date-time-stories" &&
+    !/^date-time-(range-)?picker(-stories)?$/.test(itemName)
+  ) {
     throw new Error("Unsupported DateTime item");
   }
 };

@@ -49,6 +49,9 @@ const playgrounds: Record<string, () => ReactNode> = {
   "date-time-picker": () => (
     <InputFamilyPlayground component="date-time-picker" />
   ),
+  "date-time-range-picker": () => (
+    <InputFamilyPlayground component="date-time-range-picker" />
+  ),
   dialog: DialogPlayground,
   drawer: DrawerPlayground,
   dropdown: DropdownPlayground,
