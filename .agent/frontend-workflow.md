@@ -110,7 +110,10 @@ with unsafe resource settings.
     document.activeElement === triggerRef.current,
     "Focus must return to the trigger"
   );
-  assert.ok(document.querySelector('[role="menu"]') === null, "Menu must unmount");
+  assert.ok(
+    document.querySelector('[role="menu"]') === null,
+    "Menu must unmount"
+  );
   ```
 
 - Assert small primitive snapshots for content/attributes/state instead. Do not

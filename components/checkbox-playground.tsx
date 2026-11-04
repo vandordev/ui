@@ -16,14 +16,14 @@ export const CheckboxPreview = ({
 }: {
   values: CheckboxPlaygroundValues;
 }) => (
-    <label className="flex items-center gap-3 text-sm">
-      <Checkbox
-        key={String(values.defaultChecked)}
-        {...getCheckboxPreviewProps(values)}
-      />
-      <span>{values.label}</span>
-    </label>
-  );
+  <label className="flex items-center gap-3 text-sm">
+    <Checkbox
+      key={String(values.defaultChecked)}
+      {...getCheckboxPreviewProps(values)}
+    />
+    <span>{values.label}</span>
+  </label>
+);
 
 export const CheckboxPlayground = () => (
   <ComponentPlayground

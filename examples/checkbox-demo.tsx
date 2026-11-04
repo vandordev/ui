@@ -4,8 +4,8 @@
 import { Checkbox } from "@/registry/new-york/checkbox";
 
 export const CheckboxDemo = () => (
-    <label className="flex items-center gap-3 text-sm">
-      <Checkbox defaultChecked />
-      Enable notifications
-    </label>
-  );
+  <label className="flex items-center gap-3 text-sm">
+    <Checkbox defaultChecked />
+    Enable notifications
+  </label>
+);

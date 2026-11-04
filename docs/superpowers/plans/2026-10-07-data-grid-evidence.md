@@ -61,15 +61,15 @@
 
 ## Batch gates
 
-| Batch | Status      | Evidence                                                                                    |
-| ----- | ----------- | ------------------------------------------------------------------------------------------- |
-| 1     | PASS        | Native declarations, positive/negative spike, tRPC factory, mounted Query/Table smoke       |
-| 2     | PASS        | Schema/column/pure-state/type checks; codec inverse policy approved and tested              |
-| 3     | PASS | 20 mounted controller cases and native strict consumer compilation |
-| 4     | PASS | 3 rendering + 5 real-control + 4 feedback cases; strict bindings/overrides; visual gate deferred |
+| Batch | Status      | Evidence                                                                                                  |
+| ----- | ----------- | --------------------------------------------------------------------------------------------------------- |
+| 1     | PASS        | Native declarations, positive/negative spike, tRPC factory, mounted Query/Table smoke                     |
+| 2     | PASS        | Schema/column/pure-state/type checks; codec inverse policy approved and tested                            |
+| 3     | PASS        | 20 mounted controller cases and native strict consumer compilation                                        |
+| 4     | PASS        | 3 rendering + 5 real-control + 4 feedback cases; strict bindings/overrides; visual gate deferred          |
 | 5     | IN PROGRESS | Examples, adapter/control parity, generated types, docs assembly, composed stories; remaining gates below |
-| 6     | NOT RUN     | Depends on Batch 5                                                                          |
-| 7     | NOT RUN     | Depends on Batch 6                                                                          |
+| 6     | NOT RUN     | Depends on Batch 5                                                                                        |
+| 7     | NOT RUN     | Depends on Batch 6                                                                                        |
 
 ## External gates
 

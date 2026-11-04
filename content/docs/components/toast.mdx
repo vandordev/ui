@@ -88,13 +88,20 @@ A thin countdown line sits at the bottom of the pill or body, inset from the cor
 
 The viewport supports `top-left`, `top-center`, `top-right`, `bottom-left`, `bottom-center`, and `bottom-right`. Right/left placement mirrors the stepped shoulder; bottom placement opens upward. The default top-right placement moves to top-center below the existing `sm` breakpoint. Oversized descriptions remain scrollable within the active body using touch, wheel or keyboard, without visible scrollbars or horizontal overflow.
 
-<ComponentPreview name="toast-stack-demo" title="toast-stack-demo.tsx"><ToastStackDemo /></ComponentPreview>
+<ComponentPreview name="toast-stack-demo" title="toast-stack-demo.tsx">
+  <ToastStackDemo />
+</ComponentPreview>
 
 ### Client-side navigation
 
 This link starts an operation and navigates while it is pending. The root provider remains mounted; the same toast resolves on the next page. This example uses Next.js Link; use your router's client-side link in other frameworks.
 
-<ComponentPreview name="toast-navigation-demo" title="toast-navigation-demo.tsx"><ToastNavigationDemo /></ComponentPreview>
+<ComponentPreview
+  name="toast-navigation-demo"
+  title="toast-navigation-demo.tsx"
+>
+  <ToastNavigationDemo />
+</ComponentPreview>
 
 ### Dialog and Drawer
 
@@ -102,7 +109,9 @@ The root provider portals notifications into Vandor's shared overlay host so the
 
 Create a notification before opening either modal, or trigger one inside. Both examples keep closed portals mounted to exercise inactive-host handling.
 
-<ComponentPreview name="toast-overlay-demo" title="toast-overlay-demo.tsx"><ToastOverlayDemo /></ComponentPreview>
+<ComponentPreview name="toast-overlay-demo" title="toast-overlay-demo.tsx">
+  <ToastOverlayDemo />
+</ComponentPreview>
 
 ### Optional TanStack Query v5 adapter
 
@@ -153,7 +162,9 @@ useQuery({
 
 The adapter subscribes to the existing QueryClient caches and does not replace application or per-operation callbacks. Mutation instances are tracked independently. Raw errors are never shown by default; provide an explicit safe message or mapper. Background refetches and unconfigured operations remain silent.
 
-<ComponentPreview name="toast-query-demo" title="toast-query-demo.tsx"><ToastQueryDemo /></ComponentPreview>
+<ComponentPreview name="toast-query-demo" title="toast-query-demo.tsx">
+  <ToastQueryDemo />
+</ComponentPreview>
 
 - Mutation retries keep one loading notification until the final result. Result/error mappers that throw use safe fallback text. Overlapping operations have different IDs. Dismissing loading is final; settlement does not recreate it.
 - The adapter does not override Toast durations. Loading has no countdown; its title-only success/error result defaults to 3 seconds, with the progress bar starting when presented. If you update that toast to include description/action, the core default is 4 seconds. Adapter metadata configures messages only, not duration overrides.

@@ -45,6 +45,10 @@ jobs:
       - name: Typecheck
         run: NODE_OPTIONS="--max-old-space-size=2048" timeout --signal=TERM --kill-after=5s 300s pnpm typecheck
 
+      # Test fixtures create their scratch directories under /tmp/opencode.
+      - name: Prepare scratch directory
+        run: mkdir -p /tmp/opencode
+
       - name: Autocomplete isolated consumer (network required)
         run: NODE_OPTIONS="--max-old-space-size=512" timeout --signal=TERM --kill-after=5s 1200s node tests/fixtures/autocomplete-consumer/verify.cjs
 

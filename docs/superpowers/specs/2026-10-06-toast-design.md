@@ -88,11 +88,11 @@ not automatically authorize an implementation plan, commit, or implementation.
 
 ## Duration and dismissal
 
-| Content/state | Default |
-| --- | --- |
-| Title only, including error | 3 seconds |
-| Description or action, including error | 4 seconds |
-| Loading | Persistent until resolved or explicitly dismissed |
+| Content/state                          | Default                                           |
+| -------------------------------------- | ------------------------------------------------- |
+| Title only, including error            | 3 seconds                                         |
+| Description or action, including error | 4 seconds                                         |
+| Loading                                | Persistent until resolved or explicitly dismissed |
 
 - Only loading is persistent by default; explicit `duration: 0` remains supported.
 - A 2px inset countdown line follows the pill/body bottom, pauses with the timer,

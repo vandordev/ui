@@ -10,14 +10,14 @@
 
 ## Batch and task status
 
-| Batch | Tasks | State | Evidence / blockers |
-|---|---|---|---|
-| 1 | 1–3 | LOCAL CHECKS PASS / HISTORY OPEN | Shell/Dropdown, tooltip, full-bleed/page teaching surfaces and public negative types verified; complete T2 test-before-integration history unavailable. |
-| 2 | 4–6 | LOCAL CHECKS PASS / HISTORY OPEN | Naming/forms, whole-group notch focus, real overlays, code/Reset/stories/consumer checks pass; T4 initial RED history unavailable. |
-| 3 | 7–9 | LOCAL CHECKS PASS / HISTORY OPEN | Counts 0–17, runtime/reduced motion, real StatsCard/password Reset, translated generated JSX, locale and token pass; T7/T8 initial RED history unavailable. |
-| 4 | 10–12 | LOCAL CHECKS PASS / HISTORY OPEN | Strict parser/Intl, hydration/ref, real Reset, discovery/stories and family/artifact compilation pass; T10/T11 initial chronology incomplete, real installed Next boundary blocked. |
-| 5 | 13–15 | LOCAL CHECKS PASS / HISTORY OPEN | Shared controller, both adapters, renderer, source lifecycle demo/story, old/new exports and types verified; pre-extraction inventory/RED chronology unavailable. |
-| 6 | 16 | BLOCKED / PARTIAL | Fresh full suite 509/509, typecheck, scoped lint/format, registry and complete artifact parity pass; production build OOM, visual and independent CLI/Next gates remain blocked. |
+| Batch | Tasks | State                            | Evidence / blockers                                                                                                                                                                 |
+| ----- | ----- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | 1–3   | LOCAL CHECKS PASS / HISTORY OPEN | Shell/Dropdown, tooltip, full-bleed/page teaching surfaces and public negative types verified; complete T2 test-before-integration history unavailable.                             |
+| 2     | 4–6   | LOCAL CHECKS PASS / HISTORY OPEN | Naming/forms, whole-group notch focus, real overlays, code/Reset/stories/consumer checks pass; T4 initial RED history unavailable.                                                  |
+| 3     | 7–9   | LOCAL CHECKS PASS / HISTORY OPEN | Counts 0–17, runtime/reduced motion, real StatsCard/password Reset, translated generated JSX, locale and token pass; T7/T8 initial RED history unavailable.                         |
+| 4     | 10–12 | LOCAL CHECKS PASS / HISTORY OPEN | Strict parser/Intl, hydration/ref, real Reset, discovery/stories and family/artifact compilation pass; T10/T11 initial chronology incomplete, real installed Next boundary blocked. |
+| 5     | 13–15 | LOCAL CHECKS PASS / HISTORY OPEN | Shared controller, both adapters, renderer, source lifecycle demo/story, old/new exports and types verified; pre-extraction inventory/RED chronology unavailable.                   |
+| 6     | 16    | BLOCKED / PARTIAL                | Fresh full suite 509/509, typecheck, scoped lint/format, registry and complete artifact parity pass; production build OOM, visual and independent CLI/Next gates remain blocked.    |
 
 ## Requirements and gates
 
@@ -29,8 +29,8 @@
 
 ## Change and verification ledger
 
-| When | Change/check | Result | Invalidations |
-|---|---|---|---|
+| When       | Change/check                                                                                                                                                                                                                                                                                                                                    | Result                                                                                                                                                                                                                                                                                                                        | Invalidations                                                                                                                                                                                              |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-10-28 | Changed PageContainer to `p-4 sm:p-6 lg:p-12`; removed AppShell main padding; added `showHeader=true`, localized shell labels, custom-control `ReactElement` TooltipTrigger composition, optional integrated user footer with `sidebarFooter` precedence; registered helper/Dropdown closure; added headerless/user stories and migration docs. | `pnpm typecheck` PASS; bounded `pnpm registry:build` PASS; `node --test --test-concurrency=1 tests/app-shell.test.cjs tests/page-container.test.cjs` PASS (13/13). Focused new user-footer test PASS. One intermediate AppShell artifact assertion failed against stale `public/r`; rebuilt artifacts and reran successfully. | T2 promise/link/cancellation/mobile selection lifecycle remains unverified. Custom-link hover/focus/ref behavior and responsive visual behavior remain pending. Browser and real CLI gates remain pending. |
 
 ## Current limitations
@@ -89,15 +89,15 @@
 
 ### Requirement evidence and remaining acceptance
 
-| Requirement | Current evidence | Still required |
-|---|---|---|
-| R1–R3 | Full shell/PageContainer/Dropdown lifecycle and link/overlay tests; native types; AppShell installed-artifact/story compilation | Full demo/spacing/tooltip publication audit; actual desktop/mobile/theme/safe-area browser checks; core CLI closure |
-| R4 | Pure strict vectors, actual hydration/ref/native props, DateTime artifact parity and installed-artifact snippets | True playground Reset/control coverage audit; real installed Next boundary and three-layout CLI/checksum matrix; browser Intl |
-| R5–R6 | Select naming/ref/form regressions, quote-safe code parity, complete Autocomplete suite and real Drawer/Dialog selection | Remaining label/chip/focus scenario audit and typed generated combinations; browser notch geometry/paint/overlays; CLI helper placement |
-| R7 | Exhaustive 0–17 balanced-row invariants, runtime/reduced-motion tests, 1–7 playground code and stories | Browser row/separator widths and final teaching-surface audit |
-| R8 | Native Query suite, five provider-free source tests including real renderer/Retry, positive/negative types, source demo/story | Source example refresh/error controls and complete shared contract/publication audit; real installed source matrix/browser |
-| R9 | Translated password behavior/playground props, upstream Indonesian locale identity/display, declared Button theme token | Dedicated translated-code/Reset evidence, actual light/dark contrast and installed token check |
-| R10 | Generated parity, complete suite/docs/gallery/story tests, CI matrix/Next steps added | Lint/format fixes, full spec/diff review, protected production build, real CLI and browser acceptance |
+| Requirement | Current evidence                                                                                                                | Still required                                                                                                                          |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| R1–R3       | Full shell/PageContainer/Dropdown lifecycle and link/overlay tests; native types; AppShell installed-artifact/story compilation | Full demo/spacing/tooltip publication audit; actual desktop/mobile/theme/safe-area browser checks; core CLI closure                     |
+| R4          | Pure strict vectors, actual hydration/ref/native props, DateTime artifact parity and installed-artifact snippets                | True playground Reset/control coverage audit; real installed Next boundary and three-layout CLI/checksum matrix; browser Intl           |
+| R5–R6       | Select naming/ref/form regressions, quote-safe code parity, complete Autocomplete suite and real Drawer/Dialog selection        | Remaining label/chip/focus scenario audit and typed generated combinations; browser notch geometry/paint/overlays; CLI helper placement |
+| R7          | Exhaustive 0–17 balanced-row invariants, runtime/reduced-motion tests, 1–7 playground code and stories                          | Browser row/separator widths and final teaching-surface audit                                                                           |
+| R8          | Native Query suite, five provider-free source tests including real renderer/Retry, positive/negative types, source demo/story   | Source example refresh/error controls and complete shared contract/publication audit; real installed source matrix/browser              |
+| R9          | Translated password behavior/playground props, upstream Indonesian locale identity/display, declared Button theme token         | Dedicated translated-code/Reset evidence, actual light/dark contrast and installed token check                                          |
+| R10         | Generated parity, complete suite/docs/gallery/story tests, CI matrix/Next steps added                                           | Lint/format fixes, full spec/diff review, protected production build, real CLI and browser acceptance                                   |
 
 ### Resume boundaries
 
@@ -160,15 +160,15 @@ session/subagent/worktree, branch switch, commit, merge or push was created.
 
 ### Findings and verification corrections
 
-| ID | Finding | Disposition / evidence |
-|---|---|---|
-| L-01 | Authored/inherited lint in modified scopes | CLOSED locally: direct Oxlint final JSON has zero diagnostics, 81 code files, 453 rules, one thread. No blanket baseline exemptions. HEAD-copy comparison was diagnostic only. |
-| L-02 | Empty explicit DateTime timezone ignored | CLOSED: actual RED reproduced then GREEN; full 509-test run covers the repair. |
-| L-03 | Stories docs required stock nested-family CLI | CLOSED: DataGrid instructions and executable docs assertion now require family wrapper. Initial integrated run was 508/509; corrected assertion then fresh full runs passed 509/509. |
-| L-04 | Explicit grid index omitted old controller type | CLOSED: type restored, consumer import rewrite updated, native + installed-artifact strict compilation and full suite pass. Runtime export inventory test also passes. |
-| L-05 | API metadata described only Query adapter | CLOSED: shared descriptions plus typed source/ownership entry; existing actual playground/code/Reset tests pass without adding an inert adapter control. |
-| L-06 | Async rejection test stopped awaiting microtasks | CLOSED: synchronous act caused React warnings, restored async act with an explicit microtask await; final full run has no act warnings. |
-| L-07 | Expanded tooltip test assumed disabled Trigger loses its slot | TEST CORRECTED: public Trigger remains mounted but disabled; assert actual absence of tooltip popup after focus/hover instead. No production workaround; focused and complete shell tests pass. |
+| ID   | Finding                                                             | Disposition / evidence                                                                                                                                                                                                                                                                                              |
+| ---- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| L-01 | Authored/inherited lint in modified scopes                          | CLOSED locally: direct Oxlint final JSON has zero diagnostics, 81 code files, 453 rules, one thread. No blanket baseline exemptions. HEAD-copy comparison was diagnostic only.                                                                                                                                      |
+| L-02 | Empty explicit DateTime timezone ignored                            | CLOSED: actual RED reproduced then GREEN; full 509-test run covers the repair.                                                                                                                                                                                                                                      |
+| L-03 | Stories docs required stock nested-family CLI                       | CLOSED: DataGrid instructions and executable docs assertion now require family wrapper. Initial integrated run was 508/509; corrected assertion then fresh full runs passed 509/509.                                                                                                                                |
+| L-04 | Explicit grid index omitted old controller type                     | CLOSED: type restored, consumer import rewrite updated, native + installed-artifact strict compilation and full suite pass. Runtime export inventory test also passes.                                                                                                                                              |
+| L-05 | API metadata described only Query adapter                           | CLOSED: shared descriptions plus typed source/ownership entry; existing actual playground/code/Reset tests pass without adding an inert adapter control.                                                                                                                                                            |
+| L-06 | Async rejection test stopped awaiting microtasks                    | CLOSED: synchronous act caused React warnings, restored async act with an explicit microtask await; final full run has no act warnings.                                                                                                                                                                             |
+| L-07 | Expanded tooltip test assumed disabled Trigger loses its slot       | TEST CORRECTED: public Trigger remains mounted but disabled; assert actual absence of tooltip popup after focus/hover instead. No production workaround; focused and complete shell tests pass.                                                                                                                     |
 | H-01 | Original RED-before-implementation and ordering evidence incomplete | OPEN process evidence: T2 complete preintegration set; T4 initial label RED; T7/T8 original RED; T10 original parser RED; T11 failing preparation and before-story sequence; T13 pre-extraction inventory/RED. Current tests pass, but history cannot be recreated and these composite checkboxes remain unchecked. |
 
 ### Fresh checks on the reconciled tree
