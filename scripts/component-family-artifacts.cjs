@@ -104,6 +104,8 @@ const prepareFamilyArtifacts = ({
     // The CLI combines dependency strings literally. Avoid duplicate unversioned
     // and versioned foundation packages in a closure (pnpm can mis-pair specs).
     const foundationVersions = {
+      "@base-ui/react": "@base-ui/react@^1.8.0",
+      "class-variance-authority": "class-variance-authority@^0.7.1",
       cn: "cn@^0.4.0",
       "lucide-react": "lucide-react@1.11.0",
       motion: "motion@^12.38.0",

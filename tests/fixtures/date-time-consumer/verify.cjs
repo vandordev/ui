@@ -62,6 +62,9 @@ try {
     path.join(root, "app/layout.tsx"),
     'import "./globals.css"; import type { ReactNode } from "react"; export default function Layout({ children }: { children: ReactNode }) { return <html lang="en"><body>{children}</body></html>; }'
   );
+  // The fixture runs tsc without Next's generated next-env.d.ts; TypeScript 6
+  // checks side-effect imports, so declare stylesheets.
+  writeFileSync(path.join(root, "app/css.d.ts"), 'declare module "*.css";\n');
   writeFileSync(
     path.join(root, "app/page.tsx"),
     'import { DateTime, formatDate } from "@/shared/date-time"; export default function Page() { return <main><DateTime value="2026-10-24T08:00:00Z" timeZone="Asia/Jakarta" data-testid="instant" /><p>{formatDate(0, { timeZone: "UTC" })}</p></main>; }'
