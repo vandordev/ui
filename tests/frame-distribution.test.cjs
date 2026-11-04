@@ -15,7 +15,7 @@ const { createJiti } = require("jiti");
 const manifest = require("../registry.json");
 
 const project = process.cwd();
-const run = (cwd, executable, args) =>
+const run = (cwd, executable, args, { offline = true } = {}) =>
   spawnSync(
     "timeout",
     [
@@ -34,7 +34,7 @@ const run = (cwd, executable, args) =>
         CI: "true",
         NODE_OPTIONS: "--max-old-space-size=512",
         UV_THREADPOOL_SIZE: "1",
-        npm_config_offline: "true",
+        npm_config_offline: String(offline),
       },
       maxBuffer: 16_000,
       timeout: 95_000,
@@ -109,12 +109,12 @@ test("Frame artifacts install through shadcn into a divergent alias and stories 
     );
     const cli = path.join(project, "node_modules/shadcn/dist/index.js");
     success(
-      run(directory, cli, [
-        "add",
-        path.join(project, "public/r/frame.json"),
-        "--yes",
-        "--silent",
-      ])
+      run(
+        directory,
+        cli,
+        ["add", path.join(project, "public/r/frame.json"), "--yes", "--silent"],
+        { offline: false }
+      )
     );
     const installed = path.join(directory, "src/widgets/controls/frame.tsx");
     const source = readFileSync(installed, "utf-8");
@@ -122,12 +122,17 @@ test("Frame artifacts install through shadcn into a divergent alias and stories 
     const customized = `${source}\n// Consumer customization must survive stories installation.\n`;
     writeFileSync(installed, customized);
     success(
-      run(directory, cli, [
-        "add",
-        path.join(project, "public/r/frame-stories.json"),
-        "--yes",
-        "--silent",
-      ])
+      run(
+        directory,
+        cli,
+        [
+          "add",
+          path.join(project, "public/r/frame-stories.json"),
+          "--yes",
+          "--silent",
+        ],
+        { offline: false }
+      )
     );
     assert.equal(readFileSync(installed, "utf-8"), customized);
     assert.equal(
