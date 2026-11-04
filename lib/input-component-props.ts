@@ -250,6 +250,112 @@ export const inputComponentProps: Record<
       "DatePicker: controlled selected local calendar day."
     ),
   },
+  "date-time-picker": {
+    motion: p(
+      "boolean",
+      "true",
+      "Enables popup, calendar, and button motion; system reduced-motion takes priority.",
+      boolean("Motion", true)
+    ),
+    applyLabel: p("string", '"Apply"', "DateTimePicker: apply button text."),
+    cancelLabel: p("string", '"Cancel"', "DateTimePicker: cancel button text."),
+    className: p("string", "undefined", "DateTimePicker: trigger class name."),
+    clearLabel: p("string", '"Clear"', "DateTimePicker: clear button text."),
+    clearable: p(
+      "boolean",
+      "false",
+      "DateTimePicker: shows a Clear action that commits an empty value immediately.",
+      boolean("Clearable")
+    ),
+    dateFormat: p(
+      "string",
+      '"PPP p"',
+      "DateTimePicker: date-fns display format for the trigger. Use a 24-hour token such as HH:mm to match a 24-hour time field.",
+      text("Date format", "PPP p")
+    ),
+    defaultOpen: p(
+      "boolean",
+      "false",
+      "DateTimePicker: initial uncontrolled popover visibility."
+    ),
+    defaultValue: p(
+      "Date | undefined",
+      "undefined",
+      "DateTimePicker: initial uncontrolled date and local time."
+    ),
+    disabled: p(
+      "boolean",
+      "false",
+      "DateTimePicker: disables opening the trigger and closes an open popup.",
+      boolean("Disabled")
+    ),
+    disabledDates: p(
+      "Matcher | Matcher[]",
+      "undefined",
+      "DateTimePicker: calendar days that cannot be selected. Time is not constrained."
+    ),
+    endMonth: p("Date", "undefined", "DateTimePicker: latest navigable month."),
+    id: p(
+      "string",
+      "generated",
+      "DateTimePicker: optional stable id for the label relationship."
+    ),
+    label: p(
+      "string",
+      "required",
+      "DateTimePicker: visible accessible name.",
+      text("Label", "Starts at")
+    ),
+    locale: p(
+      "date-fns Locale",
+      "undefined",
+      "DateTimePicker: display and calendar locale."
+    ),
+    onOpenChange: p(
+      "(open: boolean) => void",
+      "undefined",
+      "DateTimePicker: observes popover visibility changes."
+    ),
+    onValueChange: p(
+      "(date: Date | undefined) => void",
+      "undefined",
+      "DateTimePicker: fires on Apply with the chosen day and time, or on Clear with undefined. Never fires while editing the draft."
+    ),
+    open: p(
+      "boolean",
+      "uncontrolled",
+      "DateTimePicker: controlled popover visibility."
+    ),
+    placeholder: p(
+      "string",
+      '"Select date and time"',
+      "DateTimePicker: trigger text when empty.",
+      text("Placeholder", "Select date and time")
+    ),
+    precision: p(
+      '"minute" | "second"',
+      '"minute"',
+      "DateTimePicker: time granularity. Emitted dates always have zero milliseconds, and zero seconds at minute precision.",
+      select("Precision", "minute", ["minute", "second"])
+    ),
+    readOnly: p(
+      "boolean",
+      "false",
+      "DateTimePicker: opens the popup but prevents changes.",
+      boolean("Read only")
+    ),
+    startMonth: p(
+      "Date",
+      "undefined",
+      "DateTimePicker: earliest navigable month."
+    ),
+    timeLabel: p("string", '"Time"', "DateTimePicker: time field label."),
+    value: p(
+      "Date | undefined",
+      "uncontrolled",
+      "DateTimePicker: controlled date and local time."
+    ),
+  },
   "date-range-picker": {
     motion: p(
       "boolean",
@@ -1027,6 +1133,11 @@ export const getInputPlaygroundCode = (
       code: `const [date, setDate] = useState<Date>();\n\n<DatePicker\n    label={${stringLiteral(String(values.label ?? "Appointment date"))}}\n    value={date}\n    onValueChange={setDate}\n${propsBlock(values, ["placeholder", "dateFormat", "clearable", "disabled", "readOnly", "motion"])}\n/>`,
       imports:
         'import { useState } from "react";\nimport { DatePicker } from "@/components/ui/date-picker";',
+    },
+    "date-time-picker": {
+      code: `const [date, setDate] = useState<Date>();\n\n<DateTimePicker\n    label={${stringLiteral(String(values.label ?? "Starts at"))}}\n    value={date}\n    onValueChange={setDate}\n${propsBlock(values, ["placeholder", "dateFormat", "precision", "clearable", "disabled", "readOnly", "motion"])}\n/>`,
+      imports:
+        'import { useState } from "react";\nimport { DateTimePicker } from "@/components/ui/date-time-picker";',
     },
     "date-range-picker": {
       code: `const [range, setRange] = useState<DateRange>();\n\n<DateRangePicker\n    label={${stringLiteral(String(values.label ?? "Reporting period"))}}\n    value={range}\n    onValueChange={setRange}\n${propsBlock(values, ["placeholder", "dateFormat", "clearable", "disabled", "readOnly", "motion"])}\n    weekStartsOn={${Number(values.weekStartsOn ?? 1)}}\n    features={${JSON.stringify(resolveRangeFeatures(values.features))}}\n/>`,

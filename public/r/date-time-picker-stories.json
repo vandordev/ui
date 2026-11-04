@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-time-picker-stories",
+  "title": "Date Time Picker Stories",
+  "description": "Portable stories for an already installed DateTimePicker.",
+  "files": [
+    {
+      "path": "registry/new-york/date-time-picker.stories.tsx",
+      "content": "/* eslint-disable sort-keys */\nimport type { Meta, StoryObj } from \"@storybook/react\";\nimport { id } from \"date-fns/locale\";\nimport { useState } from \"react\";\n\nimport { DateTimePicker } from \"./date-time-picker\";\n\nconst meta = {\n  argTypes: {\n    clearable: { control: \"boolean\" },\n    dateFormat: { control: \"text\" },\n    defaultValue: { control: false },\n    disabled: { control: \"boolean\" },\n    disabledDates: { control: false },\n    label: { control: \"text\" },\n    locale: { control: false },\n    motion: { control: \"boolean\" },\n    onOpenChange: { control: false },\n    onValueChange: { control: false },\n    open: { control: false },\n    placeholder: { control: \"text\" },\n    precision: { control: \"inline-radio\", options: [\"minute\", \"second\"] },\n    readOnly: { control: \"boolean\" },\n    value: { control: false },\n  },\n  args: {\n    clearable: true,\n    dateFormat: \"PPP p\",\n    disabled: false,\n    label: \"Starts at\",\n    motion: true,\n    placeholder: \"Select date and time\",\n    precision: \"minute\",\n    readOnly: false,\n  },\n  component: DateTimePicker,\n  parameters: { layout: \"centered\" },\n  tags: [\"autodocs\"],\n  title: \"Vandor UI/DateTimePicker\",\n} satisfies Meta<typeof DateTimePicker>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\nexport const Playground: Story = {};\nexport const Populated: Story = {\n  args: { defaultValue: new Date(2026, 9, 5, 14, 30) },\n};\nexport const WithSeconds: Story = {\n  args: {\n    ...Populated.args,\n    dateFormat: \"PPP pp\",\n    precision: \"second\",\n  },\n};\nexport const TwentyFourHour: Story = {\n  args: { ...Populated.args, dateFormat: \"PPP HH:mm\" },\n};\nexport const ReadOnly: Story = { args: { ...Populated.args, readOnly: true } };\nexport const Disabled: Story = { args: { disabled: true } };\nexport const Indonesian: Story = {\n  args: { ...Populated.args, dateFormat: \"PPP HH:mm\", locale: id },\n};\nexport const WithoutMotion: Story = { args: { motion: false } };\nexport const Controlled: Story = {\n  render: function ControlledPicker(args) {\n    const [date, setDate] = useState<Date>();\n    return <DateTimePicker {...args} value={date} onValueChange={setDate} />;\n  },\n};\n",
+      "type": "registry:ui"
+    }
+  ],
+  "type": "registry:item"
+}

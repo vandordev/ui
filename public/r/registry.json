@@ -1467,6 +1467,45 @@
       ]
     },
     {
+      "name": "date-time-picker",
+      "type": "registry:ui",
+      "title": "Date Time Picker",
+      "description": "A transactional date and time picker with a calendar and a native time field.",
+      "registryDependencies": [
+        "https://vandor-ui.vercel.app/r/button.json",
+        "https://vandor-ui.vercel.app/r/calendar.json",
+        "https://vandor-ui.vercel.app/r/popover.json"
+      ],
+      "dependencies": [
+        "cn@^0.4.0",
+        "date-fns@^4.4.0",
+        "lucide-react@1.11.0",
+        "react-day-picker@^10.0.2"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/date-time-picker.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/new-york/date-time-picker-utils.ts",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "date-time-picker-stories",
+      "type": "registry:item",
+      "title": "Date Time Picker Stories",
+      "description": "Portable stories for an already installed DateTimePicker.",
+      "files": [
+        {
+          "path": "registry/new-york/date-time-picker.stories.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
       "name": "date-time",
       "type": "registry:component",
       "title": "DateTime",

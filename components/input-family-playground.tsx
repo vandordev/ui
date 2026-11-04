@@ -12,6 +12,7 @@ import {
 import { Calendar } from "@/registry/new-york/calendar";
 import { DatePicker } from "@/registry/new-york/date-picker";
 import { DateRangePicker } from "@/registry/new-york/date-range-picker";
+import { DateTimePicker } from "@/registry/new-york/date-time-picker";
 import { Input } from "@/registry/new-york/input";
 import { InputAmount } from "@/registry/new-york/input-amount";
 import {
@@ -33,6 +34,24 @@ import {
 import { TextArea } from "@/registry/new-york/textarea";
 
 type Values = Record<string, string | boolean | number>;
+
+const DateTimePickerPreview = ({ values }: { values: Values }) => {
+  const [dateTime, setDateTime] = React.useState<Date>();
+  return (
+    <DateTimePicker
+      motion={Boolean(values.motion ?? true)}
+      label={String(values.label ?? "Starts at")}
+      placeholder={String(values.placeholder)}
+      value={dateTime}
+      onValueChange={setDateTime}
+      clearable={Boolean(values.clearable)}
+      dateFormat={String(values.dateFormat)}
+      precision={values.precision as "minute" | "second"}
+      disabled={Boolean(values.disabled)}
+      readOnly={Boolean(values.readOnly)}
+    />
+  );
+};
 
 const BasicInputPreview = ({
   component,
@@ -356,6 +375,9 @@ const getHint = (component: string) => {
   if (component === "input-secret") {
     return "This preview uses a fake value. Clipboard feedback is announced without repeating the secret.";
   }
+  if (component === "date-time-picker") {
+    return "Choose a day and a time as a draft, then Apply. Cancel, Escape, and outside dismissal discard changes; Clear commits immediately.";
+  }
   if (component === "date-range-picker") {
     return "Choose dates as a draft, then Apply. Cancel, Escape, and outside dismissal discard changes.";
   }
@@ -372,6 +394,12 @@ const advancedComponents = new Set([
   "popover",
 ]);
 
+// Previews that own their state live outside the shared switch to keep it small.
+const standalonePreviews: Record<
+  string,
+  (props: { values: Values }) => React.ReactNode
+> = { "date-time-picker": DateTimePickerPreview };
+
 export const InputFamilyPlayground = ({ component }: { component: string }) => {
   const initialValues = getInputPlaygroundDefaults(component);
   return (
@@ -381,13 +409,17 @@ export const InputFamilyPlayground = ({ component }: { component: string }) => {
       initialValues={initialValues}
       getCode={(values) => getInputPlaygroundCode(component, values)}
       hint={getHint(component)}
-      renderPreview={(values) =>
-        advancedComponents.has(component) ? (
+      renderPreview={(values) => {
+        const Standalone = standalonePreviews[component];
+        if (Standalone) {
+          return <Standalone values={values} />;
+        }
+        return advancedComponents.has(component) ? (
           <AdvancedInputPreview component={component} values={values} />
         ) : (
           <BasicInputPreview component={component} values={values} />
-        )
-      }
+        );
+      }}
     />
   );
 };

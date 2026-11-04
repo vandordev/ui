@@ -208,7 +208,11 @@ test("processed installation guidance discloses registry dependencies and suppor
 
 test("date picker props describe their restricted native API", () => {
   const { buildComponentDocSections } = jiti("../lib/component-docs.ts");
-  for (const component of ["date-picker", "date-range-picker"]) {
+  for (const component of [
+    "date-picker",
+    "date-range-picker",
+    "date-time-picker",
+  ]) {
     const output = JSON.stringify(
       buildComponentDocSections({ component }, null)
     );

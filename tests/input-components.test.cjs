@@ -785,6 +785,7 @@ test("input family playground offers a typed preview contract for every registry
     "calendar",
     "date-picker",
     "date-range-picker",
+    "date-time-picker",
     "popover",
   ];
   assert.deepEqual(
